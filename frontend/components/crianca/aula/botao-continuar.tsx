@@ -20,7 +20,7 @@ export function BotaoContinuar({
   return (
     <BotaoGrande
       rotulo={rotulo}
-      cor="grama"
+      cor="sucesso"
       tamanho={88}
       destaque={destaque}
       onClick={onClick}

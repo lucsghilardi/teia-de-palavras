@@ -10,14 +10,14 @@ use Database\Seeders\ConteudoInicialSeeder;
 beforeEach(fn () => semearConteudo());
 
 it('semeia as 10 missões: Fase 1 publicada e Fase 2 em rascunho', function () {
-    expect(Aula::count())->toBe(10)
-        ->and(Aula::where('fase', 1)->publicadas()->pluck('palavra_geradora')->all())
+    expect(Aula::daDisciplina('portugues')->count())->toBe(10)
+        ->and(Aula::daDisciplina('portugues')->where('fase', 1)->publicadas()->ordenadas()->pluck('palavra_geradora')->all())
         ->toBe(['TEIA', 'BONECA', 'PULO', 'MOLA', 'SALVA'])
         ->and(Aula::where('fase', 2)->where('status', 'rascunho')->count())->toBe(5);
 });
 
 it('encadeia cada missão à anterior', function () {
-    $aulas = Aula::query()->ordenadas()->get();
+    $aulas = Aula::query()->daDisciplina('portugues')->ordenadas()->get();
 
     expect($aulas->first()->pre_requisito_aula_id)->toBeNull();
 
@@ -53,9 +53,11 @@ it('usa só personagens originais nos textos (sem marcas de terceiros)', functio
     expect($textos)->toContain('{{heroi}}')->toContain('{{fabrica}}');
 });
 
-it('semeia 12 avatares e 9 figuras secretas', function () {
-    expect(OpcaoVisual::avatares()->count())->toBe(12)
-        ->and(OpcaoVisual::figuras()->count())->toBe(9);
+it('oferece 12 avatares espaciais e 9 figuras secretas, todos com ícone e cor', function () {
+    expect(OpcaoVisual::avatares()->ativas()->count())->toBe(12)
+        ->and(OpcaoVisual::avatares()->where('ativa', false)->count())->toBe(12)
+        ->and(OpcaoVisual::figuras()->ativas()->count())->toBe(9)
+        ->and(OpcaoVisual::whereNull('icone')->orWhereNull('cor')->count())->toBe(0);
 });
 
 it('rodar o seed de novo não duplica nem sobrescreve edição do CMS', function () {
@@ -63,6 +65,6 @@ it('rodar o seed de novo não duplica nem sobrescreve edição do CMS', function
 
     $this->seed(ConteudoInicialSeeder::class);
 
-    expect(Aula::count())->toBe(10)
+    expect(Aula::daDisciplina('portugues')->count())->toBe(10)
         ->and(aulaDaPalavra('TEIA')->titulo)->toBe('Título editado');
 });

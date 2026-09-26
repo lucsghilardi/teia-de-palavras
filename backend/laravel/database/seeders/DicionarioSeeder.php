@@ -21,6 +21,9 @@ class DicionarioSeeder extends Seeder
         'MOTO', 'NAVE', 'NOVE', 'NUCA', 'OVO', 'PAPAI', 'PANELA', 'PATO', 'PELO', 'PENA',
         'PETECA', 'PIANO', 'PICOLÉ', 'PULA', 'SAPO', 'SAPATO', 'SELO', 'SINO', 'SOPA', 'SUCO',
         'TAPETE', 'TATU', 'TOMATE', 'TUBO', 'UVA', 'VACA', 'VELA', 'VIOLA', 'VOVÓ', 'VOVÔ',
+        // Universo da nave Teia.
+        'ANTENA', 'BASE', 'CABO', 'CABINE', 'COMETA', 'ESTRELA', 'FOGUETE', 'LUNETA', 'MOTOR', 'PILOTO',
+        'PLANETA', 'RADAR', 'ROBÔ', 'SATÉLITE', 'TELA', 'TURBINA',
     ];
 
     public function run(): void

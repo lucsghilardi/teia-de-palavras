@@ -18,7 +18,8 @@ class MidiaAulaRequest extends FormRequest
         $tipo = AulaMidiaService::tipoDoAlvo((string) $this->input('alvo'));
         $precisaId = str_starts_with((string) $this->input('alvo'), 'pagina_')
             || str_starts_with((string) $this->input('alvo'), 'pergunta_')
-            || str_starts_with((string) $this->input('alvo'), 'palavra_dicionario_');
+            || str_starts_with((string) $this->input('alvo'), 'palavra_dicionario_')
+            || str_starts_with((string) $this->input('alvo'), 'atividade_');
 
         $regras = [
             'alvo' => ['required', 'string', Rule::in(array_keys(AulaMidiaService::ALVOS))],

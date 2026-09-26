@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Hourglass, Lock, Users } from "lucide-react";
 
 import { BarraTopo } from "@/components/crianca/comum/barra-topo";
 import type { MotivoTrava } from "@/components/crianca/entrada/figura-secreta";
@@ -28,14 +28,14 @@ export function PedirAdulto({
       <BarraTopo instrucao={mensagem} />
 
       <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4 pb-10 text-center">
-        <div aria-hidden className="flex items-end gap-2 text-8xl sm:text-9xl">
-          <span>{motivo === "adulto" ? "🔒" : "⏳"}</span>
-          <span>🧑‍🏫</span>
+        <div aria-hidden className="flex items-end gap-4 text-[var(--c-alerta)]">
+          {motivo === "adulto" ? <Lock className="size-24 sm:size-28" strokeWidth={1.75} /> : <Hourglass className="size-24 sm:size-28" strokeWidth={1.75} />}
+          <Users className="size-24 text-[var(--c-tinta-suave)] sm:size-28" strokeWidth={1.75} />
         </div>
 
         <h1 className="max-w-xl text-3xl font-black leading-tight sm:text-4xl">{exibir(mensagem)}</h1>
 
-        <BotaoGrande rotulo="Voltar" cor="ceu" redondo={false} tamanho={80} onClick={onVoltar} className="px-8">
+        <BotaoGrande rotulo="Voltar" cor="primaria" redondo={false} tamanho={80} onClick={onVoltar} className="px-8">
           <ArrowLeft className="size-9" aria-hidden />
           {exibir("Voltar")}
         </BotaoGrande>

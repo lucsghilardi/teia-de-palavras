@@ -19,7 +19,7 @@ function novaCrianca(array $extra = []): array
     return [
         'turma_id' => test()->turma->id,
         'apelido' => 'Gugu',
-        'avatar_chave' => 'tigre',
+        'avatar_chave' => 'robo',
         'figura_secreta_chave' => 'foguete',
         'usa_minusculas' => false,
         'consentimento' => ['aceito' => true, 'versao_texto' => 'v1'],
@@ -57,7 +57,8 @@ it('mostra a turma com as crianças', function () {
         ->assertOk()
         ->assertJsonPath('total_criancas', 1)
         ->assertJsonPath('criancas.0.apelido', 'Bia')
-        ->assertJsonPath('criancas.0.avatar.emoji', '🦊');
+        ->assertJsonPath('criancas.0.avatar.chave', 'nave')
+        ->assertJsonPath('criancas.0.avatar.icone', 'rocket');
 });
 
 it('não apaga turma com crianças', function () {
@@ -71,7 +72,7 @@ it('cadastra criança com consentimento registrado, sem expor a figura secreta',
         ->postJson('/api/painel/criancas', novaCrianca(), ['REMOTE_ADDR' => '10.1.2.3'])
         ->assertCreated()
         ->assertJsonPath('apelido', 'Gugu')
-        ->assertJsonPath('avatar.chave', 'tigre')
+        ->assertJsonPath('avatar.chave', 'robo')
         ->assertJsonPath('turma.id', $this->turma->id)
         ->assertJsonPath('responsavel.id', $this->educador->id)
         ->assertJsonPath('consentimento.versao_texto', 'v1')

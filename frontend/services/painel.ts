@@ -11,12 +11,20 @@ import type {
 } from "@/types/Aula";
 import type { Configuracoes } from "@/types/Configuracoes";
 import type {
+  AceitarAmizadePayload,
+  Amizade,
+  AmizadesResposta,
+  MiniAulaPainel,
+  StatusMiniAula,
+} from "@/types/MiniAula";
+import type {
   CreateCriancaPayload,
   Crianca,
   ListCriancasParams,
   UpdateCriancaPayload,
 } from "@/types/Crianca";
 import type { OpcoesVisuais } from "@/types/OpcaoVisual";
+import type { Progresso } from "@/types/Progresso";
 import type {
   CreatePalavraPayload,
   ImportarDicionarioResponse,
@@ -142,8 +150,8 @@ export function deleteCrianca(id: number) {
 
 // ===== Aulas (CMS) =====
 
-export function listAulas() {
-  return apiFetch<AulaResumo[]>("/painel/aulas");
+export function listAulas(disciplina?: string) {
+  return apiFetch<AulaResumo[]>(disciplina ? `/painel/aulas?disciplina=${encodeURIComponent(disciplina)}` : "/painel/aulas");
 }
 
 export function getAula(id: number) {
@@ -272,4 +280,56 @@ export function updateConfiguracoes(data: Configuracoes) {
     method: "PUT",
     body: jsonBody(data),
   });
+}
+
+// ===== Mini-aulas (fila para o adulto ouvir e aprovar) =====
+
+export function listMiniAulas(status: StatusMiniAula = "pendente") {
+  return apiFetch<MiniAulaPainel[]>(withQuery("/painel/mini-aulas", { status }));
+}
+
+export function aprovarMiniAula(id: number) {
+  return apiFetch<MiniAulaPainel>(`/painel/mini-aulas/${id}/aprovar`, { method: "POST" });
+}
+
+export function recusarMiniAula(id: number, motivo: string | null) {
+  return apiFetch<MiniAulaPainel>(`/painel/mini-aulas/${id}/recusar`, {
+    method: "POST",
+    body: jsonBody({ motivo }),
+  });
+}
+
+/** URL que o `<audio>` do painel usa (passa pelo proxy, que injeta o Bearer). */
+export function urlAudioMiniAula(miniAula: MiniAulaPainel) {
+  return miniAula.audio_url ? `/api/proxy${miniAula.audio_url}` : null;
+}
+
+// ===== Amizades entre turmas =====
+
+export function listAmizades() {
+  return apiFetch<AmizadesResposta>("/painel/amizades");
+}
+
+export function gerarConviteAmizade(turmaId: number) {
+  return apiFetch<Amizade>("/painel/amizades", {
+    method: "POST",
+    body: jsonBody({ turma_id: turmaId }),
+  });
+}
+
+export function aceitarAmizade(data: AceitarAmizadePayload) {
+  return apiFetch<Amizade>("/painel/amizades/aceitar", {
+    method: "POST",
+    body: jsonBody(data),
+  });
+}
+
+export function encerrarAmizade(id: number) {
+  return apiFetch<Amizade>(`/painel/amizades/${id}`, { method: "DELETE" });
+}
+
+// ===== Progresso de uma criança =====
+
+export function getProgresso(criancaId: number) {
+  return apiFetch<Progresso>(`/painel/progresso/${criancaId}`);
 }

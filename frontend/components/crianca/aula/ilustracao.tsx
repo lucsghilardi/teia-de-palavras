@@ -2,20 +2,22 @@
 
 import { useState } from "react";
 
+import { Icone } from "@/components/crianca/ui/icone";
 import { cn } from "@/lib/utils";
 
 /**
- * Figura da aula (imagem do CMS) ou, sem imagem, um desenho amigável:
- * emoji grande sobre um degradê. Imagem quebrada também cai no desenho.
+ * Figura da aula (imagem do CMS) ou, sem imagem, um desenho do tema: ícone
+ * grande sobre um céu noturno. Imagem quebrada também cai no desenho.
  */
 export function Ilustracao({
   src,
-  emoji,
+  icone,
   alt = "",
   className,
 }: {
   src: string | null | undefined;
-  emoji: string;
+  /** Nome de ícone do lucide (lib/icones.ts) para a reserva. */
+  icone: string;
   alt?: string;
   className?: string;
 }) {
@@ -29,7 +31,7 @@ export function Ilustracao({
         alt={alt}
         draggable={false}
         onError={() => setFalhou(true)}
-        className={cn("h-full w-full select-none rounded-[2rem] bg-white object-contain", className)}
+        className={cn("h-full w-full select-none rounded-[2rem] bg-[var(--c-superficie)] object-contain", className)}
       />
     );
   }
@@ -41,13 +43,11 @@ export function Ilustracao({
       aria-hidden={alt ? undefined : true}
       className={cn(
         "flex h-full w-full select-none items-center justify-center overflow-hidden rounded-[2rem]",
-        "bg-linear-to-br from-[#FFE29A] via-[#FFC7E0] to-[#B9A8FF]",
+        "bg-linear-to-br from-[#312e81] via-[var(--c-superficie-2)] to-[var(--c-superficie)] ring-2 ring-[var(--c-borda)]",
         className,
       )}
     >
-      <span aria-hidden className="text-[clamp(3.5rem,16vmin,9rem)] leading-none drop-shadow-[0_6px_0_rgba(0,0,0,0.08)]">
-        {emoji}
-      </span>
+      <Icone nome={icone} aria-hidden className="size-[clamp(4rem,18vmin,10rem)] text-[var(--c-primaria)] drop-shadow-[0_0_24px_rgba(34,211,238,0.45)]" strokeWidth={1.5} />
     </div>
   );
 }

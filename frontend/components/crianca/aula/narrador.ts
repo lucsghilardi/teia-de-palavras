@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { useNarracaoAutomatica } from "@/hooks/use-falar-ao-chegar";
 import { falar } from "@/lib/fala";
 import type { Conquista } from "@/types/CriancaApp";
 
@@ -69,6 +70,7 @@ export function useNarracaoDeChegada(
   instrucao: Trecho,
   definirInstrucao: (t: Trecho) => void,
 ): boolean {
+  const automatica = useNarracaoAutomatica();
   const [narrada, setNarrada] = useState<string | number | null>(null);
 
   useEffect(() => {
@@ -76,7 +78,8 @@ export function useNarracaoDeChegada(
 
     definirInstrucao(instrucao);
 
-    void narrar(fala).then(() => {
+    // Narração desligada: a instrução fica no alto-falante e a tela já está "pronta".
+    void (automatica ? narrar(fala) : Promise.resolve(true)).then(() => {
       if (ativo) setNarrada(chave);
     });
 

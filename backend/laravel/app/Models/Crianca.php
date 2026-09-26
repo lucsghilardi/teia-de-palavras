@@ -31,6 +31,7 @@ class Crianca extends Authenticatable implements JWTSubject
         'avatar_chave',
         'figura_secreta_hash',
         'usa_minusculas',
+        'narracao_automatica',
         'tentativas_login_falhas',
         'bloqueada_ate',
         'exclusao_solicitada_em',
@@ -44,6 +45,7 @@ class Crianca extends Authenticatable implements JWTSubject
     {
         return [
             'usa_minusculas' => 'boolean',
+            'narracao_automatica' => 'boolean',
             'bloqueada_ate' => 'datetime',
             'exclusao_solicitada_em' => 'datetime',
         ];

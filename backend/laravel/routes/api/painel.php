@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\Api\Painel\AmizadeController;
 use App\Http\Controllers\Api\Painel\AulaController;
 use App\Http\Controllers\Api\Painel\ConfiguracaoController;
 use App\Http\Controllers\Api\Painel\CriancaController;
 use App\Http\Controllers\Api\Painel\DicionarioController;
+use App\Http\Controllers\Api\Painel\MiniAulaController;
 use App\Http\Controllers\Api\Painel\OpcaoVisualController;
+use App\Http\Controllers\Api\Painel\ProgressoController;
 use App\Http\Controllers\Api\Painel\TurmaController;
 use App\Http\Controllers\Api\Painel\UserController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +39,18 @@ Route::middleware(['auth:api', 'panel.active', 'role:admin,educador'])->prefix('
     Route::post('/dicionario/importar', [DicionarioController::class, 'importar']);
     Route::put('/dicionario/{palavra}', [DicionarioController::class, 'update'])->whereNumber('palavra');
     Route::delete('/dicionario/{palavra}', [DicionarioController::class, 'destroy'])->whereNumber('palavra');
+
+    Route::get('/amizades', [AmizadeController::class, 'index']);
+    Route::post('/amizades', [AmizadeController::class, 'store']);
+    Route::post('/amizades/aceitar', [AmizadeController::class, 'aceitar']);
+    Route::delete('/amizades/{amizade}', [AmizadeController::class, 'destroy'])->whereNumber('amizade');
+
+    Route::get('/mini-aulas', [MiniAulaController::class, 'index']);
+    Route::post('/mini-aulas/{miniAula}/aprovar', [MiniAulaController::class, 'aprovar'])->whereNumber('miniAula');
+    Route::post('/mini-aulas/{miniAula}/recusar', [MiniAulaController::class, 'recusar'])->whereNumber('miniAula');
+    Route::get('/mini-aulas/{miniAula}/audio', [MiniAulaController::class, 'audio'])->whereNumber('miniAula');
+
+    Route::get('/progresso/{crianca}', ProgressoController::class)->whereNumber('crianca');
 
     Route::get('/configuracoes', [ConfiguracaoController::class, 'show']);
     Route::put('/configuracoes', [ConfiguracaoController::class, 'update']);

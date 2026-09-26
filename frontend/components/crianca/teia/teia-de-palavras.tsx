@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft, Network, RefreshCw, Rocket, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -10,7 +10,8 @@ import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { corDaPeca } from "@/components/crianca/ui/peca";
 import { useCrianca } from "@/context/CriancaContext";
 import { useFalarAoChegar } from "@/hooks/use-falar-ao-chegar";
-import { exibir } from "@/lib/exibir";
+import { COPY } from "@/lib/copy";
+import { exibirPalavra } from "@/lib/exibir";
 import { falar } from "@/lib/fala";
 import { sons } from "@/lib/sons";
 import { cn } from "@/lib/utils";
@@ -36,7 +37,7 @@ function DesenhoTeia({ largura, altura, fios, aneis }: { largura: number; altura
       viewBox={`0 0 ${largura} ${altura}`}
       preserveAspectRatio="xMidYMid meet"
     >
-      <g fill="none" stroke="#B9A8E8" strokeLinecap="round" strokeLinejoin="round">
+      <g fill="none" stroke="var(--c-portugues)" strokeLinecap="round" strokeLinejoin="round">
         {fios.map((d, i) => (
           <path key={`f${i}`} d={d} strokeWidth={2} />
         ))}
@@ -83,7 +84,7 @@ function FichaPalavra({
           "transition-transform duration-100 active:translate-y-1 active:shadow-none",
           "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)] touch-manipulation",
           corDaPeca(item.palavra),
-          nova && "ring-4 ring-white shadow-[0_0_20px_6px_rgba(255,201,60,0.85)]",
+          nova && "ring-4 ring-[var(--c-tinta)] shadow-[0_0_20px_6px_rgba(250,204,21,0.7)]",
         )}
       >
         {item.imagem_url ? (
@@ -95,15 +96,11 @@ function FichaPalavra({
             draggable={false}
             loading="lazy"
             decoding="async"
-            className="size-9 rounded-lg bg-white/70 object-contain"
+            className="size-9 rounded-lg bg-[var(--c-superficie)]/70 object-contain"
           />
         ) : null}
-        <span className="whitespace-nowrap leading-none">{exibir(item.palavra, minusculas)}</span>
-        {nova ? (
-          <span aria-hidden className="absolute -top-3 -right-3 text-xl leading-none">
-            ✨
-          </span>
-        ) : null}
+        <span className="whitespace-nowrap leading-none">{exibirPalavra(item.palavra, minusculas)}</span>
+        {nova ? <Sparkles aria-hidden className="absolute -top-3 -right-3 size-6 fill-[var(--c-alerta)] text-[var(--c-alerta)]" /> : null}
       </button>
     </li>
   );
@@ -156,7 +153,7 @@ export function TeiaDePalavras() {
     return () => observador.disconnect();
   }, []);
 
-  const minusculas = crianca?.usa_minusculas ?? false;
+  const minusculas = crianca?.usa_minusculas ?? true;
   const palavras = useMemo(() => (estado.tipo === "pronto" ? estado.teia.palavras : []), [estado]);
   const total = estado.tipo === "pronto" ? estado.teia.total : (crianca?.teia_total ?? 0);
   const comImagem = palavras.some((p) => p.imagem_url);
@@ -182,26 +179,24 @@ export function TeiaDePalavras() {
   const vazia = estado.tipo === "pronto" && palavras.length === 0;
 
   return (
-    <main className="flex min-h-dvh flex-col bg-[radial-gradient(circle_at_50%_40%,#F4EEFF_0%,var(--c-fundo)_70%)]">
+    <main className="flex min-h-dvh flex-col">
       <BarraTopo instrucao={instrucao ?? "Esta é a sua Teia de Palavras!"}>
-        <BotaoGrande rotulo="Voltar para o mapa" cor="branco" tamanho={72} onClick={() => router.push("/app")}>
+        <BotaoGrande rotulo={COPY.planeta.voltar} cor="neutra" tamanho={72} onClick={() => router.push("/app")}>
           <ArrowLeft className="size-9" aria-hidden />
         </BotaoGrande>
-        <h1 className="sr-only">Minha Teia de Palavras</h1>
-        <span aria-hidden className="text-5xl">
-          🕸️
-        </span>
+        <h1 className="flex items-center gap-2 text-2xl font-black sm:text-3xl">
+          <Network aria-hidden className="size-8 text-[var(--c-portugues)]" strokeWidth={2.5} />
+          Minha Teia
+        </h1>
       </BarraTopo>
 
       <div className="flex flex-1 flex-col items-center gap-6 px-4 pt-2 pb-8 sm:px-6">
         {estado.tipo === "erro" ? (
           <div className="flex min-h-[50dvh] flex-col items-center justify-center gap-6">
-            <span aria-hidden className="text-8xl">
-              🕸️
-            </span>
+            <Network aria-hidden className="size-24 text-[var(--c-borda)]" />
             <BotaoGrande
               rotulo="Tentar de novo"
-              cor="ceu"
+              cor="primaria"
               tamanho={96}
               onClick={() => {
                 setEstado({ tipo: "carregando" });
@@ -228,17 +223,15 @@ export function TeiaDePalavras() {
                   <BotaoGrande
                     rotulo={`${textoTotal(total)} na teia`}
                     falaAoTocar={total === 0 ? FALA_VAZIA : `Você já descobriu ${textoTotal(total)}!`}
-                    cor="branco"
+                    cor="neutra"
                     tamanho={80}
                     disabled={estado.tipo === "carregando"}
                     className={cn(
-                      "size-20 flex-col gap-0 border-4 border-[#B9A8E8] px-0 text-xl tabular-nums leading-none disabled:opacity-100",
+                      "size-20 flex-col gap-0 border-4 border-[var(--c-portugues)] px-0 text-xl tabular-nums leading-none disabled:opacity-100",
                       estado.tipo === "carregando" && "animate-crianca-pulso",
                     )}
                   >
-                    <span aria-hidden className="text-3xl">
-                      🕷️
-                    </span>
+                    <Network aria-hidden className="size-7 text-[var(--c-portugues)]" strokeWidth={2.5} />
                     {estado.tipo === "pronto" ? <span aria-hidden>{total}</span> : null}
                   </BotaoGrande>
                 </div>
@@ -272,17 +265,16 @@ export function TeiaDePalavras() {
 
         {vazia ? (
           <BotaoGrande
-            rotulo="Ir para o mapa"
+            rotulo="Ir para o planeta Português"
             falaAoTocar="Vamos descobrir palavras!"
-            cor="grama"
+            cor="sucesso"
             redondo={false}
             tamanho={88}
             destaque
-            className="px-8 text-4xl"
-            onClick={() => router.push("/app")}
+            className="px-8"
+            onClick={() => router.push("/app/planeta/portugues")}
           >
-            <span aria-hidden>🗺️</span>
-            <span aria-hidden>▶</span>
+            <Rocket className="size-10" aria-hidden />
           </BotaoGrande>
         ) : null}
       </div>

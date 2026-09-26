@@ -16,9 +16,10 @@ class CriancaFactory extends Factory
             'turma_id' => Turma::factory(),
             'responsavel_user_id' => fn (array $atributos) => Turma::find($atributos['turma_id'])->educador_user_id,
             'apelido' => ucfirst(fake()->unique()->firstName()),
-            'avatar_chave' => 'raposa',
+            'avatar_chave' => 'nave',
             'figura_secreta_hash' => Hash::make('estrela'),
-            'usa_minusculas' => false,
+            'usa_minusculas' => true,
+            'narracao_automatica' => true,
         ];
     }
 }

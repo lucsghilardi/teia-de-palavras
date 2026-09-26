@@ -3,12 +3,14 @@
 namespace App\Services\Aulas;
 
 use App\Models\Aula;
+use App\Models\AulaAtividade;
 use App\Models\Configuracao;
 use App\Models\Crianca;
 use App\Models\CriancaAula;
 use App\Models\Silaba;
 use App\Models\TeiaPalavra;
 use App\Models\TurmaSessao;
+use App\Services\Atividades\ContextoAtividade;
 use App\Services\Audio\ResolverAudio;
 use App\Services\Palavras\FamiliasService;
 use App\Support\Midia;
@@ -16,9 +18,11 @@ use App\Support\Texto;
 use Illuminate\Support\Collection;
 
 /**
- * Monta a aula como o app da criança precisa (docs/api-crianca.md, AulaCrianca):
- * textos com o nome do herói/fábrica, áudio já resolvido, peças acumuladas
- * para a criação e metas marcadas como encontradas.
+ * Monta a missão como o app da criança precisa (docs/api-crianca.md,
+ * AulaCrianca): a sequência `atividades[]` montada pelo avaliador de cada
+ * tipo (sem respostas). Os recursos de Português (história, peças
+ * acumuladas, metas marcadas como encontradas, Teia) vão para as atividades
+ * legadas pelo contexto; nada deles fica solto no topo do payload.
  */
 class MontadorAulaCrianca
 {
@@ -65,37 +69,80 @@ class MontadorAulaCrianca
      */
     private function conteudo(Aula $aula, ResolverAudio $audio, Collection $acumuladas, ?Crianca $crianca, string $status, int $etapa): array
     {
-        $aula->loadMissing(['silabas.silaba', 'silabas.familia.silaba', 'historiaPaginas', 'perguntas', 'palavras']);
+        $aula->loadMissing(['silabas.silaba', 'silabas.familia.silaba', 'historiaPaginas', 'perguntas', 'palavras', 'atividades']);
 
+        $recursos = $this->recursos($aula, $audio, $acumuladas, $crianca);
+        $total = $aula->atividades->count();
+        // Missão que mudou no CMS depois de começada: nunca aponta além da conquista.
+        $etapa = max(1, min($etapa, $total + 1));
+
+        $atividades = $aula->atividades->map(function (AulaAtividade $atividade) use ($aula, $audio, $recursos, $crianca) {
+            $contexto = new ContextoAtividade(
+                $crianca,
+                $aula,
+                $audio,
+                $recursos,
+                ContextoAtividade::semente($crianca, $aula, $atividade->ordem),
+            );
+
+            return [
+                'ordem' => $atividade->ordem,
+                'tipo' => $atividade->tipo,
+                'titulo' => $atividade->titulo,
+                'instrucao' => $atividade->instrucao,
+                'imagem_url' => Midia::url($atividade->imagem_path),
+                'avaliada' => $atividade->ehAvaliada(),
+                ...$atividade->avaliador()->montar($atividade, $contexto),
+            ];
+        })->values();
+
+        return [
+            'id' => $aula->id,
+            'titulo' => $aula->titulo,
+            'descricao' => $aula->descricao,
+            'disciplina' => $aula->disciplina,
+            'rotulo' => $aula->rotuloExibido(),
+            'fase' => $aula->fase,
+            'palavra_geradora' => $aula->palavra_geradora,
+            'palavra_imagem_url' => $recursos['palavra_imagem_url'],
+            'palavra_audio_url' => $recursos['palavra_audio_url'],
+            'status' => $status,
+            'etapa_atual' => $etapa,
+            'total_atividades' => $total,
+            'atividades' => $atividades,
+        ];
+    }
+
+    /**
+     * Recursos de Português compartilhados pelas atividades legadas.
+     *
+     * @param  Collection<int, Silaba>  $acumuladas
+     * @return array<string, mixed>
+     */
+    private function recursos(Aula $aula, ResolverAudio $audio, Collection $acumuladas, ?Crianca $crianca): array
+    {
         $naTeia = $crianca
             ? TeiaPalavra::where('crianca_id', $crianca->id)->pluck('palavra_normalizada')->flip()
             : collect();
         $falada = fn (Silaba $s) => ['texto' => $s->texto, 'audio_url' => $audio->silaba($s)];
 
         return [
-            'id' => $aula->id,
-            'titulo' => $aula->titulo,
-            'fase' => $aula->fase,
-            'palavra_geradora' => $aula->palavra_geradora,
             'palavra_imagem_url' => Midia::url($aula->palavra_imagem_path),
-            'palavra_audio_url' => $audio->palavra($aula->palavra_geradora, $aula->palavra_audio_path),
-            'status' => $status,
-            'etapa_atual' => $etapa,
-            'etapas' => array_values(Aula::ETAPAS),
+            'palavra_audio_url' => $aula->palavra_geradora ? $audio->palavra($aula->palavra_geradora, $aula->palavra_audio_path) : null,
             'historia' => $aula->historiaPaginas->map(fn ($p) => [
                 'texto' => Configuracao::aplicarPlaceholders($p->texto),
                 'imagem_url' => Midia::url($p->imagem_path),
                 'audio_url' => Midia::url($p->audio_path),
-            ])->values(),
+            ])->values()->all(),
             'perguntas' => $aula->perguntas->map(fn ($q) => [
                 'texto' => Configuracao::aplicarPlaceholders($q->texto),
                 'audio_url' => Midia::url($q->audio_path),
-            ])->values(),
-            'palmas' => $aula->silabas->map(fn ($s) => $falada($s->silaba))->values(),
+            ])->values()->all(),
+            'palmas' => $aula->silabas->map(fn ($s) => $falada($s->silaba))->values()->all(),
             'ficha' => $aula->silabas->map(fn ($s) => [
                 'silaba' => $s->silaba->texto,
-                'membros' => $s->familia->map(fn ($f) => $falada($f->silaba))->values(),
-            ])->values(),
+                'membros' => $s->familia->map(fn ($f) => $falada($f->silaba))->values()->all(),
+            ])->values()->all(),
             'pecas' => $this->pecas($aula, $acumuladas, $falada),
             'metas' => $aula->palavras->map(fn ($p) => [
                 'palavra' => $p->palavra,
@@ -103,7 +150,7 @@ class MontadorAulaCrianca
                 'imagem_url' => Midia::url($p->imagem_path),
                 'audio_url' => $audio->palavra($p->palavra, $p->audio_path),
                 'encontrada' => $naTeia->has($p->palavra_normalizada),
-            ])->values(),
+            ])->values()->all(),
             'teia' => $crianca
                 ? TeiaPalavra::where('crianca_id', $crianca->id)
                     ->latest('descoberta_em')
@@ -111,6 +158,7 @@ class MontadorAulaCrianca
                     ->get(['palavra_exibida'])
                     ->map(fn ($t) => ['palavra' => $t->palavra_exibida, 'audio_url' => $audio->palavra($t->palavra_exibida)])
                     ->values()
+                    ->all()
                 : [],
             'palavrinhas' => config('teia.palavrinhas'),
         ];

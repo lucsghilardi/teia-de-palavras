@@ -3,12 +3,24 @@
 import { ApiError, UnauthorizedError, type ApiErrorBody } from "./apiError";
 import type {
   AulaCrianca,
+  EntregaAberta,
+  EntregaMiniAula,
   Eu,
+  Galaxia,
+  Medalhas,
+  MiniAulaCriada,
+  MiniAulasRecebidas,
+  MinhaMiniAula,
   Missao,
+  ModelosMiniAula,
   Pulso,
+  Reacao,
   ResultadoConclusao,
   ResultadoProducao,
+  ResultadoResposta,
+  ResultadoRevisao,
   ResultadoTentativa,
+  Revisao,
   Teia,
   TurmaEntrada,
 } from "@/types/CriancaApp";
@@ -41,7 +53,8 @@ export async function criancaFetch<T>(caminho: string, opcoes: RequestInit = {})
   const headers = new Headers(opcoes.headers ?? {});
   headers.set("Accept", "application/json");
 
-  if (opcoes.body && !headers.has("Content-Type")) {
+  // FormData (áudio gravado) define o próprio Content-Type, com o boundary.
+  if (opcoes.body && !(opcoes.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
 
@@ -85,8 +98,18 @@ export async function sair() {
 
 export const buscarEu = () => criancaFetch<Eu>("/eu");
 export const pulso = () => post<Pulso>("/sessao/pulso");
-export const buscarMapa = () => criancaFetch<{ missoes: Missao[] }>("/mapa");
+export const buscarGalaxia = () => criancaFetch<Galaxia>("/galaxia");
+export const buscarMapa = (disciplina?: string) =>
+  criancaFetch<{ missoes: Missao[] }>(disciplina ? `/mapa?disciplina=${encodeURIComponent(disciplina)}` : "/mapa");
 export const buscarTeia = () => criancaFetch<Teia>("/teia");
+export const buscarMedalhas = () => criancaFetch<Medalhas>("/medalhas");
+
+// ---------- Revisão espaçada ----------
+
+export const buscarRevisao = () => criancaFetch<Revisao>("/revisao");
+
+export const responderRevisao = (item: number, resposta: Record<string, unknown>) =>
+  post<ResultadoRevisao>(`/revisao/${item}/responder`, resposta);
 
 // ---------- Aula ----------
 
@@ -103,3 +126,24 @@ export const enviarProducao = (id: number, palavras: string[]) =>
   post<ResultadoProducao>(`/aulas/${id}/producao`, { palavras });
 
 export const concluirAula = (id: number) => post<ResultadoConclusao>(`/aulas/${id}/concluir`);
+
+/** Resposta genérica a uma atividade avaliada (o corpo depende do tipo; ver docs/atividades.md). */
+export const responderAtividade = (id: number, ordem: number, resposta: Record<string, unknown>) =>
+  post<ResultadoResposta>(`/aulas/${id}/atividades/${ordem}/responder`, resposta);
+
+// ---------- Base dos amigos (mini-aulas) ----------
+
+export const buscarModelosMiniAula = (aulaId: number, semente = 0) =>
+  criancaFetch<ModelosMiniAula>(`/mini-aulas/modelos?aula_id=${aulaId}&semente=${semente}`);
+
+/** Multipart: aula_id, modelo, semente, duracao_ms e o arquivo `audio`. */
+export const enviarMiniAula = (dados: FormData) => criancaFetch<MiniAulaCriada>("/mini-aulas", { method: "POST", body: dados });
+
+export const buscarMinhasMiniAulas = () => criancaFetch<{ mini_aulas: MinhaMiniAula[] }>("/mini-aulas/minhas");
+export const buscarMiniAulasRecebidas = () => criancaFetch<MiniAulasRecebidas>("/mini-aulas/recebidas");
+export const buscarEntrega = (id: number) => criancaFetch<EntregaAberta>(`/mini-aulas/entregas/${id}`);
+
+export const responderEntrega = (id: number, resposta: Record<string, unknown>) =>
+  post<ResultadoResposta>(`/mini-aulas/entregas/${id}/responder`, resposta);
+
+export const reagirEntrega = (id: number, reacao: Reacao) => post<EntregaMiniAula>(`/mini-aulas/entregas/${id}/reagir`, { reacao });

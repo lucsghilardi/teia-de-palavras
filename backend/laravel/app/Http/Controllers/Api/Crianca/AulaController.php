@@ -73,7 +73,9 @@ class AulaController extends Controller
             return $this->trancada();
         }
 
-        if ($etapa < 1 || $etapa >= count(Aula::ETAPAS)) {
+        $total = $aula->totalAtividades();
+
+        if ($etapa < 1 || $etapa > $total) {
             return response()->json(['message' => 'Essa etapa não existe.'], 422);
         }
 
@@ -89,7 +91,8 @@ class AulaController extends Controller
             $linha->update(['etapa_atual' => $etapa + 1]);
         }
 
-        $this->sessoes->registrar($crianca, 'etapa_concluida', $aula, $etapa, ['etapa' => Aula::ETAPAS[$etapa]]);
+        $tipo = $aula->atividades()->where('ordem', $etapa)->value('tipo');
+        $this->sessoes->registrar($crianca, 'etapa_concluida', $aula, $etapa, ['etapa' => $tipo]);
 
         return response()->json(['etapa_atual' => $linha->etapa_atual]);
     }
@@ -140,16 +143,17 @@ class AulaController extends Controller
         }
 
         $jaConcluida = $linha->status === CriancaAula::CONCLUIDA;
+        $conquista = $aula->totalAtividades() + 1;
 
-        if (! $jaConcluida && $linha->etapa_atual < count(Aula::ETAPAS)) {
+        if (! $jaConcluida && $linha->etapa_atual < $conquista) {
             return response()->json(['message' => 'Ainda falta um pouquinho para terminar a missão!'], 422);
         }
 
         $desbloqueadas = $this->desbloqueio->concluir($crianca, $aula);
-        $stats = $this->gamificacao->darEstrelas($crianca, $jaConcluida ? 0 : (int) config('teia.estrelas.missao'));
+        $stats = $this->gamificacao->darXp($crianca, $jaConcluida ? 0 : (int) config('teia.xp.missao'));
 
         if (! $jaConcluida) {
-            $this->sessoes->registrar($crianca, 'aula_concluida', $aula, 8);
+            $this->sessoes->registrar($crianca, 'aula_concluida', $aula, $conquista);
         }
 
         $audio = ResolverAudio::para($crianca);
@@ -160,7 +164,7 @@ class AulaController extends Controller
                 'titulo' => $a->titulo,
                 'palavra_geradora' => $a->palavra_geradora,
             ])->values(),
-            'estrelas' => (int) $stats->xp_total,
+            'xp_total' => (int) $stats->xp_total,
             'conquistas' => $this->gamificacao->avaliarConquistas($crianca),
             'palavras_da_missao' => TeiaPalavra::where('crianca_id', $crianca->id)
                 ->where('aula_id', $aula->id)
@@ -188,17 +192,7 @@ class AulaController extends Controller
     /** Linha de progresso; inicia a aula se ela estiver aberta e ainda não começou. */
     private function progresso(Crianca $crianca, Aula $aula): ?CriancaAula
     {
-        $linha = CriancaAula::where('crianca_id', $crianca->id)->where('aula_id', $aula->id)->first();
-
-        if ($linha !== null) {
-            return $linha;
-        }
-
-        try {
-            return $this->desbloqueio->iniciar($crianca, $aula);
-        } catch (DomainException) {
-            return null;
-        }
+        return $this->desbloqueio->progressoOuIniciar($crianca, $aula);
     }
 
     private function trancada(): JsonResponse

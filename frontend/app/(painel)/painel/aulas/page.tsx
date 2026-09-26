@@ -72,6 +72,7 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { mensagemDeErro } from "@/lib/api-errors";
+import { DISCIPLINAS, infoDisciplina, ordemDaDisciplina } from "@/lib/disciplinas";
 import { appToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import {
@@ -83,6 +84,7 @@ import {
   reordenarAulas,
 } from "@/services/painel";
 import type { Aula, AulaResumo } from "@/types/Aula";
+import type { Disciplina } from "@/types/CriancaApp";
 
 const FASES_PADRAO = [1, 2];
 
@@ -92,7 +94,14 @@ const DESCRICAO_FASE: Record<number, string> = {
 };
 
 function ordenarAulas(aulas: AulaResumo[]) {
-  return [...aulas].sort((a, b) => a.fase - b.fase || a.ordem - b.ordem);
+  return [...aulas].sort(
+    (a, b) => ordemDaDisciplina(a.disciplina) - ordemDaDisciplina(b.disciplina) || a.fase - b.fase || a.ordem - b.ordem,
+  );
+}
+
+/** Nome curto da missão nos avisos e rótulos (palavra geradora em Português). */
+function nomeCurto(aula: AulaResumo) {
+  return aula.disciplina === "portugues" ? aula.rotulo.toLocaleUpperCase("pt-BR") : aula.rotulo;
 }
 
 /** Atualiza o resumo da lista com o que voltou de publicar/despublicar. */
@@ -103,6 +112,10 @@ function resumoAtualizado(resumo: AulaResumo, aula: Aula): AulaResumo {
     status: aula.status,
     fase: aula.fase,
     ordem: aula.ordem,
+    disciplina: aula.disciplina,
+    rotulo: aula.rotulo ?? aula.palavra_geradora ?? aula.titulo,
+    descricao: aula.descricao,
+    habilidade_bncc: aula.habilidade_bncc,
     palavra_geradora: aula.palavra_geradora,
     palavra_imagem_url: aula.palavra_imagem_url,
     pre_requisito_aula_id: aula.pre_requisito_aula_id,
@@ -116,12 +129,18 @@ const instrucoesLeitor: ScreenReaderInstructions = {
 };
 
 function anunciosLeitor(aulas: AulaResumo[]): Announcements {
-  const nome = (id: string | number) =>
-    aulas.find((aula) => aula.id === Number(id))?.palavra_geradora ?? "aula";
+  const nome = (id: string | number) => {
+    const aula = aulas.find((item) => item.id === Number(id));
+    return aula ? nomeCurto(aula) : "aula";
+  };
   const posicao = (id: string | number) => {
     const aula = aulas.find((item) => item.id === Number(id));
     if (!aula) return 0;
-    return aulas.filter((item) => item.fase === aula.fase).findIndex((item) => item.id === aula.id) + 1;
+    return (
+      aulas
+        .filter((item) => item.disciplina === aula.disciplina && item.fase === aula.fase)
+        .findIndex((item) => item.id === aula.id) + 1
+    );
   };
 
   return {
@@ -183,7 +202,7 @@ function AulaLinha({
         ref={setActivatorNodeRef}
         {...attributes}
         {...listeners}
-        aria-label={`Mover aula ${aula.palavra_geradora} (posição ${posicao})`}
+        aria-label={`Mover aula ${nomeCurto(aula)} (posição ${posicao})`}
         disabled={arrastoDesabilitado}
         className="flex size-9 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground outline-none hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/50 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40"
       >
@@ -207,15 +226,20 @@ function AulaLinha({
       ) : null}
 
       <div className="min-w-0 flex-1 basis-48">
-        <p className="text-2xl leading-tight font-extrabold tracking-wide break-words uppercase">
-          {aula.palavra_geradora}
+        <p className={cn("text-2xl leading-tight font-extrabold tracking-wide break-words", aula.disciplina === "portugues" && "uppercase")}>
+          {aula.rotulo}
         </p>
         <p className="text-sm break-words text-muted-foreground">{aula.titulo}</p>
         <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-          <span>{aula.totais.silabas} sílabas</span>
-          <span>{aula.totais.paginas} páginas</span>
-          <span>{aula.totais.perguntas} perguntas</span>
-          <span>{aula.totais.palavras} palavras</span>
+          <span>{aula.totais.atividades} atividades</span>
+          {aula.disciplina === "portugues" ? (
+            <>
+              <span>{aula.totais.silabas} sílabas</span>
+              <span>{aula.totais.paginas} páginas</span>
+              <span>{aula.totais.palavras} palavras</span>
+            </>
+          ) : null}
+          {aula.habilidade_bncc ? <span>{aula.habilidade_bncc}</span> : null}
         </p>
       </div>
 
@@ -227,7 +251,7 @@ function AulaLinha({
           <Link2 className="size-3 shrink-0" aria-hidden="true" />
           {preRequisito ? (
             <span className="truncate">
-              Depois de <strong className="uppercase">{preRequisito.palavra_geradora}</strong>
+              Depois de <strong className={preRequisito.disciplina === "portugues" ? "uppercase" : undefined}>{preRequisito.rotulo}</strong>
             </span>
           ) : (
             "Sem pré-requisito"
@@ -272,7 +296,7 @@ function AulaLinha({
             className="text-destructive hover:text-destructive"
             disabled={ocupada}
             onClick={() => onExcluir(aula)}
-            aria-label={`Excluir aula ${aula.palavra_geradora}`}
+            aria-label={`Excluir aula ${nomeCurto(aula)}`}
             title="Excluir rascunho"
           >
             <Trash2 />
@@ -291,7 +315,7 @@ export default function AulasPage() {
   const [aulaOcupada, setAulaOcupada] = useState<number | null>(null);
 
   const [novaAberta, setNovaAberta] = useState(false);
-  const [formNova, setFormNova] = useState({ titulo: "", palavra_geradora: "", fase: "1" });
+  const [formNova, setFormNova] = useState({ titulo: "", palavra_geradora: "", fase: "1", disciplina: "portugues" as Disciplina });
   const [criando, setCriando] = useState(false);
   const [erroNova, setErroNova] = useState<string | null>(null);
 
@@ -322,13 +346,19 @@ export default function AulasPage() {
     };
   }, []);
 
-  const fases = useMemo(
-    () =>
-      Array.from(new Set([...FASES_PADRAO, ...aulas.map((aula) => aula.fase)])).sort(
-        (a, b) => a - b,
-      ),
-    [aulas],
-  );
+  /** Fases que aparecem em cada disciplina: as padrão em Português; nas outras, só as que têm aula. */
+  const fasesDe = useMemo(() => {
+    const mapa = new Map<Disciplina, number[]>();
+
+    for (const d of DISCIPLINAS) {
+      const daDisciplina = aulas.filter((aula) => aula.disciplina === d.chave).map((aula) => aula.fase);
+      const base = d.chave === "portugues" ? FASES_PADRAO : daDisciplina.length > 0 ? [] : [1];
+
+      mapa.set(d.chave, Array.from(new Set([...base, ...daDisciplina])).sort((a, b) => a - b));
+    }
+
+    return mapa;
+  }, [aulas]);
 
   const porId = useMemo(() => new Map(aulas.map((aula) => [aula.id, aula])), [aulas]);
   const anuncios = useMemo(() => anunciosLeitor(aulas), [aulas]);
@@ -341,14 +371,14 @@ export default function AulasPage() {
     [aulas],
   );
 
-  async function handleDragEnd(fase: number, event: DragEndEvent) {
+  async function handleDragEnd(disciplina: Disciplina, fase: number, event: DragEndEvent) {
     const { active, over } = event;
 
     if (!over || active.id === over.id) {
       return;
     }
 
-    const daFase = aulas.filter((aula) => aula.fase === fase);
+    const daFase = aulas.filter((aula) => aula.disciplina === disciplina && aula.fase === fase);
     const de = daFase.findIndex((aula) => aula.id === Number(active.id));
     const para = daFase.findIndex((aula) => aula.id === Number(over.id));
 
@@ -363,7 +393,12 @@ export default function AulasPage() {
     }));
 
     // Otimista: a lista já aparece na nova ordem enquanto o backend confirma.
-    setAulas(ordenarAulas([...aulas.filter((aula) => aula.fase !== fase), ...novaOrdem]));
+    setAulas(
+      ordenarAulas([
+        ...aulas.filter((aula) => !(aula.disciplina === disciplina && aula.fase === fase)),
+        ...novaOrdem,
+      ]),
+    );
     setReordenando(true);
 
     try {
@@ -412,9 +447,11 @@ export default function AulasPage() {
     setErroNova(null);
 
     try {
+      const portugues = formNova.disciplina === "portugues";
       const criada = await createAula({
         titulo: formNova.titulo.trim(),
-        palavra_geradora: formNova.palavra_geradora.trim(),
+        disciplina: formNova.disciplina,
+        ...(portugues ? { palavra_geradora: formNova.palavra_geradora.trim() } : {}),
         fase: Number(formNova.fase),
       });
 
@@ -457,12 +494,12 @@ export default function AulasPage() {
       <div className="space-y-6">
         <PainelPageHeader
           title="Aulas"
-          description="Cada aula parte de uma palavra geradora. Arraste para mudar a ordem dentro da fase; só aulas publicadas aparecem para as crianças."
+          description="Uma missão por disciplina: em Português ela parte de uma palavra geradora; nas outras, de uma sequência de atividades. Arraste para mudar a ordem dentro da fase; só aulas publicadas aparecem para as crianças."
           actions={
             <Button
               type="button"
               onClick={() => {
-                setFormNova({ titulo: "", palavra_geradora: "", fase: "1" });
+                setFormNova({ titulo: "", palavra_geradora: "", fase: "1", disciplina: "portugues" });
                 setErroNova(null);
                 setNovaAberta(true);
               }}
@@ -491,11 +528,19 @@ export default function AulasPage() {
           </Card>
         </div>
 
-        {fases.map((fase) => {
-          const daFase = aulas.filter((aula) => aula.fase === fase);
+        {DISCIPLINAS.map((disciplina) => (
+          <section key={disciplina.chave} className="space-y-4" aria-label={disciplina.nome}>
+            <h2 className="flex items-center gap-2 text-lg font-extrabold">
+              <span aria-hidden className="inline-block size-3 rounded-full" style={{ backgroundColor: disciplina.cor }} />
+              {disciplina.nome}
+              <span className="text-sm font-normal text-muted-foreground">{disciplina.descricao}</span>
+            </h2>
+
+        {(fasesDe.get(disciplina.chave) ?? []).map((fase) => {
+          const daFase = aulas.filter((aula) => aula.disciplina === disciplina.chave && aula.fase === fase);
 
           return (
-            <Card key={fase}>
+            <Card key={`${disciplina.chave}-${fase}`}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   Fase {fase}
@@ -504,21 +549,21 @@ export default function AulasPage() {
                   </Badge>
                   {reordenando ? <Spinner className="text-muted-foreground" /> : null}
                 </CardTitle>
-                {DESCRICAO_FASE[fase] ? (
+                {disciplina.chave === "portugues" && DESCRICAO_FASE[fase] ? (
                   <CardDescription>{DESCRICAO_FASE[fase]}</CardDescription>
                 ) : null}
               </CardHeader>
               <CardContent>
                 {daFase.length === 0 ? (
                   <p className="rounded-xl border border-dashed bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
-                    Nenhuma aula na Fase {fase}.
+                    Nenhuma aula de {disciplina.nome} na Fase {fase}.
                   </p>
                 ) : (
                   <DndContext
-                    id={`aulas-fase-${fase}`}
+                    id={`aulas-${disciplina.chave}-fase-${fase}`}
                     sensors={sensors}
                     collisionDetection={closestCenter}
-                    onDragEnd={(event) => void handleDragEnd(fase, event)}
+                    onDragEnd={(event) => void handleDragEnd(disciplina.chave, fase, event)}
                     accessibility={{
                       announcements: anuncios,
                       screenReaderInstructions: instrucoesLeitor,
@@ -528,7 +573,7 @@ export default function AulasPage() {
                       items={daFase.map((aula) => aula.id)}
                       strategy={verticalListSortingStrategy}
                     >
-                      <ol className="space-y-2" aria-label={`Aulas da Fase ${fase}`}>
+                      <ol className="space-y-2" aria-label={`Aulas de ${disciplina.nome} da Fase ${fase}`}>
                         {daFase.map((aula, index) => (
                           <AulaLinha
                             key={aula.id}
@@ -554,6 +599,8 @@ export default function AulasPage() {
             </Card>
           );
         })}
+          </section>
+        ))}
       </div>
 
       <Dialog
@@ -567,30 +614,53 @@ export default function AulasPage() {
             <DialogHeader>
               <DialogTitle>Nova aula</DialogTitle>
               <DialogDescription>
-                A aula nasce como rascunho. As sílabas e famílias são sugeridas a
-                partir da palavra geradora e podem ser ajustadas no editor.
+                A aula nasce como rascunho. Em Português, as sílabas e famílias são sugeridas a partir da
+                palavra geradora; nas outras disciplinas você monta a sequência de atividades no editor.
               </DialogDescription>
             </DialogHeader>
 
             <FieldGroup className="gap-5">
               <Field>
-                <FieldLabel htmlFor="nova-aula-palavra">Palavra geradora</FieldLabel>
-                <CaixaAltaInput
-                  id="nova-aula-palavra"
-                  value={formNova.palavra_geradora}
-                  onValueChange={(valor) =>
-                    setFormNova((atual) => ({
-                      ...atual,
-                      palavra_geradora: valor,
-                    }))
-                  }
-                  placeholder="Ex.: TATU"
-                  autoComplete="off"
-                  className="h-12 text-2xl font-extrabold tracking-wide md:text-2xl"
+                <FieldLabel htmlFor="nova-aula-disciplina">Disciplina</FieldLabel>
+                <Select
+                  value={formNova.disciplina}
+                  onValueChange={(valor) => setFormNova((atual) => ({ ...atual, disciplina: valor as Disciplina }))}
                   disabled={criando}
-                  required
-                />
+                >
+                  <SelectTrigger id="nova-aula-disciplina" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DISCIPLINAS.map((d) => (
+                      <SelectItem key={d.chave} value={d.chave}>
+                        {d.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldDescription>{infoDisciplina(formNova.disciplina).descricao}</FieldDescription>
               </Field>
+
+              {formNova.disciplina === "portugues" ? (
+                <Field>
+                  <FieldLabel htmlFor="nova-aula-palavra">Palavra geradora</FieldLabel>
+                  <CaixaAltaInput
+                    id="nova-aula-palavra"
+                    value={formNova.palavra_geradora}
+                    onValueChange={(valor) =>
+                      setFormNova((atual) => ({
+                        ...atual,
+                        palavra_geradora: valor,
+                      }))
+                    }
+                    placeholder="Ex.: TATU"
+                    autoComplete="off"
+                    className="h-12 text-2xl font-extrabold tracking-wide md:text-2xl"
+                    disabled={criando}
+                    required
+                  />
+                </Field>
+              ) : null}
 
               <Field>
                 <FieldLabel htmlFor="nova-aula-titulo">Título</FieldLabel>
@@ -600,7 +670,7 @@ export default function AulasPage() {
                   onChange={(event) =>
                     setFormNova((atual) => ({ ...atual, titulo: event.target.value }))
                   }
-                  placeholder="Ex.: O tatu e a toca"
+                  placeholder={formNova.disciplina === "portugues" ? "Ex.: O tatu e a toca" : "Ex.: Somar para decolar"}
                   disabled={criando}
                   required
                 />
@@ -641,7 +711,11 @@ export default function AulasPage() {
               </Button>
               <Button
                 type="submit"
-                disabled={criando || !formNova.titulo.trim() || !formNova.palavra_geradora.trim()}
+                disabled={
+                  criando ||
+                  !formNova.titulo.trim() ||
+                  (formNova.disciplina === "portugues" && !formNova.palavra_geradora.trim())
+                }
               >
                 {criando ? <Spinner data-icon="inline-start" /> : <Plus />}
                 Criar e editar
@@ -659,9 +733,8 @@ export default function AulasPage() {
         title="Excluir rascunho?"
         description={
           <p>
-            A aula <strong className="uppercase">{aulaExclusao?.palavra_geradora}</strong> (
-            {aulaExclusao?.titulo}) e todo o seu conteúdo serão excluídos. Só é possível
-            excluir rascunhos que nenhuma criança começou.
+            A aula <strong>{aulaExclusao ? nomeCurto(aulaExclusao) : ""}</strong> ({aulaExclusao?.titulo}) e todo o
+            seu conteúdo serão excluídos. Só é possível excluir rascunhos que nenhuma criança começou.
           </p>
         }
         confirmLabel="Excluir aula"

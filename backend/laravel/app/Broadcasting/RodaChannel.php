@@ -2,16 +2,21 @@
 
 namespace App\Broadcasting;
 
+use App\Http\Resources\OpcaoVisualResource;
 use App\Models\Crianca;
 use App\Models\TurmaSessao;
 use App\Models\User;
+use App\Services\Amizades\AmizadeService;
 
 /**
  * Canal de presença `roda.{id}`: entra o educador da turma (ou admin) e as
- * crianças da turma. O array devolvido é o que os outros membros veem.
+ * crianças da turma e das turmas amigas. O array devolvido é o que os outros
+ * membros veem (de uma criança: só apelido e avatar).
  */
 class RodaChannel
 {
+    public function __construct(private readonly AmizadeService $amizades) {}
+
     /** @return array<string, mixed>|false */
     public function join(User|Crianca $usuario, int $rodaId): array|false
     {
@@ -30,7 +35,7 @@ class RodaChannel
                 : false;
         }
 
-        if ((int) $usuario->turma_id !== (int) $roda->turma_id) {
+        if (! $this->amizades->saoAmigas((int) $usuario->turma_id, (int) $roda->turma_id)) {
             return false;
         }
 
@@ -41,7 +46,7 @@ class RodaChannel
             'tipo' => 'crianca',
             'crianca_id' => $usuario->id,
             'apelido' => $usuario->apelido,
-            'emoji' => $usuario->avatar?->emoji,
+            'avatar' => $usuario->avatar ? (new OpcaoVisualResource($usuario->avatar))->resolve() : null,
         ];
     }
 }

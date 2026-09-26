@@ -26,7 +26,7 @@ class DesbloqueioService
      */
     public function mapa(Crianca $crianca): Collection
     {
-        $aulas = Aula::query()->ordenadas()->get()->keyBy('id');
+        $aulas = Aula::query()->ordenadas()->withCount('atividades')->get()->keyBy('id');
         $progresso = CriancaAula::query()->where('crianca_id', $crianca->id)->get()->keyBy('aula_id');
         $concluidas = $progresso->where('status', CriancaAula::CONCLUIDA)->keys()->all();
 
@@ -77,6 +77,25 @@ class DesbloqueioService
     }
 
     /**
+     * Linha de progresso da criança nesta aula; se a aula está aberta e ainda
+     * não começou, inicia. Null quando a aula está trancada ou não publicada.
+     */
+    public function progressoOuIniciar(Crianca $crianca, Aula $aula): ?CriancaAula
+    {
+        $linha = CriancaAula::where('crianca_id', $crianca->id)->where('aula_id', $aula->id)->first();
+
+        if ($linha !== null) {
+            return $linha;
+        }
+
+        try {
+            return $this->iniciar($crianca, $aula);
+        } catch (DomainException) {
+            return null;
+        }
+    }
+
+    /**
      * Conclui a aula e devolve as aulas que acabaram de ser desbloqueadas
      * (para a tela de conquista anunciar o próximo capítulo).
      *
@@ -89,7 +108,7 @@ class DesbloqueioService
 
             $linha = CriancaAula::firstOrNew(['crianca_id' => $crianca->id, 'aula_id' => $aula->id]);
             $linha->status = CriancaAula::CONCLUIDA;
-            $linha->etapa_atual = count(Aula::ETAPAS);
+            $linha->etapa_atual = $aula->totalAtividades() + 1;
             $linha->iniciada_em ??= now();
             $linha->concluida_em ??= now();
             $linha->save();

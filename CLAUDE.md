@@ -4,23 +4,43 @@ Portal de alfabetização infantil (método Paulo Freire). Ver `README.md` para
 subir o projeto e o plano de fases.
 
 ## Regras de negócio inegociáveis
-- Cada aula tem UMA palavra geradora; sílabas geram famílias (TE → TA TE TI TO TU).
+- Uma aula pertence a uma disciplina (`App\Enums\Disciplina`: portugues, matematica, geografia,
+  historia) e é uma sequência de atividades (`aula_atividades`; tipos em `App\Services\Atividades\RegistroAtividades`,
+  formato do `config` em `docs/atividades.md`). Tipo novo = avaliador novo no registro + componente no front.
+- Aula de Português tem UMA palavra geradora; sílabas geram famílias (TE → TA TE TI TO TU). Missão semeada:
+  `historia, escolha, palavra, ficha, montar_palavras, escolher_silaba, ditado, frase` (sem palmas); conteúdo semeado
+  nunca sobrescreve edição do CMS (só `teia:reaplicar-conteudo --forcar`). Base pedagógica em `docs/metodos.md`.
 - Famílias ACUMULAM entre aulas: sílabas de aulas anteriores seguem disponíveis.
-- Nunca mostrar "errado", nota ou ranking à criança. Tentativa inválida → dica gentil; acerto → celebração.
+- Progresso da criança: `etapa_atual` vai de 1 a N+1 (N atividades; N+1 é a conquista). Nada de `Aula::ETAPAS`.
+- Nunca mostrar "errado", nota ou ranking à criança. 1º erro → mensagem curta + dica; 2º erro → a resposta e o item
+  entra na revisão espaçada (`crianca_itens`, caixas de Leitner em `App\Services\Revisao`); acerto → celebração.
+  XP só no primeiro acerto de cada item; nível pela tabela `config('teia.niveis')`; medalhas em `config/conquistas.php`.
 - Palavra válida descoberta entra na Teia de Palavras da criança.
 - Áudio: gravação aprovada > arquivo da aula > Web Speech API pt-BR.
 - LGPD: criança tem só apelido, avatar e turma. Cadastro pelo responsável com consentimento. Áudios em disco privado.
+- Ensino entre pares: mini-aula (voz + desafio gerado de uma missão) só circula depois que um adulto aprova;
+  amizade entre turmas exige código de um responsável + aceite com termo do outro; áudio de criança só é servido
+  à própria turma e às turmas amigas (`AudioController`), recusa apaga o arquivo, `teia:limpar-gravacoes` purga;
+  crianças nunca trocam texto livre (reações fixas) e de um amigo veem só apelido e avatar.
 
 ## Arquitetura
 - Laravel 12 API-first em `backend/laravel`. Dois guards JWT (tymon): `api` (User: admin|educador) e `crianca` (Crianca).
   A claim `prv` do tymon impede usar um token no guard do outro.
 - Rotas em `routes/api/*.php` por área; controllers em `App\Http\Controllers\Api\{Painel,Crianca,Turma}`; regras em `App\Services`.
 - Código novo usa FormRequest e API Resource. Nomes de domínio em português; tabelas de framework em inglês.
-- Reverb: canais em `routes/channels.php` SEMPRE com `['guards' => ['api', 'crianca']]`; rota de auth em `/api/broadcasting/auth`.
+- Reverb: canais em `routes/channels.php` SEMPRE com `['guards' => ['api', 'crianca']]`; rota de auth em `/api/broadcasting/auth`
+  (adulto) e `/api/crianca/broadcasting/auth` (criança). A Roda (`routes/api/turma.php`, `App\Services\Roda\RodaService`,
+  contrato em `docs/api-roda.md`) transmite snapshots `RodaAtualizada`/`DuplaAtualizada`; sem websocket o front faz polling.
+- XP é o único nome (`xp`, `xp_total`, `darXp`, `config('teia.xp.*')`): não reintroduza "estrelas" na API.
+- Progresso no painel (`GET /painel/progresso/{crianca}`) mostra só o caminho da própria criança: nunca comparação nem ranking.
 - Next 16 em `frontend`: o navegador nunca vê o JWT; ele fica em cookie httpOnly (`teia_sessao`) e o proxy
   `app/api/proxy/[...path]` injeta o Bearer e renova no 401. `apiFetch` em `services/api.ts`.
-- Painel do educador em `app/(painel)/painel/*` (shadcn). App da criança em `app/(crianca)/app/*`
-  (botões ≥ 64px, caixa alta na Fase 1, áudio em todo toque, prefers-reduced-motion).
+- Painel do educador em `app/(painel)/painel/*` (shadcn). App da criança em `app/(crianca)/app/*`:
+  tema Espaço (tokens em `globals.css` `.tema-crianca`, fonte Lexend, ícones lucide via `lib/icones.ts`,
+  NUNCA emoji na tela), Galáxia (`GET /crianca/galaxia`) → planeta (`/app/planeta/{disciplina}`) → missão.
+  Botões ≥ 64px, áudio em todo toque, prefers-reduced-motion. `usa_minusculas` = "texto como escrito"
+  (padrão true; `lib/exibir.ts`: `exibir` para frases, `exibirPalavra` para peças/palavras);
+  `narracao_automatica` por criança (`useFalarAoChegar`/`useNarracaoDeChegada` respeitam).
 
 ## Comandos
 - Testes backend: `docker compose exec backend php artisan test` (Pest, PostgreSQL `teia_test`).

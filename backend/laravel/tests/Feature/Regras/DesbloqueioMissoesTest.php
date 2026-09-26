@@ -14,7 +14,9 @@ beforeEach(function () {
 
 function statusNoMapa(Crianca $crianca): array
 {
+    // Só as missões de Português (as de Matemática têm a própria trilha).
     return app(DesbloqueioService::class)->mapa($crianca)
+        ->filter(fn ($item) => $item['aula']->disciplina === 'portugues')
         ->mapWithKeys(fn ($item) => [$item['aula']->palavra_geradora => $item['status']])
         ->all();
 }
@@ -93,5 +95,5 @@ it('percorre as cinco missões da Fase 1 em ordem', function () {
     }
 
     expect(array_unique(array_values(statusNoMapa($this->crianca))))->toBe(['concluida'])
-        ->and(Aula::publicadas()->count())->toBe(5);
+        ->and(Aula::publicadas()->daDisciplina('portugues')->count())->toBe(5);
 });

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
-import { MapaMissoes } from "@/components/crianca/mapa/mapa-missoes";
+import { Galaxia } from "@/components/crianca/galaxia/galaxia";
 
 export const metadata: Metadata = {
-  title: "Mapa de missões · Teia de Palavras",
+  title: "Galáxia · Teia de Palavras",
 };
 
-/** Início do app da criança: o mapa de missões. */
-export default function MapaPage() {
-  return <MapaMissoes />;
+/** Início do app da criança: a Galáxia (planetas, missões do dia, revisão). */
+export default function GalaxiaPage() {
+  return <Galaxia />;
 }

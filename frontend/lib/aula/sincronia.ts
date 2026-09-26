@@ -9,19 +9,23 @@
 export type EnviarEtapa = (etapa: number) => Promise<{ etapa_atual: number }>;
 
 export type Sincronizador = {
-  /** Garante que o servidor saiba que a etapa `etapa` (1..7) terminou. true = confirmado. */
+  /** Garante que o servidor saiba que a etapa `etapa` (1..N) terminou. true = confirmado. */
   concluir: (etapa: number) => Promise<boolean>;
   /** etapa_atual que o servidor já confirmou. */
   confirmada: () => number;
 };
 
-const ULTIMA_ETAPA_CONCLUIVEL = 7;
-
+/**
+ * @param total  N+1: número de atividades mais a conquista. A conquista (etapa
+ *               `total`) nunca é enviada por aqui: ela é outra rota (/concluir).
+ */
 export function criarSincronizador(
   enviar: EnviarEtapa,
   etapaDoServidor: number,
+  total: number,
   aoConfirmar?: (etapaAtual: number) => void,
 ): Sincronizador {
+  const ultimaConcluivel = Math.max(1, Math.trunc(total) - 1);
   let confirmada = Math.max(1, Math.trunc(etapaDoServidor) || 1);
   let fila: Promise<unknown> = Promise.resolve();
 
@@ -38,7 +42,7 @@ export function criarSincronizador(
   }
 
   function concluir(etapa: number): Promise<boolean> {
-    const alvo = Math.min(ULTIMA_ETAPA_CONCLUIVEL, Math.trunc(etapa));
+    const alvo = Math.min(ultimaConcluivel, Math.trunc(etapa));
 
     const passo = fila.then(async () => {
       while (confirmada <= alvo) {

@@ -8,7 +8,9 @@ export interface Crianca {
   id: number;
   apelido: string;
   avatar: OpcaoVisual;
+  /** "Texto como escrito" (caso natural e peças em minúsculas). */
   usa_minusculas: boolean;
+  narracao_automatica: boolean;
   turma: { id: number; nome: string; codigo: string };
   responsavel: { id: number; name: string };
   bloqueada_ate: string | null;
@@ -28,6 +30,7 @@ export interface CreateCriancaPayload {
   avatar_chave: string;
   figura_secreta_chave: string;
   usa_minusculas?: boolean;
+  narracao_automatica?: boolean;
   consentimento: ConsentimentoPayload;
 }
 
@@ -35,6 +38,7 @@ export interface UpdateCriancaPayload {
   apelido: string;
   avatar_chave: string;
   usa_minusculas: boolean;
+  narracao_automatica: boolean;
   turma_id: number;
 }
 

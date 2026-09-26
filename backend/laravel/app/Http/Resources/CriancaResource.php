@@ -23,6 +23,7 @@ class CriancaResource extends JsonResource
             'apelido' => $this->apelido,
             'avatar' => $this->avatar ? new OpcaoVisualResource($this->avatar) : null,
             'usa_minusculas' => (bool) $this->usa_minusculas,
+            'narracao_automatica' => (bool) $this->narracao_automatica,
             'turma' => $this->turma ? ['id' => $this->turma->id, 'nome' => $this->turma->nome, 'codigo' => $this->turma->codigo] : null,
             'responsavel' => $this->responsavel ? ['id' => $this->responsavel->id, 'name' => $this->responsavel->name] : null,
             'bloqueada_ate' => $this->estaBloqueada() ? $this->bloqueada_ate : null,

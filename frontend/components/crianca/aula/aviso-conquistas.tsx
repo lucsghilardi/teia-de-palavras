@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
 
+import { Icone } from "@/components/crianca/ui/icone";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
 import { exibir } from "@/lib/exibir";
 import type { Conquista } from "@/types/CriancaApp";
@@ -42,13 +43,11 @@ export function AvisoConquistas({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: reduzido ? 0 : -30 }}
             transition={{ type: "spring", stiffness: 380, damping: 24 }}
-            className="flex max-w-full flex-col gap-2 rounded-[2rem] border-4 border-[var(--c-sol)] bg-white px-5 py-3 shadow-[0_8px_0_var(--c-sol-sombra)]"
+            className="flex max-w-full flex-col gap-2 rounded-[2rem] border-4 border-[var(--c-alerta)] bg-[var(--c-superficie)] px-5 py-3 shadow-[0_8px_0_var(--c-alerta-sombra)]"
           >
             {lote.conquistas.map((c) => (
               <div key={c.chave} className="flex items-center gap-3">
-                <span aria-hidden className="text-5xl leading-none">
-                  {c.emoji || "🏅"}
-                </span>
+                <Icone nome={c.icone} aria-hidden className="size-12 shrink-0 text-[var(--c-alerta)]" strokeWidth={2.25} />
                 <span className="text-xl font-black leading-tight sm:text-2xl">
                   <span className="sr-only">Nova conquista: </span>
                   {exibir(c.titulo, minusculas)}

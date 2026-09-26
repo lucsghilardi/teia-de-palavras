@@ -19,7 +19,7 @@ class ProducaoService
 
     /**
      * @param  list<string>  $palavras
-     * @return array{texto: string, estrelas: int, conquistas: list<array<string, string>>}
+     * @return array{texto: string, xp_total: int, conquistas: list<array<string, string>>}
      *
      * @throws DomainException com mensagem gentil para a criança
      */
@@ -47,12 +47,12 @@ class ProducaoService
 
         Producao::create(['crianca_id' => $crianca->id, 'aula_id' => $aula->id, 'texto' => $texto, 'palavras' => $palavras]);
 
-        $stats = $this->gamificacao->darEstrelas($crianca, $primeiraNestaAula ? (int) config('teia.estrelas.producao') : 0);
+        $stats = $this->gamificacao->darXp($crianca, $primeiraNestaAula ? (int) config('teia.xp.producao') : 0);
         $this->sessoes->registrar($crianca, 'producao', $aula, 7, ['texto' => $texto]);
 
         return [
             'texto' => $texto,
-            'estrelas' => (int) $stats->xp_total,
+            'xp_total' => (int) $stats->xp_total,
             'conquistas' => $this->gamificacao->avaliarConquistas($crianca),
         ];
     }

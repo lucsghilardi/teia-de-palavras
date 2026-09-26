@@ -1,89 +1,105 @@
-# Modo turma: a Roda (Fase 3) — contrato
+# A Roda (modo turma ao vivo) — contrato
 
-A **Roda** é o círculo de cultura: o educador conduz uma missão com a turma
-inteira ao mesmo tempo. Cada criança usa o próprio dispositivo (já logada no
-app); a tela do educador pode ir para o projetor.
+A **Roda** é a missão ao vivo: o educador conduz uma missão no próprio dispositivo (ou no
+projetor) e cada criança acompanha no dela, já logada no app. Escopo contido, de propósito:
 
-- Tabela `turma_sessoes` (model `TurmaSessao`), participantes, duplas e tentativas da dupla.
-- Uma turma tem no máximo **uma roda aberta** (status `aguardando` ou `em_andamento`).
-- Tempo real: Laravel Reverb, **um canal de presença por roda**: `presence-roda.{id}`
-  (no Echo: `echo.join("roda.{id}")`). Autoriza o educador da turma (ou admin) e as crianças da turma.
-  - Membro educador: `{ id: "e{userId}", tipo: "educador", nome }`
-  - Membro criança: `{ id: "c{criancaId}", tipo: "crianca", crianca_id, apelido, emoji }`
+- **Seguir o líder**: o educador escolhe a etapa (1..N+1, como no app individual) e todas as
+  crianças veem a mesma atividade. Página da história e item de uma atividade ficam por conta
+  de cada criança (o educador só marca `pagina`/`item` como referência).
+- **Duplas automáticas**: sorteadas entre quem está na roda (quem sobra joga sozinho). Numa
+  etapa de `montar_palavras` ou de qualquer atividade **avaliada**, uma criança **propõe** a
+  resposta e o par **confirma** ("concordo") ou pede para **mudar**. Confirmar avalia a proposta
+  para as duas crianças, com a mesma política das missões (palavra válida entra na Teia das duas
+  com origem `dupla` e medalha "Ajudou um amigo"; atividade avaliada grava `crianca_respostas`,
+  dá XP e agenda revisão para as duas). A vez alterna a cada resposta.
+- **Turmas amigas** (ver `docs/api-painel.md`, Amizades): a criança de uma turma amiga vê a roda
+  aberta na Galáxia e entra pelo código (QR/link `/app/roda?codigo=XXXXXX`).
+- **Encerrar** conclui a missão para quem participou (XP da missão só na primeira vez).
+- Sem criança-mestre nesta versão.
+
+Tabelas: `turma_sessoes` (a roda: `codigo` de 6 caracteres, `status aguardando|em_andamento|encerrada`,
+`etapa_atual`, `estado {pagina, item}`), `turma_sessao_participantes`, `duplas`, `dupla_tentativas`
+(`atividade_ordem`, `resposta jsonb`, `status proposta|confirmada|recusada`, `valida`, `palavra_resultado`,
+`dica`, `resultado jsonb`). Uma turma tem no máximo **uma roda aberta**.
+
+## Tempo real
+
+Laravel Reverb, um canal de presença por roda: `presence-roda.{id}` (no Echo: `echo.join("roda.{id}")`).
+Entram o educador da turma (ou admin) e as crianças da turma **e das turmas amigas**.
+
+- Membro educador: `{ id: "e{userId}", tipo: "educador", nome }`
+- Membro criança: `{ id: "c{criancaId}", tipo: "crianca", crianca_id, apelido, avatar: OpcaoVisual|null }`
 - Eventos (nomes com ponto no `listen`, pois usam `broadcastAs`):
-  - `.roda.atualizada` → payload `RodaEstado` (snapshot completo; substitua o estado local).
-  - `.dupla.atualizada` → payload `DuplaEstado` (cada criança filtra pela própria dupla).
-- Ao (re)conectar, o cliente busca o snapshot pela API. Sem websocket, faça polling a cada 5 s.
-- Autorização do canal:
-  - educador: `POST /api/proxy/broadcasting/auth` (já existe, `lib/echo.ts`);
-  - criança: `POST /api/crianca-proxy/broadcasting/auth` (→ `/api/crianca/broadcasting/auth`).
+  - `.roda.atualizada` → `RodaEstado` (snapshot completo; substitua o estado local)
+  - `.dupla.atualizada` → `DuplaEstado` (cada criança filtra pela própria dupla)
+- Ao (re)conectar, o cliente busca o snapshot pela API. Sem websocket (`NEXT_PUBLIC_REVERB_APP_KEY`
+  vazio ou Reverb fora), `hooks/use-roda-tempo-real.ts` faz polling a cada 5 s.
+- Autorização do canal: educador `POST /api/proxy/broadcasting/auth`; criança
+  `POST /api/crianca-proxy/broadcasting/auth` (→ `/api/crianca/broadcasting/auth`, guard `crianca`).
 
 ## Tipos
 
 ```
 RodaEstado = {
-  id, codigo,                       // código de 6 caracteres (vira QR: /app/roda?codigo=XXXXXX)
-  status: "aguardando"|"em_andamento"|"encerrada",
-  etapa_atual: 1..8,                // mesma ordem do app individual (missao..conquista)
-  estado: { pagina: number, pergunta: number },   // página da história / pergunta da conversa (0-based)
-  crianca_mestre_id: number|null,   // criança-mestre: conduz a leitura e a conversa
-  aula: { id, titulo, palavra_geradora },
+  id, codigo, status: "aguardando"|"em_andamento"|"encerrada",
+  etapa_atual: 1..N+1, total_etapas: N+1,
+  estado: { pagina, item },
+  aula: { id, titulo, rotulo, disciplina, palavra_geradora|null, total_atividades },
   turma: { id, nome },
-  participantes: [ { id, apelido, avatar: OpcaoVisual|null } ],   // entraram na roda (ordem de chegada)
-  duplas: [ { id, crianca_a_id, crianca_b_id } ]
-}
+  participantes: [ { id, apelido, avatar: OpcaoVisual|null, presente } ],   // ordem de chegada; presente = não saiu
+  duplas: [ { id, crianca_a_id, crianca_b_id } ],
+  iniciada_em, encerrada_em, created_at }
 
 DuplaEstado = {
   id, roda_id,
   criancas: [ { id, apelido, avatar } ],   // [a, b]
-  vez_de: number,                          // criança que PROPÕE agora (alterna após cada resposta)
-  tentativa: null | {
-    id, silabas: string[], proposta_por: number,
-    status: "proposta"|"confirmada"|"recusada",
-    valida: boolean|null, palavra: string|null, dica: string|null
-  },
-  palavras: [ { palavra, audio_url } ]     // descobertas pela dupla nesta roda
-}
+  vez_de: number,                          // quem propõe agora (a começa; alterna a cada resposta)
+  tentativa: null | { id, atividade_ordem, resposta, proposta_por,
+                      status: "proposta"|"confirmada"|"recusada",
+                      valida: boolean|null, palavra: string|null, dica: string|null,
+                      resultado: ResultadoTentativa|ResultadoResposta|null },   // avaliação (para quem propôs)
+  palavras: [ { palavra, audio_url } ] }   // descobertas pela dupla nesta roda
 
-ConteudoRoda = AulaCrianca (mesmo formato do docs/api-crianca.md), com:
-  - pecas: sílabas liberadas pela missão da roda e por todas as missões anteriores
-    (a turma inteira usa as mesmas peças);
-  - metas[].encontrada / teia: da criança que pediu (no painel: encontrada = false, teia = []).
+ConteudoRoda = AulaCrianca (docs/api-crianca.md), com as peças liberadas até a missão da roda
+  (a turma inteira usa as mesmas peças) e, para a criança, as metas/Teia dela.
 ```
 
 ## Painel (educador, guard `api`, prefixo `/api/painel`)
 
 - `GET /rodas` → `RodaEstado[]` das turmas do educador (abertas primeiro, depois as 10 últimas encerradas).
 - `POST /rodas` `{ turma_id, aula_id }` → 201 `RodaEstado` (status `aguardando`).
-  422 se a turma já tem roda aberta (`message` + `roda_id` da aberta). A aula precisa estar publicada.
+  422 `{ message, roda_id }` se a turma já tem roda aberta; 422 se a missão não está publicada; 403 turma de outro.
 - `GET /rodas/{id}` → `{ roda: RodaEstado, conteudo: ConteudoRoda, criancas_da_turma: [ { id, apelido, avatar } ], duplas: DuplaEstado[] }`
-- `POST /rodas/{id}/comandos` `{ acao, valor? }` → `RodaEstado` (e transmite `.roda.atualizada`)
-  - `iniciar` — sai de `aguardando`, vai para a etapa 1
-  - `avancar` / `voltar` — etapa +1 / −1 (zera página e pergunta)
-  - `ir_etapa` `valor: 1..8`
-  - `pagina` `valor: n` — página da história; `pergunta` `valor: n` — pergunta da conversa
-  - `mestre` `valor: crianca_id|null` — escolhe (ou tira) a criança-mestre (precisa ter entrado na roda)
-  - `encerrar` — fecha a roda; a missão fica **concluída para quem participou** (+3 estrelas na primeira vez)
-- `POST /rodas/{id}/duplas` `{ pares: [[a, b], ...] }` ou `{ automatico: true }` → `{ roda: RodaEstado, duplas: DuplaEstado[] }`
-  Refaz as duplas só com quem entrou na roda. No automático, quem sobra fica sem dupla (brinca sozinho).
+- `POST /rodas/{id}/comandos` `{ acao, valor? }` → `RodaEstado` (e transmite `.roda.atualizada`). 422 depois de encerrada.
+  - `iniciar` — sai de `aguardando`, etapa 1 (qualquer outro comando também tira de `aguardando`)
+  - `avancar` / `voltar` — etapa ±1 (zera página e item); `ir_etapa` `valor: 1..N+1` (limitado)
+  - `pagina` / `item` `valor: n` — referência da página da história / item da atividade
+  - `encerrar` — fecha a roda; a missão fica concluída para quem participou (+XP da missão na primeira vez)
+- `POST /rodas/{id}/duplas` `{ automatico: true }` ou `{ pares: [[a, b], ...] }` → `{ roda, duplas: DuplaEstado[] }`
+  Refaz todas as duplas só com quem está na roda (presente). 422 para par repetido, criança fora da roda ou consigo mesma.
 
 ## App da criança (guard `crianca`, prefixo `/api/crianca`)
 
-- `GET /roda` → `{ roda: { id, codigo, status, aula: { id, titulo, palavra_geradora } } | null }`
-  (roda aberta da turma da criança; o mapa consulta a cada 15 s e mostra "Entrar na roda").
+- `GET /roda` → `{ roda: { id, codigo, status, aula: { id, titulo, rotulo, palavra_geradora }, turma: { id, nome } } | null }`
+  (roda aberta da própria turma, senão de uma turma amiga; a Galáxia consulta a cada 15 s e mostra "Roda aberta").
 - `POST /rodas/entrar` `{ codigo? }` → `{ roda: RodaEstado, conteudo: ConteudoRoda, eu: crianca_id, dupla: DuplaEstado|null }`
-  Sem `codigo`, entra na roda aberta da própria turma. 404 `{ message }` se não houver / código de outra turma.
-- `GET /rodas/{id}` → mesmo formato do `entrar` (só para quem já entrou; 403 senão).
-- `POST /rodas/{id}/sair` → 200.
-- `POST /rodas/{id}/mestre` `{ acao: "proxima"|"anterior" }` → `RodaEstado`.
-  Só a criança-mestre; muda a página (etapa 1) ou a pergunta (etapa 2). 403 para as outras.
-- Dupla (etapa 6, criação):
-  - `POST /rodas/{id}/dupla/propor` `{ silabas }` → `DuplaEstado` — só quem tem a vez; 409 se já há proposta esperando resposta.
-  - `POST /rodas/{id}/dupla/responder` `{ aceitar: boolean }` → `DuplaEstado` — só o parceiro.
-    `aceitar=true` valida a palavra: válida entra na Teia **das duas crianças** (origem `dupla`, 1 estrela
-    para cada, medalha "Ajudou um amigo"); inválida volta com `dica` gentil. `aceitar=false` ("vamos mudar")
-    não valida nada. Em ambos os casos a vez passa para a outra criança.
-- Sozinha (sem dupla) na etapa 6: `POST /rodas/{id}/tentativas` `{ silabas }` → mesmo formato de
-  `POST /aulas/{id}/tentativas` do app individual, usando as peças da roda.
-- Produção (etapa 7): `POST /rodas/{id}/producao` `{ palavras }` → mesmo formato do app individual.
+  Sem `codigo`, entra na roda aberta da própria turma (ou de uma amiga). 404 se não há roda para ela.
+- `GET /rodas/{id}` → mesmo pacote (só para quem já entrou; 403 senão; 404 se a roda não é da turma/amiga).
+  Uma roda encerrada continua legível para quem participou (tela final).
+- `POST /rodas/{id}/sair` → `{ ok: true }` (marca ausente; voltar a entrar marca presente).
+- Dupla (etapa de `montar_palavras` ou atividade avaliada):
+  - `POST /rodas/{id}/dupla/propor` `{ ...resposta do tipo }` (ex.: `{ silabas }`, `{ item, opcao }`) → `DuplaEstado`
+    403 fora da vez; 409 se já há proposta esperando resposta; 422 sem dupla ou etapa que não é de responder.
+  - `POST /rodas/{id}/dupla/responder` `{ aceitar: boolean }` → `DuplaEstado` — só o par (403 para quem propôs; 409 sem proposta).
+    `aceitar=true` avalia para as duas crianças e devolve `tentativa.resultado`; `false` ("vamos mudar") não avalia nada.
+    Nos dois casos a vez passa para a outra criança.
+- Sozinha (sem dupla):
+  - `POST /rodas/{id}/tentativas` `{ silabas }` → mesmo formato de `POST /aulas/{id}/tentativas`, com as peças da roda.
+  - `POST /rodas/{id}/atividades/{ordem}/responder` `{ ...resposta }` → mesmo formato de `POST /aulas/{id}/atividades/{ordem}/responder`.
+- `POST /rodas/{id}/producao` `{ palavras }` → mesmo formato do app individual.
 - `POST /broadcasting/auth` → autorização do canal de presença (via `/api/crianca-proxy/broadcasting/auth`).
+
+Front: `app/(crianca)/app/(logada)/roda/page.tsx` (`?codigo=` do QR), `components/crianca/roda/*`,
+`hooks/use-roda-tempo-real.ts`, `services/roda.ts`, `types/Roda.ts`; painel em `app/(painel)/painel/rodas/*`.
+Na criança, a proposta da dupla passa pelo mesmo `ProvedorEnvioResposta` das atividades: quem propõe
+espera a resposta do par (snapshot `.dupla.atualizada` ou polling) e só então vê o feedback.

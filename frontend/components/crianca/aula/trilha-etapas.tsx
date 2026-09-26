@@ -1,48 +1,29 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { createElement, useEffect, useRef } from "react";
 
 import { narrar } from "@/components/crianca/aula/narrador";
+import { ICONE_TIPO, NOME_FALADO_TIPO } from "@/components/crianca/atividades/registro";
 import { sons } from "@/lib/sons";
 import { cn } from "@/lib/utils";
-import { ETAPAS, type Etapa } from "@/types/CriancaApp";
-
-export const ICONE_ETAPA: Record<Etapa, string> = {
-  missao: "📖",
-  conversa: "💬",
-  palavra: "🕸️",
-  palmas: "👏",
-  ficha: "🧩",
-  criacao: "🛠️",
-  producao: "✏️",
-  conquista: "🏆",
-};
-
-/** Nome falado ao tocar no ícone da etapa que já está na tela. */
-export const NOME_FALADO_ETAPA: Record<Etapa, string> = {
-  missao: "A história da missão",
-  conversa: "Hora de conversar",
-  palavra: "A palavra da missão",
-  palmas: "Palmas",
-  ficha: "Ficha de descoberta",
-  criacao: "Criar palavras",
-  producao: "Fazer uma frase",
-  conquista: "Conquista",
-};
+import type { Atividade } from "@/types/CriancaApp";
 
 /**
- * Trilha das 8 etapas. A etapa na tela fica em destaque; as já liberadas podem
- * ser tocadas para rever; as da frente ficam trancadas (desabilitadas).
- * Nomes acessíveis estáveis: "Etapa N de 8".
+ * Trilha das etapas: as N atividades da missão e, no fim, a conquista. A etapa
+ * na tela fica em destaque; as já liberadas podem ser tocadas para rever; as
+ * da frente ficam trancadas (desabilitadas). Nomes acessíveis estáveis:
+ * "Etapa n de N+1".
  */
 export function TrilhaEtapas({
+  atividades,
   etapaAtual,
   etapaVisivel,
   concluidas,
   aoIr,
   className,
 }: {
+  atividades: Atividade[];
   etapaAtual: number;
   etapaVisivel: number;
   concluidas: number[];
@@ -50,6 +31,10 @@ export function TrilhaEtapas({
   className?: string;
 }) {
   const refTrilha = useRef<HTMLOListElement | null>(null);
+  const itens = [
+    ...atividades.map((a) => ({ n: a.ordem, tipo: a.tipo as keyof typeof ICONE_TIPO })),
+    { n: atividades.length + 1, tipo: "conquista" as const },
+  ];
 
   useEffect(() => {
     refTrilha.current
@@ -58,8 +43,8 @@ export function TrilhaEtapas({
   }, [etapaVisivel]);
 
   return (
-    // Botões de 64 px (regra do escopo). No celular as 8 etapas não cabem
-    // lado a lado: a trilha rola na horizontal (a página não) e centraliza a atual.
+    // Botões de 64 px (regra do escopo). No celular as etapas não cabem lado a
+    // lado: a trilha rola na horizontal (a página não) e centraliza a atual.
     <ol
       ref={refTrilha}
       aria-label="Etapas da missão"
@@ -70,17 +55,16 @@ export function TrilhaEtapas({
         className,
       )}
     >
-      {ETAPAS.map((etapa, i) => {
-        const n = i + 1;
+      {itens.map(({ n, tipo }) => {
         const visivel = n === etapaVisivel;
         const liberada = n <= etapaAtual;
         const feita = concluidas.includes(n);
 
         return (
-          <li key={etapa} className="flex shrink-0 snap-center justify-center">
+          <li key={n} className="flex shrink-0 snap-center justify-center">
             <button
               type="button"
-              aria-label={`Etapa ${n} de ${ETAPAS.length}`}
+              aria-label={`Etapa ${n} de ${itens.length}`}
               aria-current={visivel ? "step" : undefined}
               data-etapa={n}
               disabled={!liberada}
@@ -88,27 +72,25 @@ export function TrilhaEtapas({
                 sons.toque();
 
                 if (visivel) {
-                  void narrar(NOME_FALADO_ETAPA[etapa]);
+                  void narrar(NOME_FALADO_TIPO[tipo]);
                 } else {
                   aoIr(n);
                 }
               }}
               className={cn(
-                "relative flex size-16 items-center justify-center rounded-2xl text-2xl",
+                "relative flex size-16 items-center justify-center rounded-2xl",
                 "transition-transform duration-150 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]",
                 "touch-manipulation select-none",
-                visivel && "z-10 scale-110 bg-white shadow-[0_4px_0_var(--c-teia-sombra)] ring-4 ring-[var(--c-teia)]",
-                !visivel && liberada && "bg-white/80 shadow-[0_3px_0_var(--c-borda)] active:translate-y-0.5",
-                !liberada && "cursor-not-allowed bg-black/5 opacity-45 grayscale",
+                visivel && "z-10 scale-110 bg-[var(--c-superficie-2)] text-[var(--c-primaria)] shadow-[0_4px_0_var(--c-primaria-sombra)] ring-4 ring-[var(--c-primaria)]",
+                !visivel && liberada && "bg-[var(--c-superficie)] text-[var(--c-tinta)] shadow-[0_3px_0_var(--c-borda)] active:translate-y-0.5",
+                !liberada && "cursor-not-allowed bg-white/5 text-[var(--c-tinta-suave)] opacity-45",
               )}
             >
-              <span aria-hidden className="leading-none">
-                {ICONE_ETAPA[etapa]}
-              </span>
+              {createElement(ICONE_TIPO[tipo], { "aria-hidden": true, className: "size-8", strokeWidth: 2.25 })}
               {feita && !visivel && (
                 <span
                   aria-hidden
-                  className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-[var(--c-grama)] text-white shadow"
+                  className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-[var(--c-sucesso)] text-[var(--c-fundo)] shadow"
                 >
                   <Check className="size-3.5" strokeWidth={4} />
                 </span>

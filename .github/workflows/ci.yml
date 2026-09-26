@@ -41,7 +41,7 @@ jobs:
           JWT_SECRET: ci-jwt-secret-nao-usar-em-producao-0123456789
 
   frontend:
-    name: Frontend (lint + build)
+    name: Frontend (lint + testes + build)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -55,6 +55,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npm run lint
+      - run: npm test
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: '1'

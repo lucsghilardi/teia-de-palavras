@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, KeyRound } from "lucide-react";
 import { useAnimate } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -22,7 +22,7 @@ import type { OpcaoVisual } from "@/types/OpcaoVisual";
 export type MotivoTrava = "adulto" | "espera";
 
 export const FALA_CHAMAR_ADULTO = "Vamos chamar um adulto para ajudar?";
-export const FALA_ESPERAR = "Vamos esperar um pouquinho? Depois a gente tenta de novo.";
+export const FALA_ESPERAR = "Vamos esperar um pouco? Depois a gente tenta de novo.";
 const FALA_TENTAR_DE_NOVO = "Hmm, não é essa figura. Vamos tentar de novo?";
 const FALA_SEM_CONEXAO = "Ops! Não consegui entrar agora. Vamos tentar de novo?";
 
@@ -101,20 +101,18 @@ export function FiguraSecreta({
   return (
     <main className="flex min-h-dvh flex-col">
       <BarraTopo instrucao={instrucao}>
-        <BotaoGrande rotulo="Voltar" cor="branco" tamanho={72} onClick={onVoltar} disabled={enviando !== null}>
+        <BotaoGrande rotulo="Voltar" cor="neutra" tamanho={72} onClick={onVoltar} disabled={enviando !== null}>
           <ArrowLeft className="size-9" aria-hidden />
         </BotaoGrande>
         <div className="flex min-w-0 items-center gap-2">
-          <VisualOpcao opcao={crianca.avatar} className="size-14 shrink-0 text-5xl" />
+          <VisualOpcao opcao={crianca.avatar} className="size-14 shrink-0" />
           <span className="truncate text-2xl font-black tracking-wide">{exibir(crianca.apelido)}</span>
         </div>
         <h1 className="sr-only">Qual é a sua figura secreta?</h1>
       </BarraTopo>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 pb-8">
-        <span aria-hidden className="text-5xl">
-          🤫
-        </span>
+        <KeyRound aria-hidden className="size-12 text-[var(--c-alerta)]" strokeWidth={2.25} />
         <ul
           ref={escopo}
           aria-label="Figuras secretas"
@@ -131,14 +129,14 @@ export function FiguraSecreta({
                   disabled={enviando !== null}
                   onClick={() => void escolher(figura)}
                   className={cn(
-                    "flex aspect-square w-full min-h-16 min-w-16 items-center justify-center rounded-3xl bg-white p-2",
+                    "flex aspect-square w-full min-h-16 min-w-16 items-center justify-center rounded-3xl bg-[var(--c-superficie)] p-2",
                     "shadow-[0_6px_0_var(--c-borda)] transition-transform duration-100 active:translate-y-1 active:shadow-none",
                     "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)] touch-manipulation",
                     enviando !== null && !escolhida && "opacity-50",
-                    escolhida && "ring-4 ring-[var(--c-teia)] ring-offset-2",
+                    escolhida && "ring-4 ring-[var(--c-primaria)] ring-offset-2 ring-offset-[var(--c-fundo)]",
                   )}
                 >
-                  <VisualOpcao opcao={figura} className="size-[70%] text-[clamp(3rem,14vmin,5.5rem)]" reserva="❓" />
+                  <VisualOpcao opcao={figura} className="size-[70%]" reserva="sparkles" />
                 </button>
               </li>
             );

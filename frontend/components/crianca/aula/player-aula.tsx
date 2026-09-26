@@ -1,25 +1,21 @@
 "use client";
 
+import { ArrowLeft, CloudOff, Lock, Orbit, RefreshCw, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { createElement, useCallback, useEffect, useReducer, useRef, useState } from "react";
 
+import { AtividadeAtual } from "@/components/crianca/atividades/registro";
+import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { AvisoConquistas, type LoteConquistas } from "@/components/crianca/aula/aviso-conquistas";
 import { BarraAula } from "@/components/crianca/aula/barra-aula";
-import { EtapaConquista } from "@/components/crianca/aula/etapas/etapa-conquista";
-import { EtapaConversa } from "@/components/crianca/aula/etapas/etapa-conversa";
-import { EtapaCriacao } from "@/components/crianca/aula/etapas/etapa-criacao";
-import { EtapaFicha } from "@/components/crianca/aula/etapas/etapa-ficha";
-import { EtapaMissao } from "@/components/crianca/aula/etapas/etapa-missao";
-import { EtapaPalavra } from "@/components/crianca/aula/etapas/etapa-palavra";
-import { EtapaPalmas } from "@/components/crianca/aula/etapas/etapa-palmas";
-import { EtapaProducao } from "@/components/crianca/aula/etapas/etapa-producao";
 import { cancelarNarracao, narrar, type Trecho } from "@/components/crianca/aula/narrador";
-import type { PropsEtapa } from "@/components/crianca/aula/tipos";
+import { TelaConquista } from "@/components/crianca/aula/tela-conquista";
 import { useWakeLock } from "@/components/crianca/aula/use-wake-lock";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { BotaoOuvir } from "@/components/crianca/ui/botao-ouvir";
 import { useCrianca } from "@/context/CriancaContext";
-import { estadoInicial, motorAula, nomeDaEtapa, TOTAL_ETAPAS } from "@/lib/aula/motor";
+import { COPY } from "@/lib/copy";
+import { atividadeVisivel, ehConquista, estadoInicial, motorAula, totalEtapas } from "@/lib/aula/motor";
 import { criarSincronizador, type Sincronizador } from "@/lib/aula/sincronia";
 import { parar } from "@/lib/fala";
 import { sons } from "@/lib/sons";
@@ -31,18 +27,18 @@ import {
 } from "@/services/crianca";
 import type { Conquista, ResultadoConclusao } from "@/types/CriancaApp";
 
-const FALA_TRANCADA = "Essa missão ainda está trancada";
-const FALA_FALHA = "Não consegui abrir a missão. Vamos tentar de novo?";
+const FALA_TRANCADA = COPY.missao.trancada;
+const FALA_FALHA = COPY.missao.falha;
 
-/** Tela simples de espera/aviso, sempre com saída para o mapa. */
+/** Tela simples de espera/aviso, sempre com saída para a Galáxia. */
 function TelaAviso({
-  emoji,
+  icone,
   fala,
   falarNaChegada = true,
   pulsar = false,
   aoTentarDeNovo,
 }: {
-  emoji: string;
+  icone: LucideIcon;
   /** O que o alto-falante repete (null = sem alto-falante, ex.: carregando). */
   fala: string | null;
   /** false quando quem abriu a tela já está falando (ex.: missão trancada). */
@@ -59,10 +55,8 @@ function TelaAviso({
   return (
     <div className="flex h-dvh flex-col">
       <header className="flex items-center justify-between gap-3 px-3 pt-3 sm:px-5">
-        <BotaoGrande rotulo="Voltar ao mapa" cor="branco" tamanho={64} onClick={() => router.push("/app")}>
-          <span aria-hidden className="text-3xl leading-none">
-            🗺️
-          </span>
+        <BotaoGrande rotulo={COPY.planeta.voltar} cor="neutra" tamanho={64} onClick={() => router.push("/app")}>
+          <ArrowLeft className="size-9" aria-hidden />
         </BotaoGrande>
         {fala && (
           <div onClickCapture={cancelarNarracao}>
@@ -75,14 +69,14 @@ function TelaAviso({
         aria-label={fala ? undefined : "Carregando"}
         className="flex flex-1 flex-col items-center justify-center gap-8 px-4"
       >
-        <span aria-hidden className={pulsar ? "animate-crianca-pulso text-8xl" : "text-8xl"}>
-          {emoji}
-        </span>
+        {createElement(icone, {
+          "aria-hidden": true,
+          strokeWidth: 1.75,
+          className: pulsar ? "size-24 animate-crianca-pulso text-[var(--c-primaria)]" : "size-24 text-[var(--c-borda)]",
+        })}
         {aoTentarDeNovo && (
-          <BotaoGrande rotulo="Tentar de novo" cor="ceu" tamanho={96} destaque onClick={aoTentarDeNovo}>
-            <span aria-hidden className="text-5xl leading-none">
-              🔄
-            </span>
+          <BotaoGrande rotulo={COPY.comum.tentarDeNovo} cor="primaria" tamanho={96} destaque onClick={aoTentarDeNovo}>
+            <RefreshCw className="size-12" aria-hidden />
           </BotaoGrande>
         )}
       </main>
@@ -91,9 +85,10 @@ function TelaAviso({
 }
 
 /**
- * Player da aula: carrega (POST /iniciar), retoma na etapa_atual, mostra a
- * etapa da vez com a barra de cima (mapa · trilha · alto-falante) e avisa o
- * servidor, de forma otimista, a cada etapa concluída.
+ * Player da missão: carrega (POST /iniciar), retoma na etapa_atual, mostra a
+ * atividade da vez (escolhida pelo registro de tipos) com a barra de cima
+ * (mapa · trilha · alto-falante) e avisa o servidor, de forma otimista, a
+ * cada etapa concluída. Depois da última atividade vem a tela de conquista.
  */
 export function PlayerAula({ id }: { id: number }) {
   const router = useRouter();
@@ -103,7 +98,7 @@ export function PlayerAula({ id }: { id: number }) {
   const [carga, setCarga] = useState(0);
   const [instrucao, setInstrucao] = useState<Trecho>({ texto: "Vamos começar a missão!" });
   const [lote, setLote] = useState<LoteConquistas | null>(null);
-  const [estrelasNoInicio] = useState(() => crianca?.estrelas ?? null);
+  const [xpNoInicio] = useState(() => crianca?.xp ?? null);
   const sincronizador = useRef<Sincronizador | null>(null);
   const refConteudo = useRef<HTMLElement | null>(null);
 
@@ -131,9 +126,12 @@ export function PlayerAula({ id }: { id: number }) {
       .then((aula) => {
         if (!ativo) return;
 
+        const total = totalEtapas(aula);
+
         sincronizador.current = criarSincronizador(
           (n) => concluirEtapaApi(id, n),
-          aula.status === "concluida" ? TOTAL_ETAPAS : aula.etapa_atual,
+          aula.status === "concluida" ? total : aula.etapa_atual,
+          total,
           (etapaAtual) => despachar({ tipo: "sincronizar", etapaAtual }),
         );
         despachar({ tipo: "carregar", aula });
@@ -171,14 +169,15 @@ export function PlayerAula({ id }: { id: number }) {
   }, [estado.etapaVisivel]);
 
   const etapaVisivel = estado.etapaVisivel;
+  const total = estado.total;
 
   const concluirEtapa = useCallback(() => {
     despachar({ tipo: "concluirEtapa", etapa: etapaVisivel });
 
-    if (etapaVisivel < TOTAL_ETAPAS) {
+    if (etapaVisivel < total) {
       void sincronizador.current?.concluir(etapaVisivel);
     }
-  }, [etapaVisivel]);
+  }, [etapaVisivel, total]);
 
   const irPara = useCallback((etapa: number) => despachar({ tipo: "irPara", etapa }), []);
 
@@ -195,16 +194,16 @@ export function PlayerAula({ id }: { id: number }) {
     despachar({ tipo: "descobrirPalavra", palavra, audio_url: audioUrl });
   }, []);
 
-  /** Garante as etapas 1..7 no servidor e conclui a aula (tenta 2 vezes). Nunca rejeita. */
+  /** Garante as etapas 1..N no servidor e conclui a missão (tenta 2 vezes). Nunca rejeita. */
   const concluirMissao = useCallback(async (): Promise<ResultadoConclusao | null> => {
     for (let tentativa = 0; tentativa < 2; tentativa++) {
-      await sincronizador.current?.concluir(TOTAL_ETAPAS - 1);
+      await sincronizador.current?.concluir(total - 1);
 
       try {
         const r = await concluirAulaApi(id);
 
         despachar({ tipo: "concluirAula" });
-        atualizar({ estrelas: r.estrelas });
+        atualizar({ xp: r.xp_total });
         void recarregar();
 
         return r;
@@ -219,16 +218,16 @@ export function PlayerAula({ id }: { id: number }) {
     }
 
     return null;
-  }, [id, atualizar, recarregar, router]);
+  }, [id, total, atualizar, recarregar, router]);
 
   if (falha === "trancada") {
-    return <TelaAviso emoji="🔒" fala={FALA_TRANCADA} falarNaChegada={false} />;
+    return <TelaAviso icone={Lock} fala={FALA_TRANCADA} falarNaChegada={false} />;
   }
 
   if (falha === "rede") {
     return (
       <TelaAviso
-        emoji="🌧️"
+        icone={CloudOff}
         fala={FALA_FALHA}
         aoTentarDeNovo={() => {
           setFalha(null);
@@ -239,44 +238,51 @@ export function PlayerAula({ id }: { id: number }) {
   }
 
   if (!estado.aula) {
-    return <TelaAviso emoji="🕸️" fala={null} pulsar />;
+    return <TelaAviso icone={Orbit} fala={null} pulsar />;
   }
 
   const aula = estado.aula;
-  const minusculas = crianca?.usa_minusculas ?? false;
-  const etapa = nomeDaEtapa(etapaVisivel);
-  const props: PropsEtapa = {
+  const minusculas = crianca?.usa_minusculas ?? true;
+  const atividade = atividadeVisivel(estado);
+  const conquista = ehConquista(estado);
+  const props: Omit<PropsAtividade, "atividade"> = {
     aula,
     minusculas,
     aoConcluir: concluirEtapa,
     definirInstrucao: setInstrucao,
     mostrarConquistas,
+    aoDescobrir: descobrirPalavra,
   };
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
       <BarraAula
+        disciplina={aula.disciplina}
+        atividades={aula.atividades}
         etapaAtual={estado.etapaAtual}
         etapaVisivel={etapaVisivel}
         concluidas={estado.concluidas}
         aoIr={irPara}
         instrucao={instrucao}
-        estrelas={crianca?.estrelas ?? null}
-        mostrarVoltar={etapa !== "conquista"}
+        xp={crianca?.xp ?? null}
+        mostrarVoltar={!conquista}
       />
 
       <main ref={refConteudo} className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden pt-2">
         <h1 className="sr-only">{aula.titulo}</h1>
-        {etapa === "missao" && <EtapaMissao key={etapa} {...props} />}
-        {etapa === "conversa" && <EtapaConversa key={etapa} {...props} />}
-        {etapa === "palavra" && <EtapaPalavra key={etapa} {...props} />}
-        {etapa === "palmas" && <EtapaPalmas key={etapa} {...props} />}
-        {etapa === "ficha" && <EtapaFicha key={etapa} {...props} />}
-        {etapa === "criacao" && <EtapaCriacao key={etapa} {...props} aoDescobrir={descobrirPalavra} />}
-        {etapa === "producao" && <EtapaProducao key={etapa} {...props} />}
-        {etapa === "conquista" && (
-          <EtapaConquista key={etapa} {...props} concluirMissao={concluirMissao} estrelasNoInicio={estrelasNoInicio} />
-        )}
+        {atividade ? (
+          <AtividadeAtual key={`${atividade.tipo}-${atividade.ordem}`} {...props} atividade={atividade} />
+        ) : conquista ? (
+          <TelaConquista
+            key="conquista"
+            aula={aula}
+            minusculas={minusculas}
+            definirInstrucao={setInstrucao}
+            mostrarConquistas={mostrarConquistas}
+            concluirMissao={concluirMissao}
+            xpNoInicio={xpNoInicio}
+          />
+        ) : null}
       </main>
 
       <AvisoConquistas lote={lote} minusculas={minusculas} aoSumir={esconderConquistas} />

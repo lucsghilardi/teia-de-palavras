@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { dicaDaCriacao, metasPendentes, organizarPecas, palavrasDaProducao } from "./conteudo";
-import { aulaTeia } from "./fixtures";
+import { aulaTeia, criacaoDe } from "./fixtures";
 
 describe("organizarPecas", () => {
   it("põe as da aula primeiro e tira repetidas", () => {
@@ -18,7 +18,7 @@ describe("organizarPecas", () => {
 });
 
 describe("metas e dica", () => {
-  const { metas } = aulaTeia();
+  const { metas } = criacaoDe(aulaTeia());
 
   it("pendentes descontam as achadas agora", () => {
     expect(metasPendentes(metas).map((m) => m.palavra)).toEqual(["TEIA", "TATU"]);

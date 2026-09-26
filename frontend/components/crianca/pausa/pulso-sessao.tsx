@@ -48,7 +48,7 @@ export function PulsoSessao() {
 
   return (
     <ConvitePausa
-      minusculas={crianca?.usa_minusculas ?? false}
+      minusculas={crianca?.usa_minusculas ?? true}
       onContinuar={() => setPausa(false)}
       onSair={() => {
         setPausa(false);

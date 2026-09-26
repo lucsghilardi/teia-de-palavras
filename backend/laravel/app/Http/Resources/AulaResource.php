@@ -14,7 +14,11 @@ class AulaResource extends JsonResource
         return [
             'id' => $this->id,
             'slug' => $this->slug,
+            'disciplina' => $this->disciplina,
             'titulo' => $this->titulo,
+            'rotulo' => $this->rotulo,
+            'descricao' => $this->descricao,
+            'habilidade_bncc' => $this->habilidade_bncc,
             'fase' => $this->fase,
             'ordem' => $this->ordem,
             'status' => $this->status,
@@ -55,6 +59,7 @@ class AulaResource extends JsonResource
                 'imagem_url' => Midia::url($w->imagem_path),
                 'audio_url' => Midia::url($w->audio_path),
             ])->values(),
+            'atividades' => AulaAtividadeResource::collection($this->atividades),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

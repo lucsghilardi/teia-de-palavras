@@ -1,36 +1,20 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend (Next.js 16)
 
-## Getting Started
-
-First, run the development server:
+Este é o app web da Teia de Palavras: o painel do educador em `app/(painel)` e o app da
+criança em `app/(crianca)`. Para subir o projeto, os comandos e as regras de negócio, leia o
+[`README.md`](../README.md) e o [`CLAUDE.md`](../CLAUDE.md) na raiz do repositório.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci            # dependências
+npm run dev       # desenvolvimento (porta 3000; no compose, 3005)
+npm test          # Vitest: lógica pura em lib/
+npm run lint      # eslint
+npm run build     # build de produção (standalone)
+npm run test:e2e  # Playwright: missões completas só por toques (exige a API no ar)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+O E2E prepara a turma de teste chamando `php artisan teia:preparar-e2e --json`. Por padrão ele
+usa o compose de desenvolvimento (`docker compose exec -T backend …`); para rodar sem Docker,
+defina `E2E_PREPARAR_CMD` com o comando local, por exemplo
+`E2E_PREPARAR_CMD="php artisan teia:preparar-e2e --json"` executado a partir de `backend/laravel`.
+Se o Chromium do Playwright não estiver baixado, `E2E_CHROMIUM=/caminho/do/chromium` usa um já instalado.
