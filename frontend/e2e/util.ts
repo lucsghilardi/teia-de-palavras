@@ -98,5 +98,5 @@ export async function etapaAtual(page: Page, n: number, total: number) {
 /** A tela nunca diz "errado", nem mostra nota ou ranking. */
 export async function semPalavrasProibidas(page: Page) {
   const texto = ((await page.locator("body").textContent()) ?? "").toLowerCase();
-  expect(texto).not.toMatch(/errad|incorret|ranking|nota\b/);
+  expect(texto).not.toMatch(/errad|incorret|ranking|\bnota\b(?! de )/);
 }

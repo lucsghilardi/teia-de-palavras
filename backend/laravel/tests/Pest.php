@@ -4,6 +4,8 @@ use App\Models\Aula;
 use App\Models\Crianca;
 use App\Models\CriancaAula;
 use Database\Seeders\ConfiguracoesSeeder;
+use Database\Seeders\ConteudoGeografiaSeeder;
+use Database\Seeders\ConteudoHistoriaSeeder;
 use Database\Seeders\ConteudoInicialSeeder;
 use Database\Seeders\ConteudoMatematicaSeeder;
 use Database\Seeders\DicionarioSeeder;
@@ -21,7 +23,7 @@ pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->in('Feature', 'Unit');
 
-/** Semeia avatares, configurações, dicionário, as 10 missões de Português e as de Matemática. */
+/** Semeia avatares, configurações, dicionário e as missões dos quatro planetas. */
 function semearConteudo(): void
 {
     test()->seed([
@@ -30,6 +32,8 @@ function semearConteudo(): void
         DicionarioSeeder::class,
         ConteudoInicialSeeder::class,
         ConteudoMatematicaSeeder::class,
+        ConteudoGeografiaSeeder::class,
+        ConteudoHistoriaSeeder::class,
     ]);
 }
 

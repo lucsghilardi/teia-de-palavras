@@ -8,12 +8,17 @@ use App\Models\AulaAtividade;
 
 /**
  * Sequência de atividades que uma aula recebe ao nascer (ou quando o CMS não
- * manda `atividades`). Português mantém a sequência histórica das missões;
- * as outras disciplinas começam vazias e o educador monta no editor.
+ * manda `atividades`). Só entram tipos que funcionam com config vazio; as
+ * missões semeadas de Português acrescentam `escolha` e `escolher_silaba`
+ * (ver Database\Seeders\ConteudoInicialSeeder::SEQUENCIA). As outras
+ * disciplinas começam vazias e o educador monta no editor.
  */
 final class AtividadesPadrao
 {
-    public const PORTUGUES = ['historia', 'conversa', 'palavra', 'palmas', 'ficha', 'montar_palavras', 'frase'];
+    public const PORTUGUES = ['historia', 'conversa', 'palavra', 'ficha', 'montar_palavras', 'frase'];
+
+    /** Sequência da primeira versão (o backfill da migration de disciplinas usa esta). */
+    public const PORTUGUES_LEGADA = ['historia', 'conversa', 'palavra', 'palmas', 'ficha', 'montar_palavras', 'frase'];
 
     /** @return list<string> */
     public static function paraDisciplina(Disciplina $disciplina): array

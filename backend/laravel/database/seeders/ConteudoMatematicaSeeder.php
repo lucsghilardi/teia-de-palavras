@@ -2,60 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Enums\Disciplina;
-use App\Models\Aula;
-use App\Services\Aulas\AulaEditorService;
+use App\Services\Conteudo\AplicadorConteudo;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Missões de Matemática (BNCC 2º ano), no universo da nave Teia. Cada missão
- * é uma sequência de atividades em JSON validadas pelo registro de tipos.
- * Idempotente: missão que já existe (pelo slug) não é tocada.
+ * é uma sequência de atividades genéricas (config JSON validado pelos
+ * avaliadores), do concreto (ícones) ao abstrato (símbolos). Idempotente por slug.
  */
 class ConteudoMatematicaSeeder extends Seeder
 {
-    public function run(AulaEditorService $editor): void
+    public function run(AplicadorConteudo $aplicador): void
     {
-        $anterior = null;
-
-        foreach (self::missoes() as $dados) {
-            $existente = Aula::where('slug', $dados['slug'])->first();
-
-            if ($existente !== null) {
-                $anterior = $existente;
-
-                continue;
-            }
-
-            // Tudo ou nada: um config inválido não deixa a missão pela metade no banco.
-            $anterior = DB::transaction(function () use ($dados, $anterior, $editor) {
-                $aula = Aula::create([
-                    'slug' => $dados['slug'],
-                    'disciplina' => Disciplina::Matematica->value,
-                    'titulo' => $dados['titulo'],
-                    'rotulo' => $dados['rotulo'],
-                    'descricao' => $dados['descricao'],
-                    'habilidade_bncc' => $dados['habilidade_bncc'],
-                    'fase' => $dados['fase'],
-                    'ordem' => $dados['ordem'],
-                    'status' => Aula::STATUS_RASCUNHO,
-                ]);
-
-                $editor->atualizar($aula, [
-                    'titulo' => $dados['titulo'],
-                    'fase' => $dados['fase'],
-                    'pre_requisito_aula_id' => $anterior?->id,
-                    'atividades' => $dados['atividades'],
-                ]);
-
-                if ($dados['publicar']) {
-                    $editor->publicar($aula);
-                }
-
-                return $aula;
-            });
-        }
+        $aplicador->aplicarLista(self::missoes());
     }
 
     /** @return list<array<string, mixed>> */
@@ -64,6 +23,7 @@ class ConteudoMatematicaSeeder extends Seeder
         return [
             [
                 'slug' => 'matematica-1-somar-para-decolar',
+                'disciplina' => 'matematica',
                 'titulo' => 'Somar para decolar',
                 'rotulo' => '7 + 5',
                 'descricao' => 'Contar, somar e subtrair até 20 para abastecer a nave.',
@@ -125,6 +85,154 @@ class ConteudoMatematicaSeeder extends Seeder
                                 'dica' => 'Tire 5 de 15.',
                                 'explicacao' => '15 - 5 = 10.',
                             ],
+                        ]],
+                    ],
+                ],
+            ],
+            [
+                'slug' => 'matematica-2-contar-ate-100',
+                'disciplina' => 'matematica',
+                'titulo' => 'Contar até 100',
+                'rotulo' => '1, 2, 3',
+                'descricao' => 'Contar, comparar e ordenar números até 100 com o radar da nave.',
+                'habilidade_bncc' => 'EF02MA01',
+                'fase' => 1,
+                'ordem' => 2,
+                'publicar' => true,
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'O radar',
+                        'config' => ['paginas' => [
+                            ['texto' => 'O radar da nave Teia contou estrelas a noite inteira. Agora é a sua vez de conferir a contagem.', 'icone' => 'radar'],
+                            ['texto' => 'Quando der, conte de 10 em 10: 10, 20, 30... É bem mais rápido do que contar de um em um.', 'icone' => 'hash'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'contar',
+                        'titulo' => 'Conferir o radar',
+                        'instrucao' => 'Conte em grupos de 10 e toque no número certo.',
+                        'config' => ['itens' => [
+                            ['icone' => 'star', 'quantidade' => 23],
+                            ['icone' => 'moon', 'quantidade' => 41],
+                            ['icone' => 'rocket', 'quantidade' => 68],
+                            ['icone' => 'satellite', 'quantidade' => 90],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'ordenar',
+                        'titulo' => 'Do menor ao maior',
+                        'instrucao' => 'Coloque os números em ordem, do menor ao maior.',
+                        'config' => [
+                            'instrucao' => 'do menor ao maior',
+                            'modo' => 'numeros',
+                            'itens' => [['texto' => '12'], ['texto' => '25'], ['texto' => '47'], ['texto' => '63'], ['texto' => '88']],
+                            'dica' => 'Comece pelo número menor. Olhe primeiro as dezenas.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'Antes e depois',
+                        'instrucao' => 'Toque na resposta.',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'Qual número vem logo depois de 39?', 'opcoes' => ['40', '38', '49'], 'correta' => 0, 'dica' => 'Conte a partir de 39: 39, 40.', 'explicacao' => 'Depois de 39 vem 40.'],
+                            ['pergunta' => 'Qual desses números é o maior?', 'opcoes' => ['71', '17', '70'], 'correta' => 0, 'dica' => 'Olhe primeiro as dezenas; se empatar, as unidades.', 'explicacao' => '71 tem 7 dezenas e 1 unidade: é o maior.'],
+                        ]],
+                    ],
+                ],
+            ],
+            [
+                'slug' => 'matematica-3-dezenas-e-unidades',
+                'disciplina' => 'matematica',
+                'titulo' => 'Dezenas e unidades',
+                'rotulo' => '10 + 4',
+                'descricao' => 'Pacotes de 10 e caixas soltas: dezenas e unidades nos suprimentos da base.',
+                'habilidade_bncc' => 'EF02MA04',
+                'fase' => 1,
+                'ordem' => 3,
+                'publicar' => true,
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'Pacotes de 10',
+                        'config' => ['paginas' => [
+                            ['texto' => 'Na base, as caixas de suprimentos chegam em pacotes de 10. Um pacote fechado é uma dezena.', 'icone' => 'package'],
+                            ['texto' => '14 caixas são 1 pacote de 10 e mais 4 soltas: 1 dezena e 4 unidades. 10 + 4 = 14.', 'icone' => 'hash'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'contar',
+                        'titulo' => 'Pacotes e caixas soltas',
+                        'instrucao' => 'Conte os pacotes de 10 e as caixas soltas.',
+                        'config' => ['itens' => [
+                            ['icone' => 'package', 'quantidade' => 14],
+                            ['icone' => 'package', 'quantidade' => 32],
+                            ['icone' => 'package', 'quantidade' => 57],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'parear',
+                        'titulo' => 'Número e pacotes',
+                        'instrucao' => 'Ligue cada número ao que ele tem.',
+                        'config' => [
+                            'instrucao' => 'ligue cada número ao que ele tem',
+                            'pares' => [
+                                ['a' => '34', 'b' => '3 dezenas e 4 unidades'],
+                                ['a' => '50', 'b' => '5 dezenas'],
+                                ['a' => '29', 'b' => '2 dezenas e 9 unidades'],
+                                ['a' => '7', 'b' => '7 unidades'],
+                            ],
+                            'dica' => 'Conte os pacotes de 10 primeiro: eles são as dezenas.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'Quantas dezenas?',
+                        'instrucao' => 'Toque na resposta.',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'Quantas dezenas tem o número 46?', 'opcoes' => ['4', '6', '46'], 'correta' => 0, 'dica' => 'A dezena é o primeiro algarismo.', 'explicacao' => '46 tem 4 dezenas e 6 unidades.'],
+                            ['pergunta' => 'O número 80 tem quantas unidades soltas?', 'opcoes' => ['0', '8', '80'], 'correta' => 0, 'dica' => 'São 8 pacotes fechados e nenhuma caixa solta.', 'explicacao' => '80 são 8 dezenas e 0 unidades.'],
+                        ]],
+                    ],
+                ],
+            ],
+            [
+                'slug' => 'matematica-4-loja-espacial',
+                'disciplina' => 'matematica',
+                'titulo' => 'Loja espacial',
+                'rotulo' => 'R$',
+                'descricao' => 'Moedas e notas na loja da base (entra no ar com a atividade de dinheiro).',
+                'habilidade_bncc' => 'EF02MA20',
+                'fase' => 1,
+                'ordem' => 4,
+                'publicar' => false,
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'A loja da base',
+                        'config' => ['paginas' => [
+                            ['texto' => 'A loja da base vende peças, lanches e adesivos de planetas. Para comprar, a tripulação usa moedas e notas.', 'icone' => 'store'],
+                            ['texto' => 'Moedas de 1 real, 50 centavos e 25 centavos; notas de 2, 5, 10 e 20 reais. Juntar as certas é a missão.', 'icone' => 'coins'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'ordenar',
+                        'titulo' => 'Do que vale menos ao que vale mais',
+                        'instrucao' => 'Coloque em ordem, do que vale menos ao que vale mais.',
+                        'config' => [
+                            'instrucao' => 'do que vale menos ao que vale mais',
+                            'modo' => 'numeros',
+                            'itens' => [['texto' => '1 real', 'icone' => 'coins'], ['texto' => '2 reais', 'icone' => 'banknote'], ['texto' => '5 reais', 'icone' => 'banknote'], ['texto' => '10 reais', 'icone' => 'banknote']],
+                            'dica' => 'A moeda de 1 real vale menos que qualquer nota de dinheiro.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'Quantas moedas?',
+                        'instrucao' => 'Toque na resposta.',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'Quantas moedas de 1 real formam 5 reais?', 'opcoes' => ['5', '1', '10'], 'correta' => 0, 'dica' => 'Conte de 1 em 1 até chegar em 5.', 'explicacao' => '5 moedas de 1 real são 5 reais.'],
+                            ['pergunta' => 'Uma nota de 10 reais vale quantas moedas de 1 real?', 'opcoes' => ['10', '5', '2'], 'correta' => 0, 'dica' => 'Conte de 1 em 1 até 10.', 'explicacao' => 'Uma nota de 10 vale 10 moedas de 1 real.'],
                         ]],
                     ],
                 ],

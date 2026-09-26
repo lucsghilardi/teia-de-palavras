@@ -21,8 +21,13 @@ final class VerdadeiroFalso extends Escolha
         return [
             'itens' => ['required', 'array', 'min:1', 'max:12'],
             'itens.*.id' => ['nullable', 'string', 'max:40'],
-            'itens.*.frase' => ['required', 'string', 'max:300'],
-            'itens.*.correta' => ['required', 'boolean'],
+            // Entrada do CMS: `frase` + `correta` booleana. Config já normalizado: formato de escolha.
+            'itens.*.frase' => ['required_without:itens.*.pergunta', 'nullable', 'string', 'max:300'],
+            'itens.*.pergunta' => ['nullable', 'string', 'max:300'],
+            'itens.*.opcoes' => ['nullable', 'array', 'size:2'],
+            'itens.*.opcoes.*' => ['string', 'max:40'],
+            'itens.*.correta' => ['required'],
+            'embaralhar' => ['nullable', 'boolean'],
             'itens.*.dica' => ['nullable', 'string', 'max:200'],
             'itens.*.explicacao' => ['nullable', 'string', 'max:300'],
             'itens.*.icone' => ['nullable', 'string', 'max:40'],

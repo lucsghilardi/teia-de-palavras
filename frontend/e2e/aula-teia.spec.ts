@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page, test } from "@playwright/test";
 
 import { type CriancaE2E, prepararCriancaE2E } from "./fixture";
+import { semPalavrasProibidas } from "./util";
 
 /*
 | Critério de aceite da Fase 2: uma criança completa a aula TEIA do início ao
@@ -101,7 +102,7 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await cabeNaTela(page);
   await capturar(page, "galaxia");
   await expect(page.getByRole("button", { name: "Planeta Português", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Planeta Geografia", exact: true })).toContainText(/em breve/i);
+  await expect(page.getByRole("button", { name: "Planeta Geografia", exact: true })).toContainText("0 de 3");
 
   // ---------- Planeta Português: a trilha de missões ----------
   await tocar(page, "Planeta Português");
@@ -118,9 +119,13 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   expect(await tocarEnquantoHouver(page, "Próximo")).toBeGreaterThan(0);
   await tocar(page, "Continuar");
 
-  // ---------- 2. Conversa ----------
+  // ---------- 2. Você entendeu? Duas perguntas de compreensão ----------
   await etapaAtual(page, 2);
-  await tocarEnquantoHouver(page, "Próxima pergunta");
+  await expect(botao(page, "Continuar")).toBeHidden();
+  await tocar(page, "Por causa da rede de energia que ela lança");
+  await tocar(page, "Próximo");
+  await tocar(page, "Um robô tatu");
+  await semPalavrasProibidas(page);
   await tocar(page, "Continuar");
 
   // ---------- 3. Palavra geradora ----------
@@ -128,25 +133,16 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await tocar(page, "Palavra TEIA");
   await tocar(page, "Continuar");
 
-  // ---------- 4. Palmas silábicas: um toque por sílaba ----------
+  // ---------- 4. Ficha de descoberta ----------
   await etapaAtual(page, 4);
-  await expect(botao(page, "Continuar")).toBeHidden();
-  await tocar(page, "Palma");
-  await tocar(page, "Palma");
-  await expect(botao(page, "Sílaba TEI")).toBeVisible();
-  await expect(botao(page, "Sílaba A")).toBeVisible();
-  await tocar(page, "Continuar");
-
-  // ---------- 5. Ficha de descoberta ----------
-  await etapaAtual(page, 5);
   for (const silaba of ["TA", "TE", "TI", "TO", "TU"]) {
     await expect(botao(page, `Sílaba ${silaba}`)).toBeVisible();
   }
   await tocar(page, "Sílaba TA");
   await tocar(page, "Continuar");
 
-  // ---------- 6. Criação: montar palavras com as peças ----------
-  await etapaAtual(page, 6);
+  // ---------- 5. Criação: montar palavras com as peças ----------
+  await etapaAtual(page, 5);
 
   // Tentativa que não existe: dica gentil, nada de "errado".
   await tocar(page, "Sílaba TU");
@@ -165,6 +161,20 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await tocar(page, "Sílaba TO");
   await tocar(page, "Formar palavra");
   await expect(botao(page, "Palavra TETO na teia")).toBeVisible();
+  await capturar(page, "etapa-5-depois");
+  await tocar(page, "Continuar");
+
+  // ---------- 6. Escolher a sílaba: completar TATU e TETO, trocar TIA por TIO ----------
+  await etapaAtual(page, 6);
+  await expect(botao(page, "Continuar")).toBeHidden();
+  // Uma escolha que não é: dica falada, nada de "errado", e a criança tenta de novo.
+  await tocar(page, "Sílaba TO");
+  await semPalavrasProibidas(page);
+  await tocar(page, "Sílaba TU");
+  await tocar(page, "Próximo");
+  await tocar(page, "Sílaba TE");
+  await tocar(page, "Próximo");
+  await tocar(page, "Sílaba O");
   await capturar(page, "etapa-6-depois");
   await tocar(page, "Continuar");
 
@@ -202,10 +212,12 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await expect(botao(page, "Palavra TETO")).toBeVisible();
   await expect(page.locator("body")).not.toContainText(/errad|incorret|ranking|nota/i);
 
-  // ---------- A Galáxia direto para a próxima missão do dia ----------
+  // ---------- A Galáxia mostra o progresso do planeta ----------
   await tocar(page, "Voltar à Galáxia");
   await expect(page).toHaveURL(/\/app$/);
-  await expect(page.getByRole("button", { name: "Missão BONECA, disponível", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Planeta Português", exact: true })).toContainText("1 de 5");
+  // Português acabou de ser jogado: as missões do dia passam a ser dos outros planetas.
+  await expect(page.getByRole("button", { name: "Missão 7 + 5, disponível", exact: true })).toBeVisible();
 });
 
 test("figura secreta diferente não entra e não diz 'errado'", async ({ page }) => {

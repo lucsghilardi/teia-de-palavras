@@ -7,7 +7,9 @@ subir o projeto e o plano de fases.
 - Uma aula pertence a uma disciplina (`App\Enums\Disciplina`: portugues, matematica, geografia,
   historia) e é uma sequência de atividades (`aula_atividades`; tipos em `App\Services\Atividades\RegistroAtividades`,
   formato do `config` em `docs/atividades.md`). Tipo novo = avaliador novo no registro + componente no front.
-- Aula de Português tem UMA palavra geradora; sílabas geram famílias (TE → TA TE TI TO TU).
+- Aula de Português tem UMA palavra geradora; sílabas geram famílias (TE → TA TE TI TO TU). Missão semeada:
+  `historia, escolha, palavra, ficha, montar_palavras, escolher_silaba, frase` (sem palmas); conteúdo semeado
+  nunca sobrescreve edição do CMS (só `teia:reaplicar-conteudo --forcar`). Base pedagógica em `docs/metodos.md`.
 - Famílias ACUMULAM entre aulas: sílabas de aulas anteriores seguem disponíveis.
 - Progresso da criança: `etapa_atual` vai de 1 a N+1 (N atividades; N+1 é a conquista). Nada de `Aula::ETAPAS`.
 - Nunca mostrar "errado", nota ou ranking à criança. 1º erro → mensagem curta + dica; 2º erro → a resposta e o item

@@ -35,12 +35,13 @@ it('é idempotente', function () {
     expect(Aula::count())->toBe($antes);
 });
 
-it('a missão aparece no mapa como disponível, depois das de Português', function () {
+it('as missões publicadas aparecem no mapa encadeadas, depois das de Português', function () {
     $crianca = Crianca::factory()->create();
     $missoes = $this->comoCrianca($crianca)->getJson('/api/crianca/mapa')->json('missoes');
-    $matematica = collect($missoes)->where('disciplina', 'matematica');
+    $matematica = collect($missoes)->where('disciplina', 'matematica')->values();
 
-    expect($matematica)->toHaveCount(1)
-        ->and($matematica->first()['status'])->toBe('disponivel')
-        ->and(collect($missoes)->pluck('disciplina')->unique()->values()->all())->toBe(['portugues', 'matematica']);
+    expect($matematica)->toHaveCount(3)
+        ->and($matematica->pluck('rotulo')->all())->toBe(['7 + 5', '1, 2, 3', '10 + 4'])
+        ->and($matematica->pluck('status')->all())->toBe(['disponivel', 'bloqueada', 'bloqueada'])
+        ->and(collect($missoes)->pluck('disciplina')->unique()->values()->all())->toBe(['portugues', 'matematica', 'geografia', 'historia']);
 });

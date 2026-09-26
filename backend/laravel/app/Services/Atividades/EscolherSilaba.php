@@ -30,8 +30,9 @@ final class EscolherSilaba extends Generico
             'itens' => ['required', 'array', 'min:1', 'max:12'],
             'itens.*.id' => ['nullable', 'string', 'max:40'],
             'itens.*.modo' => ['required', 'string', 'in:completar,trocar'],
-            'itens.*.palavra' => ['required_if:itens.*.modo,completar', 'nullable', 'string', 'max:40'],
-            'itens.*.de' => ['required_if:itens.*.modo,trocar', 'nullable', 'string', 'max:40'],
+            // `palavra` (ou `de`, no modo trocar): o config normalizado guarda sempre em `palavra`.
+            'itens.*.palavra' => ['nullable', 'string', 'max:40'],
+            'itens.*.de' => ['nullable', 'string', 'max:40'],
             'itens.*.para' => ['required_if:itens.*.modo,trocar', 'nullable', 'string', 'max:40'],
             'itens.*.silabas' => ['required', 'array', 'min:1', 'max:8'],
             'itens.*.silabas.*' => ['required', 'string', 'max:8'],
@@ -51,13 +52,18 @@ final class EscolherSilaba extends Generico
             $silabas = array_values(array_map(fn ($s) => mb_strtoupper(trim($s), 'UTF-8'), $item['silabas']));
             $opcoes = array_values(array_unique(array_map(fn ($s) => mb_strtoupper(trim($s), 'UTF-8'), $item['opcoes'])));
             $modo = $item['modo'];
-            $posicao = (int) ($modo === 'completar' ? ($item['oculta'] ?? 0) : ($item['posicao'] ?? 0));
+            // No config de entrada, completar usa `oculta`; o normalizado guarda `posicao` nos dois modos.
+            $posicao = (int) ($item['posicao'] ?? ($modo === 'completar' ? ($item['oculta'] ?? 0) : 0));
 
             if ($posicao >= count($silabas)) {
                 throw ValidationException::withMessages(["itens.$i.".($modo === 'completar' ? 'oculta' : 'posicao') => 'A posição precisa apontar para uma das sílabas.']);
             }
 
-            $palavra = mb_strtoupper(trim((string) ($modo === 'completar' ? $item['palavra'] : $item['de'])), 'UTF-8');
+            $palavra = mb_strtoupper(trim((string) ($item['palavra'] ?? $item['de'] ?? '')), 'UTF-8');
+
+            if ($palavra === '') {
+                throw ValidationException::withMessages(["itens.$i.".($modo === 'completar' ? 'palavra' : 'de') => 'Informe a palavra.']);
+            }
 
             if (Texto::juntarNormalizado($silabas) !== Texto::normalizar($palavra)) {
                 throw ValidationException::withMessages(["itens.$i.silabas" => "As sílabas não formam {$palavra}."]);

@@ -27,7 +27,7 @@ it('aula nova de Português já vem com a sequência legada de atividades', func
 
     $resumo = $this->comoAdulto($this->educador)->getJson('/api/painel/aulas')->assertOk()->json();
 
-    expect($resumo[0]['totais']['atividades'])->toBe(7)
+    expect($resumo[0]['totais']['atividades'])->toBe(count(AtividadesPadrao::PORTUGUES))
         ->and($resumo[0]['rotulo'])->toBe('TEIA');
 });
 

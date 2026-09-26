@@ -1,8 +1,9 @@
 <?php
 
+use App\Models\Aula;
 use App\Models\Crianca;
 use App\Models\CriancaAula;
-use App\Services\Aulas\AtividadesPadrao;
+use Database\Seeders\ConteudoInicialSeeder;
 
 beforeEach(function () {
     semearConteudo();
@@ -16,17 +17,20 @@ it('entrega a sequência de atividades montada por tipo, sem respostas', functio
     expect($aula['disciplina'])->toBe('portugues')
         ->and($aula['rotulo'])->toBe('TEIA')
         ->and($aula['total_atividades'])->toBe(7)
-        ->and($aula['etapas'])->toBe([...AtividadesPadrao::PORTUGUES, 'conquista'])
-        ->and(array_column($aula['atividades'], 'tipo'))->toBe(AtividadesPadrao::PORTUGUES)
+        ->and($aula['etapas'])->toBe([...ConteudoInicialSeeder::SEQUENCIA, 'conquista'])
+        ->and(array_column($aula['atividades'], 'tipo'))->toBe(ConteudoInicialSeeder::SEQUENCIA)
         ->and(array_column($aula['atividades'], 'ordem'))->toBe(range(1, 7))
-        ->and(array_column($aula['atividades'], 'avaliada'))->toBe([false, false, false, false, false, true, true]);
+        ->and(array_column($aula['atividades'], 'avaliada'))->toBe([false, true, false, false, true, true, true]);
 
-    [$historia, $conversa, $palavra, $palmas, $ficha, $criacao, $frase] = $aula['atividades'];
+    [$historia, $escolha, $palavra, $ficha, $criacao, $silaba, $frase] = $aula['atividades'];
 
-    expect($historia['paginas'])->toHaveCount(5)
-        ->and($conversa['perguntas'])->toHaveCount(3)
+    expect($historia['paginas'])->toHaveCount(3)
+        ->and($escolha['itens'])->toHaveCount(2)
+        ->and($escolha['itens'][0]['opcoes'])->toHaveCount(3)
+        ->and($escolha['itens'][0])->not->toHaveKey('correta')
         ->and($palavra['palavra'])->toBe('TEIA')
-        ->and(array_column($palmas['silabas'], 'texto'))->toBe(['TEI', 'A'])
+        ->and($silaba['itens'])->toHaveCount(3)
+        ->and($silaba['itens'][0]['pecas'])->toBe(['TA', null])
         ->and(array_column($ficha['linhas'][0]['membros'], 'texto'))->toBe(['TA', 'TE', 'TI', 'TO', 'TU'])
         ->and(array_column($criacao['pecas'], 'texto'))->toBe(array_column($aula['pecas'], 'texto'))
         ->and(array_column($criacao['metas'], 'palavra'))->toContain('TATU')
@@ -51,7 +55,7 @@ it('a última etapa concluível é a última atividade; a conquista vem depois d
 it('responder numa atividade avaliada equivale à tentativa da criação', function () {
     $url = "/api/crianca/aulas/{$this->teia->id}/atividades";
 
-    $acerto = $this->comoCrianca($this->crianca)->postJson("{$url}/6/responder", ['silabas' => ['TA', 'TU']])
+    $acerto = $this->comoCrianca($this->crianca)->postJson("{$url}/5/responder", ['silabas' => ['TA', 'TU']])
         ->assertOk()
         ->assertJsonPath('correta', true)
         ->assertJsonPath('extra.palavra', 'TATU')
@@ -63,7 +67,7 @@ it('responder numa atividade avaliada equivale à tentativa da criação', funct
 
     expect($acerto['extra']['conquistas'][0]['chave'])->toBe('primeira_palavra');
 
-    $erro = $this->comoCrianca($this->crianca)->postJson("{$url}/6/responder", ['silabas' => ['TU', 'TO', 'TA']])
+    $erro = $this->comoCrianca($this->crianca)->postJson("{$url}/5/responder", ['silabas' => ['TU', 'TO', 'TA']])
         ->assertOk()
         ->assertJsonPath('correta', false)
         ->assertJsonPath('xp_ganho', 0)
@@ -76,6 +80,12 @@ it('responder numa atividade avaliada equivale à tentativa da criação', funct
         ->assertOk()
         ->assertJsonPath('correta', true)
         ->assertJsonPath('extra.texto', 'O TATU');
+
+    // Escolher sílaba (EF02LP02): completar TATU com TU.
+    $this->comoCrianca($this->crianca)->postJson("{$url}/6/responder", ['item' => 'e1', 'silaba' => 'TU'])
+        ->assertOk()
+        ->assertJsonPath('correta', true)
+        ->assertJsonPath('xp_ganho', 1);
 });
 
 it('recusa resposta em atividade que não é avaliada ou que não existe', function () {
@@ -85,7 +95,7 @@ it('recusa resposta em atividade que não é avaliada ou que não existe', funct
     $this->comoCrianca($this->crianca)->postJson("{$url}/9/responder", [])->assertNotFound();
 
     $boneca = aulaDaPalavra('BONECA');
-    $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$boneca->id}/atividades/6/responder", ['silabas' => ['BO', 'CA']])->assertForbidden();
+    $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$boneca->id}/atividades/5/responder", ['silabas' => ['BO', 'CA']])->assertForbidden();
 });
 
 it('mapa traz disciplina, rótulo e total de atividades, e filtra por disciplina', function () {
@@ -99,7 +109,7 @@ it('mapa traz disciplina, rótulo e total de atividades, e filtra por disciplina
 
     expect(collect($matematica)->pluck('disciplina')->unique()->all())->toBe(['matematica'])
         ->and($this->comoCrianca($this->crianca)->getJson('/api/crianca/mapa?disciplina=portugues')->json('missoes'))->toHaveCount(5)
-        ->and($this->comoCrianca($this->crianca)->getJson('/api/crianca/mapa?disciplina=quimica')->json('missoes'))->toHaveCount(5 + count($matematica));
+        ->and($this->comoCrianca($this->crianca)->getJson('/api/crianca/mapa?disciplina=quimica')->json('missoes'))->toHaveCount(Aula::publicadas()->count());
 });
 
 it('etapa_atual nunca passa da conquista quando a missão encolhe', function () {

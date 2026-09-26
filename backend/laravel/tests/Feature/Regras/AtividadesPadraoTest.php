@@ -2,12 +2,13 @@
 
 use App\Models\Aula;
 use App\Services\Aulas\AtividadesPadrao;
+use Database\Seeders\ConteudoInicialSeeder;
 
-it('toda missão semeada de Português tem a sequência legada de 7 atividades', function () {
+it('toda missão semeada de Português tem a sequência de 7 atividades (com escolha e escolher_silaba)', function () {
     semearConteudo();
 
     Aula::daDisciplina('portugues')->with('atividades')->get()->each(function (Aula $aula) {
-        expect($aula->atividades->pluck('tipo')->all())->toBe(AtividadesPadrao::PORTUGUES)
+        expect($aula->atividades->pluck('tipo')->all())->toBe(ConteudoInicialSeeder::SEQUENCIA)
             ->and($aula->atividades->pluck('ordem')->all())->toBe(range(1, 7))
             ->and($aula->disciplina)->toBe('portugues');
     });
@@ -21,7 +22,8 @@ it('garantir() cria a sequência padrão uma única vez e deixa outras disciplin
     $matematica = Aula::create(['slug' => 'm', 'titulo' => 'M', 'disciplina' => 'matematica']);
     AtividadesPadrao::garantir($matematica);
 
-    expect($portugues->atividades()->count())->toBe(7)
+    expect($portugues->atividades()->count())->toBe(count(AtividadesPadrao::PORTUGUES))
+        ->and($portugues->atividades()->pluck('tipo')->all())->not->toContain('palmas')
         ->and($matematica->atividades()->count())->toBe(0)
         ->and($matematica->palavra_geradora)->toBeNull()
         ->and($matematica->totalAtividades())->toBe(0);
@@ -35,7 +37,7 @@ it('a migration preenche aulas antigas de Português sem atividades (idempotente
     $migration->preencherAtividadesLegadas();
     $migration->preencherAtividadesLegadas();
 
-    expect($aula->atividades()->pluck('tipo')->all())->toBe(AtividadesPadrao::PORTUGUES)
+    expect($aula->atividades()->pluck('tipo')->all())->toBe(AtividadesPadrao::PORTUGUES_LEGADA)
         ->and($outra->atividades()->count())->toBe(0);
 });
 
