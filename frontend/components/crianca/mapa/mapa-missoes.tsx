@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCw, Repeat } from "lucide-react";
+import { RefreshCw, Repeat, RotateCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -11,6 +11,7 @@ import { BotaoOuvir } from "@/components/crianca/ui/botao-ouvir";
 import { useCrianca } from "@/context/CriancaContext";
 import { useFalarAoChegar } from "@/hooks/use-falar-ao-chegar";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
+import { rotuloRevisao } from "@/lib/crianca/revisao";
 import { exibir } from "@/lib/exibir";
 import { falar } from "@/lib/fala";
 import { sons } from "@/lib/sons";
@@ -199,21 +200,34 @@ export function MapaMissoes() {
   }
 
   const estrelas = crianca?.estrelas ?? 0;
+  const nivel = crianca?.nivel ?? 1;
+  const devidos = crianca?.revisao_devidos ?? 0;
   const rotuloEstrelas = estrelas === 1 ? "1 estrela" : `${estrelas} estrelas`;
 
   return (
     <main className="flex min-h-dvh flex-col bg-[linear-gradient(180deg,#E8F6FF_0%,var(--c-fundo)_45%,#EAF8E6_100%)]">
       <header className="sticky top-0 z-10 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[color-mix(in_srgb,#E8F6FF_88%,transparent)] px-4 pt-4 pb-3 backdrop-blur sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:px-6">
+        <h1 className="sr-only">Mapa de missões</h1>
         <div className="col-start-1 row-start-1 flex min-w-0 items-center gap-3">
-          <span className="flex size-16 shrink-0 items-center justify-center rounded-full border-4 border-white bg-white shadow-[0_4px_0_var(--c-borda)]">
-            <VisualOpcao opcao={crianca?.avatar} className="size-12 text-5xl" />
-          </span>
-          <h1 className="truncate text-2xl font-black tracking-wide sm:text-3xl">
-            {crianca ? exibir(crianca.apelido, minusculas) : " "}
-          </h1>
+          <BotaoGrande
+            rotulo="Meu perfil"
+            cor="branco"
+            redondo={false}
+            tamanho={64}
+            className="max-w-full justify-start gap-3 py-1 pr-5 pl-1"
+            onClick={() => router.push("/app/eu")}
+          >
+            <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-[var(--c-fundo)]">
+              <VisualOpcao opcao={crianca?.avatar} className="size-11 text-4xl" />
+            </span>
+            <span aria-hidden className="flex min-w-0 flex-col items-start leading-tight">
+              <span className="truncate text-2xl font-black tracking-wide sm:text-3xl">{crianca ? exibir(crianca.apelido, minusculas) : " "}</span>
+              <span className="text-sm font-bold text-[var(--c-teia)]">{exibir(`Nível ${nivel}`, minusculas)}</span>
+            </span>
+          </BotaoGrande>
         </div>
 
-        <div className="col-span-2 row-start-2 flex items-center gap-3 sm:col-span-1 sm:col-start-2 sm:row-start-1">
+        <div className="col-span-2 row-start-2 flex flex-wrap items-center gap-3 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:flex-nowrap">
           <BotaoGrande
             rotulo={rotuloEstrelas}
             falaAoTocar={`Você tem ${rotuloEstrelas}!`}
@@ -224,6 +238,18 @@ export function MapaMissoes() {
           >
             <span aria-hidden>⭐</span>
             {estrelas}
+          </BotaoGrande>
+
+          <BotaoGrande
+            rotulo={rotuloRevisao(devidos)}
+            cor={devidos > 0 ? "grama" : "branco"}
+            redondo={false}
+            tamanho={64}
+            className="px-4 text-3xl tabular-nums"
+            onClick={() => router.push("/app/revisao")}
+          >
+            <RotateCcw className="size-8" aria-hidden strokeWidth={2.75} />
+            {devidos > 0 ? <span aria-hidden>{devidos}</span> : null}
           </BotaoGrande>
 
           <BotaoGrande

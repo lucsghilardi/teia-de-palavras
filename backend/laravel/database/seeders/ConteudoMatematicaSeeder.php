@@ -6,6 +6,7 @@ use App\Enums\Disciplina;
 use App\Models\Aula;
 use App\Services\Aulas\AulaEditorService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Missões de Matemática (BNCC 2º ano), no universo da nave Teia. Cada missão
@@ -27,30 +28,33 @@ class ConteudoMatematicaSeeder extends Seeder
                 continue;
             }
 
-            $aula = Aula::create([
-                'slug' => $dados['slug'],
-                'disciplina' => Disciplina::Matematica->value,
-                'titulo' => $dados['titulo'],
-                'rotulo' => $dados['rotulo'],
-                'descricao' => $dados['descricao'],
-                'habilidade_bncc' => $dados['habilidade_bncc'],
-                'fase' => $dados['fase'],
-                'ordem' => $dados['ordem'],
-                'status' => Aula::STATUS_RASCUNHO,
-            ]);
+            // Tudo ou nada: um config inválido não deixa a missão pela metade no banco.
+            $anterior = DB::transaction(function () use ($dados, $anterior, $editor) {
+                $aula = Aula::create([
+                    'slug' => $dados['slug'],
+                    'disciplina' => Disciplina::Matematica->value,
+                    'titulo' => $dados['titulo'],
+                    'rotulo' => $dados['rotulo'],
+                    'descricao' => $dados['descricao'],
+                    'habilidade_bncc' => $dados['habilidade_bncc'],
+                    'fase' => $dados['fase'],
+                    'ordem' => $dados['ordem'],
+                    'status' => Aula::STATUS_RASCUNHO,
+                ]);
 
-            $editor->atualizar($aula, [
-                'titulo' => $dados['titulo'],
-                'fase' => $dados['fase'],
-                'pre_requisito_aula_id' => $anterior?->id,
-                'atividades' => $dados['atividades'],
-            ]);
+                $editor->atualizar($aula, [
+                    'titulo' => $dados['titulo'],
+                    'fase' => $dados['fase'],
+                    'pre_requisito_aula_id' => $anterior?->id,
+                    'atividades' => $dados['atividades'],
+                ]);
 
-            if ($dados['publicar']) {
-                $editor->publicar($aula);
-            }
+                if ($dados['publicar']) {
+                    $editor->publicar($aula);
+                }
 
-            $anterior = $aula;
+                return $aula;
+            });
         }
     }
 

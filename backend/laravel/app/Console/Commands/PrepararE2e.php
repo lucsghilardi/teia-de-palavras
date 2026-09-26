@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Crianca;
+use App\Models\CriancaItem;
 use App\Models\Turma;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
@@ -11,8 +12,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Prepara o banco de desenvolvimento para o teste de ponta a ponta
- * (frontend/e2e): turma "E2E" com código fixo e a criança "Teste" recriada.
- * Mexe só nessa turma. Recusa rodar em produção.
+ * (frontend/e2e): turma "E2E" com código fixo e a criança "Teste" recriada
+ * (com um item vencido na Revisão). Mexe só nessa turma. Recusa rodar em produção.
  */
 class PrepararE2e extends Command
 {
@@ -69,6 +70,16 @@ class PrepararE2e extends Command
 
             $crianca->consentimentos()->create([
                 'user_id' => $educador->id, 'versao_texto' => 'e2e', 'aceito_em' => now(), 'ip' => '127.0.0.1',
+            ]);
+
+            // Um item vencido na Revisão, para o E2E jogar a sessão do dia.
+            CriancaItem::create([
+                'crianca_id' => $crianca->id,
+                'disciplina' => 'matematica',
+                'chave' => 'fato:7+5',
+                'dados' => ['tipo' => 'somar_subtrair', 'config' => ['itens' => [['a' => 7, 'b' => 5, 'operacao' => '+']], 'apoio' => 'icones', 'opcoes' => 3]],
+                'caixa' => 0,
+                'proxima_revisao_em' => today(),
             ]);
 
             return $crianca;

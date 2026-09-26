@@ -10,7 +10,9 @@ subir o projeto e o plano de fases.
 - Aula de Português tem UMA palavra geradora; sílabas geram famílias (TE → TA TE TI TO TU).
 - Famílias ACUMULAM entre aulas: sílabas de aulas anteriores seguem disponíveis.
 - Progresso da criança: `etapa_atual` vai de 1 a N+1 (N atividades; N+1 é a conquista). Nada de `Aula::ETAPAS`.
-- Nunca mostrar "errado", nota ou ranking à criança. Resposta que não acerta → mensagem curta + dica; acerto → celebração.
+- Nunca mostrar "errado", nota ou ranking à criança. 1º erro → mensagem curta + dica; 2º erro → a resposta e o item
+  entra na revisão espaçada (`crianca_itens`, caixas de Leitner em `App\Services\Revisao`); acerto → celebração.
+  XP só no primeiro acerto de cada item; nível pela tabela `config('teia.niveis')`; medalhas em `config/conquistas.php`.
 - Palavra válida descoberta entra na Teia de Palavras da criança.
 - Áudio: gravação aprovada > arquivo da aula > Web Speech API pt-BR.
 - LGPD: criança tem só apelido, avatar e turma. Cadastro pelo responsável com consentimento. Áudios em disco privado.

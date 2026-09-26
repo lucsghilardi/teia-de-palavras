@@ -30,8 +30,19 @@ return [
     // XP das atividades genéricas: só no primeiro acerto de cada item.
     'xp' => [
         'atividade_item' => 1,
+        'revisao_item' => 1,
     ],
 
     // Política de feedback: dica no 1º erro; a partir do 2º, a resposta certa.
     'tentativas_ate_resposta' => 2,
+
+    // Nível pela tabela de XP acumulado: nível N = quantos limiares o XP já passou.
+    'niveis' => [0, 10, 25, 45, 70, 100, 140, 190, 250, 320, 400, 500, 620, 760, 920, 1100],
+
+    // Revisão espaçada (caixas de Leitner): intervalo em dias de cada caixa.
+    'revisao' => [
+        'intervalos_dias' => [0, 1, 3, 7, 14, 30],
+        'itens_por_sessao' => 6,
+        'caixa_dominada' => 4,
+    ],
 ];

@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { celebrar } from "@/components/crianca/aula/celebrar";
 import { falasDeConquistas, narrar } from "@/components/crianca/aula/narrador";
 import { useTratarSessao } from "@/components/crianca/aula/sessao";
+import { useEnviarResposta } from "@/components/crianca/atividades/envio-resposta";
 import { useCrianca } from "@/context/CriancaContext";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
 import { sons } from "@/lib/sons";
@@ -41,6 +42,7 @@ export function useResposta({
   descreverResposta?: (respostaCorreta: unknown) => string | null;
 }) {
   const { atualizar } = useCrianca();
+  const enviarPersonalizado = useEnviarResposta();
   const tratarSessao = useTratarSessao();
   const reduzido = useMovimentoReduzido();
   const [estados, setEstados] = useState<Record<string, EstadoItem>>({});
@@ -53,7 +55,9 @@ export function useResposta({
       setEnviando(true);
 
       try {
-        const r = await responderAtividade(aula.id, atividade.ordem, { item, ...corpo });
+        const r = enviarPersonalizado
+          ? await enviarPersonalizado(atividade.ordem, { item, ...corpo })
+          : await responderAtividade(aula.id, atividade.ordem, { item, ...corpo });
 
         setEstados((atual) => ({
           ...atual,
@@ -67,7 +71,7 @@ export function useResposta({
           },
         }));
 
-        atualizar({ estrelas: r.xp_total });
+        atualizar({ estrelas: r.xp_total, xp: r.xp_total, nivel: r.nivel });
 
         if (r.correta) {
           celebrar(reduzido);
@@ -95,7 +99,7 @@ export function useResposta({
         setEnviando(false);
       }
     },
-    [aula.id, atividade.ordem, atualizar, descreverResposta, enviando, mostrarConquistas, reduzido, tratarSessao],
+    [aula.id, atividade.ordem, atualizar, descreverResposta, enviando, enviarPersonalizado, mostrarConquistas, reduzido, tratarSessao],
   );
 
   const estadoDe = useCallback((item: string): EstadoItem | undefined => estados[item], [estados]);

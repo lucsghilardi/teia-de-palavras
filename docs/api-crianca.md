@@ -14,7 +14,7 @@ Regras gerais:
   Prioridade já resolvida no backend: gravação aprovada > áudio da aula > null.
 - Textos de história/perguntas já chegam com `{{heroi}}`/`{{fabrica}}` trocados.
 - `OpcaoVisual = { chave, rotulo, emoji, imagem_url|null }`.
-- `Conquista = { chave, titulo, descricao, emoji }`.
+- `Conquista = { chave, titulo, descricao, emoji, icone }` (`icone` é um nome do lucide; o front não usa o emoji).
 
 ## Entrada (públicas, sem token)
 
@@ -41,7 +41,10 @@ Regras gerais:
 ```
 { id, apelido, avatar: OpcaoVisual, usa_minusculas,
   turma: { id, nome },
-  estrelas, sequencia_dias, teia_total,
+  estrelas,                                   // = xp (nome antigo, some na Fase 9)
+  xp, nivel, xp_no_nivel, xp_para_proximo,    // nível pela tabela config('teia.niveis'); último nível → xp_para_proximo null
+  sequencia_dias, maior_sequencia, teia_total,
+  medalhas_total, revisao_devidos,            // medalhas ganhas; itens da Revisão vencidos hoje
   config: { heroi_nome, fabrica_nome, minutos_pausa } }
 ```
 
@@ -126,6 +129,37 @@ Palavra válida e nova entra na Teia e vale 1 estrela. Repetida não duplica.
   palavras_da_missao: [ { palavra, audio_url } ] }   // descobertas nesta aula
 ```
 422 se a criança ainda não chegou na etapa N+1. Concluir de novo não dá estrelas extras.
+
+## Revisão espaçada
+
+Toda atividade avaliada gera *itens* na fila de revisão da criança (caixas de Leitner:
+acerto sobe uma caixa e afasta a próxima data; erro volta para a caixa 0 e marca para
+amanhã). Intervalos, tamanho da sessão e a caixa "dominada" em `config/teia.php` (`revisao`).
+
+`GET /crianca/revisao` → 200
+```
+{ devidos,                                   // quantos itens venceram (hoje ou antes)
+  itens: [ { id, disciplina, chave, caixa,
+             atividade: Atividade } ] }      // até 6, caixa mais baixa primeiro; atividade de UM item,
+                                             // no mesmo formato de AulaCrianca.atividades (sem a resposta)
+```
+
+`POST /crianca/revisao/{item}/responder` `{ item?, ...resposta do tipo }` → 200
+```
+{ correta, item, mensagem, dica|null, resposta_correta|null, xp_ganho, tentativas: 1, resolvido: true,
+  revisao_agendada, extra, caixa, proxima_revisao_em, xp_total, nivel, conquistas: Conquista[] }
+```
+- Na revisão a resposta certa aparece já no primeiro erro (é treino, não prova); `xp_ganho` = 1 no acerto.
+- 404 se o item não é da criança.
+
+## Medalhas
+
+`GET /crianca/medalhas` → 200
+```
+{ total, desbloqueadas,
+  medalhas: [ { chave, titulo, descricao, emoji, icone, desbloqueada_em|null } ] }   // todas, na ordem do config
+```
+Só o próprio caminho da criança: nunca há ranking nem comparação.
 
 ## Teia de Palavras
 

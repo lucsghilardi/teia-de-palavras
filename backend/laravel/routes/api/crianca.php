@@ -5,7 +5,9 @@ use App\Http\Controllers\Api\Crianca\AudioController;
 use App\Http\Controllers\Api\Crianca\AulaController;
 use App\Http\Controllers\Api\Crianca\EntradaController;
 use App\Http\Controllers\Api\Crianca\MapaController;
+use App\Http\Controllers\Api\Crianca\MedalhaController;
 use App\Http\Controllers\Api\Crianca\PerfilController;
+use App\Http\Controllers\Api\Crianca\RevisaoController;
 use App\Http\Controllers\Api\Crianca\TeiaController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +26,9 @@ Route::prefix('crianca')->group(function () {
 
         Route::get('/mapa', MapaController::class);
         Route::get('/teia', TeiaController::class);
+        Route::get('/medalhas', MedalhaController::class);
+        Route::get('/revisao', [RevisaoController::class, 'index']);
+        Route::post('/revisao/{item}/responder', [RevisaoController::class, 'responder'])->whereNumber('item');
         Route::get('/audios/{gravacao}', AudioController::class)->whereNumber('gravacao');
 
         Route::get('/aulas/{aula}', [AulaController::class, 'show'])->whereNumber('aula');

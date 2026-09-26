@@ -9,6 +9,7 @@ use App\Models\CriancaResposta;
 use App\Services\Audio\ResolverAudio;
 use App\Services\Crianca\GamificacaoCrianca;
 use App\Services\Crianca\SessaoService;
+use App\Services\Revisao\RevisaoService;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -21,6 +22,7 @@ class RespostaService
     public function __construct(
         private readonly GamificacaoCrianca $gamificacao,
         private readonly SessaoService $sessoes,
+        private readonly RevisaoService $revisao,
     ) {}
 
     /**
@@ -65,6 +67,11 @@ class RespostaService
 
         $mostrarResposta = ! $resultado->correta && $linha->tentativas >= $ateResposta;
         $entregue = $mostrarResposta ? $resultado : $resultado->semRespostaCorreta();
+
+        // Revisão espaçada: acerto sobe a caixa; erro que já mostrou a resposta volta para a caixa 0.
+        if ($resultado->correta || $mostrarResposta) {
+            $this->revisao->registrar($crianca, $resultado);
+        }
 
         $xp = ($primeiroAcerto && ! $resultado->xpCreditado) ? $resultado->xp : 0;
         $stats = $this->gamificacao->darEstrelas($crianca, $xp);

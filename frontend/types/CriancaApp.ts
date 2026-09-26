@@ -6,7 +6,14 @@ export type Conquista = {
   titulo: string;
   descricao: string;
   emoji: string;
+  /** Nome de ícone do lucide (lib/icones.ts). */
+  icone: string;
 };
+
+/** Uma medalha da lista completa: ganha (data) ou ainda por ganhar (null). */
+export type Medalha = Conquista & { desbloqueada_em: string | null };
+
+export type Medalhas = { total: number; desbloqueadas: number; medalhas: Medalha[] };
 
 export type TurmaEntrada = {
   turma: { nome: string; codigo: string };
@@ -20,9 +27,19 @@ export type Eu = {
   avatar: OpcaoVisual;
   usa_minusculas: boolean;
   turma: { id: number; nome: string };
+  /** Mesmo valor de `xp` (nome antigo). */
   estrelas: number;
+  xp: number;
+  nivel: number;
+  xp_no_nivel: number;
+  /** XP que o nível atual pede para virar o próximo; null no último nível. */
+  xp_para_proximo: number | null;
   sequencia_dias: number;
+  maior_sequencia: number;
   teia_total: number;
+  medalhas_total: number;
+  /** Itens da Revisão vencidos hoje. */
+  revisao_devidos: number;
   config: { heroi_nome: string; fabrica_nome: string; minutos_pausa: number };
 };
 
@@ -214,6 +231,21 @@ export type ResultadoResposta = {
   nivel: number;
   conquistas: Conquista[];
 };
+
+// ---------- Revisão espaçada ----------
+
+/** Um item vencido, remontado como atividade de um só item (docs/api-crianca.md). */
+export type ItemRevisao = {
+  id: number;
+  disciplina: Disciplina;
+  chave: string;
+  caixa: number;
+  atividade: Atividade;
+};
+
+export type Revisao = { devidos: number; itens: ItemRevisao[] };
+
+export type ResultadoRevisao = ResultadoResposta & { caixa: number; proxima_revisao_em: string | null };
 
 export type TipoTentativa =
   | "valida"

@@ -4,12 +4,15 @@ import { ApiError, UnauthorizedError, type ApiErrorBody } from "./apiError";
 import type {
   AulaCrianca,
   Eu,
+  Medalhas,
   Missao,
   Pulso,
   ResultadoConclusao,
   ResultadoProducao,
   ResultadoResposta,
+  ResultadoRevisao,
   ResultadoTentativa,
+  Revisao,
   Teia,
   TurmaEntrada,
 } from "@/types/CriancaApp";
@@ -89,6 +92,14 @@ export const pulso = () => post<Pulso>("/sessao/pulso");
 export const buscarMapa = (disciplina?: string) =>
   criancaFetch<{ missoes: Missao[] }>(disciplina ? `/mapa?disciplina=${encodeURIComponent(disciplina)}` : "/mapa");
 export const buscarTeia = () => criancaFetch<Teia>("/teia");
+export const buscarMedalhas = () => criancaFetch<Medalhas>("/medalhas");
+
+// ---------- Revisão espaçada ----------
+
+export const buscarRevisao = () => criancaFetch<Revisao>("/revisao");
+
+export const responderRevisao = (item: number, resposta: Record<string, unknown>) =>
+  post<ResultadoRevisao>(`/revisao/${item}/responder`, resposta);
 
 // ---------- Aula ----------
 

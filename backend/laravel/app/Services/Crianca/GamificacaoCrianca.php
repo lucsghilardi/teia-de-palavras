@@ -7,6 +7,7 @@ use App\Models\Crianca;
 use App\Models\CriancaAula;
 use App\Models\CriancaConquista;
 use App\Models\CriancaEstatistica;
+use App\Models\CriancaItem;
 use App\Models\Producao;
 use App\Models\TeiaPalavra;
 
@@ -30,11 +31,46 @@ class GamificacaoCrianca
 
         if ($quantidade > 0) {
             $stats->xp_total += $quantidade;
-            $stats->nivel = 1 + intdiv($stats->xp_total, 10);
+            $stats->nivel = self::nivelPara((int) $stats->xp_total);
             $stats->save();
         }
 
         return $stats;
+    }
+
+    /** Nível = quantos limiares da tabela config('teia.niveis') o XP já passou (mínimo 1). */
+    public static function nivelPara(int $xp): int
+    {
+        $limiares = array_values(array_map('intval', (array) config('teia.niveis', [0, 10])));
+        $nivel = 0;
+
+        foreach ($limiares as $limiar) {
+            if ($xp >= $limiar) {
+                $nivel++;
+            }
+        }
+
+        return max(1, $nivel);
+    }
+
+    /**
+     * Resumo do nível para a criança ver a barra de XP.
+     *
+     * @return array{xp: int, nivel: int, xp_no_nivel: int, xp_para_proximo: int|null}
+     */
+    public static function resumoNivel(int $xp): array
+    {
+        $limiares = array_values(array_map('intval', (array) config('teia.niveis', [0, 10])));
+        $nivel = self::nivelPara($xp);
+        $base = $limiares[$nivel - 1] ?? 0;
+        $proximo = $limiares[$nivel] ?? null;
+
+        return [
+            'xp' => $xp,
+            'nivel' => $nivel,
+            'xp_no_nivel' => $xp - $base,
+            'xp_para_proximo' => $proximo === null ? null : $proximo - $base,
+        ];
     }
 
     /** Dias seguidos com atividade (hoje conta uma vez). */
@@ -79,12 +115,32 @@ class GamificacaoCrianca
         return $novas;
     }
 
-    /** @return array{chave: string, titulo: string, descricao: string, emoji: string} */
+    /** @return array{chave: string, titulo: string, descricao: string, emoji: string, icone: string} */
     public static function conquista(string $chave): array
     {
-        $dados = config("conquistas.{$chave}", ['titulo' => $chave, 'descricao' => '', 'emoji' => '⭐']);
+        $dados = config("conquistas.{$chave}", ['titulo' => $chave, 'descricao' => '', 'emoji' => '⭐', 'icone' => 'star']);
 
-        return ['chave' => $chave, 'titulo' => $dados['titulo'], 'descricao' => $dados['descricao'], 'emoji' => $dados['emoji']];
+        return [
+            'chave' => $chave,
+            'titulo' => $dados['titulo'],
+            'descricao' => $dados['descricao'],
+            'emoji' => $dados['emoji'] ?? '⭐',
+            'icone' => $dados['icone'] ?? 'star',
+        ];
+    }
+
+    private function concluiuNaDisciplina(Crianca $crianca, string $disciplina): bool
+    {
+        return CriancaAula::query()
+            ->where('crianca_id', $crianca->id)
+            ->where('status', CriancaAula::CONCLUIDA)
+            ->whereIn('aula_id', Aula::daDisciplina($disciplina)->select('id'))
+            ->exists();
+    }
+
+    private function acertosNaRevisao(Crianca $crianca): int
+    {
+        return (int) CriancaItem::where('crianca_id', $crianca->id)->sum('acertos');
     }
 
     /** @return array<string, callable(): bool> */
@@ -106,7 +162,13 @@ class GamificacaoCrianca
                     && $concluidas()->whereIn('aula_id', $fase1)->count() === $fase1->count();
             },
             'tres_dias' => fn () => $this->estatisticas($crianca)->maior_sequencia >= 3,
+            'sete_dias' => fn () => $this->estatisticas($crianca)->maior_sequencia >= 7,
             'ajudou_amigo' => fn () => TeiaPalavra::where('crianca_id', $crianca->id)->where('origem', 'dupla')->exists(),
+            'planeta_matematica_1' => fn () => $this->concluiuNaDisciplina($crianca, 'matematica'),
+            'planeta_geografia_1' => fn () => $this->concluiuNaDisciplina($crianca, 'geografia'),
+            'planeta_historia_1' => fn () => $this->concluiuNaDisciplina($crianca, 'historia'),
+            'revisao_10' => fn () => $this->acertosNaRevisao($crianca) >= 10,
+            'revisao_50' => fn () => $this->acertosNaRevisao($crianca) >= 50,
         ];
     }
 }
