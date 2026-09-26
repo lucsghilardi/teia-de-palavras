@@ -23,6 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { infoDisciplina } from "@/lib/disciplinas";
 import { formatDateTime } from "@/lib/format";
 import { caixaAlta } from "@/lib/silabas";
 import type { Aula, AulaResumo } from "@/types/Aula";
@@ -43,6 +46,8 @@ type AbaBasicoProps = {
 
 export function AbaBasico({ aula, rascunho, outrasAulas, onChange, midia }: AbaBasicoProps) {
   const fases = FASES.includes(rascunho.fase) ? FASES : [...FASES, rascunho.fase];
+  const portugues = rascunho.disciplina === "portugues";
+  const disciplina = infoDisciplina(rascunho.disciplina);
   const preRequisitoValor =
     rascunho.pre_requisito_aula_id === null
       ? SEM_PRE_REQUISITO
@@ -55,30 +60,38 @@ export function AbaBasico({ aula, rascunho, outrasAulas, onChange, midia }: AbaB
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,380px)]">
       <Card>
         <CardHeader>
-          <CardTitle>Dados da aula</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            Dados da aula
+            <Badge variant="outline" style={{ borderColor: disciplina.cor }}>
+              {disciplina.nome}
+            </Badge>
+          </CardTitle>
           <CardDescription>
-            A palavra geradora é o ponto de partida: dela saem as sílabas e as
-            famílias que a criança vai explorar.
+            {portugues
+              ? "A palavra geradora é o ponto de partida: dela saem as sílabas e as famílias que a criança vai explorar."
+              : `${disciplina.descricao} A missão é a sequência de atividades da aba “Atividades”.`}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <FieldGroup className="gap-5">
-            <Field>
-              <FieldLabel htmlFor="aula-palavra">Palavra geradora</FieldLabel>
-              <CaixaAltaInput
-                id="aula-palavra"
-                value={rascunho.palavra_geradora}
-                onValueChange={(valor) =>
-                  onChange({ palavra_geradora: valor })
-                }
-                autoComplete="off"
-                className="h-14 text-3xl font-extrabold tracking-wider md:text-3xl"
-                required
-              />
-              <FieldDescription>
-                Mudou a palavra? Revise as sílabas na aba “Sílabas e famílias”.
-              </FieldDescription>
-            </Field>
+            {portugues ? (
+              <Field>
+                <FieldLabel htmlFor="aula-palavra">Palavra geradora</FieldLabel>
+                <CaixaAltaInput
+                  id="aula-palavra"
+                  value={rascunho.palavra_geradora}
+                  onValueChange={(valor) =>
+                    onChange({ palavra_geradora: valor })
+                  }
+                  autoComplete="off"
+                  className="h-14 text-3xl font-extrabold tracking-wider md:text-3xl"
+                  required
+                />
+                <FieldDescription>
+                  Mudou a palavra? Revise as sílabas na aba “Sílabas e famílias”.
+                </FieldDescription>
+              </Field>
+            ) : null}
 
             <Field>
               <FieldLabel htmlFor="aula-titulo">Título</FieldLabel>
@@ -87,6 +100,43 @@ export function AbaBasico({ aula, rascunho, outrasAulas, onChange, midia }: AbaB
                 value={rascunho.titulo}
                 onChange={(event) => onChange({ titulo: event.target.value })}
                 required
+              />
+            </Field>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <Field>
+                <FieldLabel htmlFor="aula-rotulo">Rótulo no mapa</FieldLabel>
+                <Input
+                  id="aula-rotulo"
+                  value={rascunho.rotulo}
+                  maxLength={30}
+                  placeholder={portugues ? "Padrão: a palavra geradora" : "Ex.: 7 + 5"}
+                  onChange={(event) => onChange({ rotulo: event.target.value })}
+                />
+                <FieldDescription>O que aparece no nó da missão. Vazio usa a palavra geradora ou o título.</FieldDescription>
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="aula-bncc">Habilidade BNCC</FieldLabel>
+                <Input
+                  id="aula-bncc"
+                  value={rascunho.habilidade_bncc}
+                  maxLength={40}
+                  placeholder="Ex.: EF02MA05"
+                  onChange={(event) => onChange({ habilidade_bncc: event.target.value })}
+                />
+              </Field>
+            </div>
+
+            <Field>
+              <FieldLabel htmlFor="aula-descricao">Descrição curta</FieldLabel>
+              <Textarea
+                id="aula-descricao"
+                value={rascunho.descricao}
+                maxLength={200}
+                rows={2}
+                placeholder="Uma linha para o educador (e para os cartões da Galáxia)."
+                onChange={(event) => onChange({ descricao: event.target.value })}
               />
             </Field>
 
@@ -128,8 +178,8 @@ export function AbaBasico({ aula, rascunho, outrasAulas, onChange, midia }: AbaB
                     <SelectItem value={SEM_PRE_REQUISITO}>Nenhum (liberada ao publicar)</SelectItem>
                     {outrasAulas.map((item) => (
                       <SelectItem key={item.id} value={String(item.id)}>
-                        Fase {item.fase} · {item.ordem}. {caixaAlta(item.palavra_geradora)} —{" "}
-                        {item.titulo}
+                        {infoDisciplina(item.disciplina).nome} · Fase {item.fase} · {item.ordem}.{" "}
+                        {item.palavra_geradora ? caixaAlta(item.palavra_geradora) : item.rotulo} — {item.titulo}
                       </SelectItem>
                     ))}
                     {preRequisitoConhecido ? null : (
@@ -149,6 +199,7 @@ export function AbaBasico({ aula, rascunho, outrasAulas, onChange, midia }: AbaB
       </Card>
 
       <div className="space-y-6">
+        {portugues ? (
         <Card>
           <CardHeader>
             <CardTitle>Imagem e áudio da palavra</CardTitle>
@@ -174,6 +225,7 @@ export function AbaBasico({ aula, rascunho, outrasAulas, onChange, midia }: AbaB
             />
           </CardContent>
         </Card>
+        ) : null}
 
         <Card>
           <CardContent>

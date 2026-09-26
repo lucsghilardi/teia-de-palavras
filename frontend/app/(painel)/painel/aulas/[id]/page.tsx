@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, Save } from "lucide-react";
 
+import { AbaAtividades } from "@/components/painel/aula-editor/aba-atividades";
 import { AbaBasico } from "@/components/painel/aula-editor/aba-basico";
 import { AbaConversa } from "@/components/painel/aula-editor/aba-conversa";
 import { AbaDicionario } from "@/components/painel/aula-editor/aba-dicionario";
@@ -24,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { TabPanel, Tabs } from "@/components/ui/tabs";
 import { mensagemDeErro, mensagensDeErro } from "@/lib/api-errors";
+import { infoDisciplina } from "@/lib/disciplinas";
 import { appToast } from "@/lib/toast";
 import {
   despublicarAula,
@@ -41,7 +43,7 @@ import type { Configuracoes } from "@/types/Configuracoes";
 
 const ID_ABAS = "aula-editor";
 
-type Aba = "basico" | "silabas" | "historia" | "conversa" | "dicionario" | "revisao";
+type Aba = "basico" | "silabas" | "historia" | "conversa" | "dicionario" | "atividades" | "revisao";
 
 type Carregado = {
   aula: Aula;
@@ -281,6 +283,16 @@ function AulaEditor({ inicial, aulas, configuracoes }: AulaEditorProps) {
         }));
         break;
       }
+      case "atividade_imagem":
+        setAula((a) => ({
+          ...a,
+          atividades: a.atividades.map((x) => (x.id === alvoId ? { ...x, imagem_url: url } : x)),
+        }));
+        setRascunho((r) => ({
+          ...r,
+          atividades: r.atividades.map((x) => (x.id === alvoId ? { ...x, imagem_url: url } : x)),
+        }));
+        break;
     }
   }
 
@@ -297,16 +309,25 @@ function AulaEditor({ inicial, aulas, configuracoes }: AulaEditorProps) {
     },
   };
 
+  const portugues = aula.disciplina === "portugues";
+  const disciplina = infoDisciplina(aula.disciplina);
+
   const abas: { value: Aba; label: string }[] = [
     { value: "basico", label: "Básico" },
-    { value: "silabas", label: `Sílabas e famílias (${rascunho.silabas.length})` },
-    { value: "historia", label: `História (${rascunho.historia_paginas.length})` },
-    { value: "conversa", label: `Conversa (${rascunho.perguntas.length})` },
-    { value: "dicionario", label: `Dicionário da aula (${rascunho.palavras.length})` },
+    ...(portugues
+      ? [
+          { value: "silabas" as const, label: `Sílabas e famílias (${rascunho.silabas.length})` },
+          { value: "historia" as const, label: `História (${rascunho.historia_paginas.length})` },
+          { value: "conversa" as const, label: `Conversa (${rascunho.perguntas.length})` },
+          { value: "dicionario" as const, label: `Dicionário da aula (${rascunho.palavras.length})` },
+        ]
+      : []),
+    { value: "atividades", label: `Atividades (${rascunho.atividades.length})` },
     { value: "revisao", label: "Revisão" },
   ];
 
   const publicada = aula.status === "publicada";
+  const rotulo = portugues ? rascunho.palavra_geradora || "Sem palavra" : rascunho.rotulo || rascunho.titulo || "Sem título";
 
   return (
     <div className="space-y-6">
@@ -331,15 +352,13 @@ function AulaEditor({ inicial, aulas, configuracoes }: AulaEditorProps) {
 
           <div className="min-w-0 flex-1">
             <h1 className="flex flex-wrap items-center gap-2 text-2xl leading-tight font-extrabold tracking-wide">
-              <span className="break-all uppercase">
-                {rascunho.palavra_geradora || "Sem palavra"}
-              </span>
+              <span className={portugues ? "break-all uppercase" : "break-words"}>{rotulo}</span>
               <Badge variant={publicada ? "success" : "muted"}>
                 {publicada ? "Publicada" : "Rascunho"}
               </Badge>
             </h1>
             <p className="truncate text-sm text-muted-foreground">
-              Fase {aula.fase} · {rascunho.titulo || "Sem título"}
+              {disciplina.nome} · Fase {aula.fase} · {rascunho.titulo || "Sem título"}
             </p>
           </div>
 
@@ -407,6 +426,15 @@ function AulaEditor({ inicial, aulas, configuracoes }: AulaEditorProps) {
           <AbaDicionario
             palavras={rascunho.palavras}
             onChange={(palavras) => alterarRascunho({ palavras })}
+            midia={midia}
+          />
+        ) : null}
+
+        {aba === "atividades" ? (
+          <AbaAtividades
+            atividades={rascunho.atividades}
+            disciplina={aula.disciplina}
+            onChange={(atividades) => alterarRascunho({ atividades })}
             midia={midia}
           />
         ) : null}

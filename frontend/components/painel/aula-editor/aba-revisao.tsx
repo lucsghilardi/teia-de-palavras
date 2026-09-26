@@ -21,6 +21,16 @@ type ItemChecklist = { rotulo: string; ok: boolean; detalhe: string };
 
 /** Requisitos do backend para publicar (docs/api-painel.md). */
 export function requisitosPublicacao(aula: Aula): ItemChecklist[] {
+  const atividades = {
+    rotulo: "Pelo menos 1 atividade",
+    ok: aula.atividades.length > 0,
+    detalhe: `${aula.atividades.length} na missão`,
+  };
+
+  if (aula.disciplina !== "portugues") {
+    return [atividades];
+  }
+
   return [
     {
       rotulo: "Pelo menos 1 sílaba",
@@ -37,11 +47,33 @@ export function requisitosPublicacao(aula: Aula): ItemChecklist[] {
       ok: aula.palavras.length > 0,
       detalhe: `${aula.palavras.length} cadastrada(s)`,
     },
+    atividades,
   ];
 }
 
 function recomendacoes(aula: Aula): ItemChecklist[] {
   const paginasSemImagem = aula.historia_paginas.filter((pagina) => !pagina.imagem_url).length;
+  const avaliadas = aula.atividades.filter((a) => a.avaliada).length;
+
+  if (aula.disciplina !== "portugues") {
+    return [
+      {
+        rotulo: "Pelo menos 1 atividade avaliada",
+        ok: avaliadas > 0,
+        detalhe: avaliadas > 0 ? `${avaliadas} avaliada(s)` : "Sem atividade avaliada a missão não gera XP nem revisão",
+      },
+      {
+        rotulo: "Missão curta (até 7 atividades)",
+        ok: aula.atividades.length <= 7,
+        detalhe: `${aula.atividades.length} atividade(s)`,
+      },
+      {
+        rotulo: "Habilidade BNCC informada",
+        ok: Boolean(aula.habilidade_bncc),
+        detalhe: aula.habilidade_bncc ?? "Ajuda a organizar o currículo",
+      },
+    ];
+  }
 
   return [
     {

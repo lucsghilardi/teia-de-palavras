@@ -142,8 +142,8 @@ export function deleteCrianca(id: number) {
 
 // ===== Aulas (CMS) =====
 
-export function listAulas() {
-  return apiFetch<AulaResumo[]>("/painel/aulas");
+export function listAulas(disciplina?: string) {
+  return apiFetch<AulaResumo[]>(disciplina ? `/painel/aulas?disciplina=${encodeURIComponent(disciplina)}` : "/painel/aulas");
 }
 
 export function getAula(id: number) {

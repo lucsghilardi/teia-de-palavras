@@ -55,7 +55,22 @@ export type ItemFalado = { texto: string; audio_url: string | null };
 // ---------- Atividades ----------
 
 /** Tipos registrados no backend (RegistroAtividades) e no front (atividades/registro.ts). */
-export type TipoAtividade = "historia" | "conversa" | "palavra" | "palmas" | "ficha" | "montar_palavras" | "frase";
+export type TipoAtividade =
+  | "historia"
+  | "conversa"
+  | "palavra"
+  | "palmas"
+  | "ficha"
+  | "montar_palavras"
+  | "frase"
+  | "escolha"
+  | "verdadeiro_falso"
+  | "ordenar"
+  | "linha_do_tempo"
+  | "parear"
+  | "contar"
+  | "somar_subtrair"
+  | "escolher_silaba";
 
 type AtividadeBase = {
   /** Posição na missão, a partir de 1. */
@@ -68,7 +83,7 @@ type AtividadeBase = {
   avaliada: boolean;
 };
 
-export type PaginaHistoria = { texto: string; imagem_url: string | null; audio_url: string | null };
+export type PaginaHistoria = { texto: string; imagem_url: string | null; audio_url: string | null; icone?: string | null };
 
 export type Meta = {
   palavra: string;
@@ -101,6 +116,53 @@ export type AtividadeFrase = AtividadeBase & {
   minimo: number;
 };
 
+// ---------- Genéricas (docs/atividades.md); nunca trazem a resposta certa ----------
+
+export type OpcaoEscolha = { id: string; texto: string };
+export type ItemEscolha = { id: string; pergunta: string; icone: string | null; opcoes: OpcaoEscolha[] };
+export type AtividadeEscolha = AtividadeBase & { tipo: "escolha" | "verdadeiro_falso"; itens: ItemEscolha[] };
+
+export type ItemOrdenar = { id: string; texto: string; icone: string | null };
+export type AtividadeOrdenar = AtividadeBase & {
+  tipo: "ordenar" | "linha_do_tempo";
+  pergunta: string | null;
+  modo: "sequencia" | "tempo" | "numeros";
+  itens: ItemOrdenar[];
+};
+
+export type ItemParear = { id: string; texto: string; icone: string | null };
+export type AtividadeParear = AtividadeBase & {
+  tipo: "parear";
+  pergunta: string | null;
+  esquerda: ItemParear[];
+  direita: ItemParear[];
+};
+
+export type ItemContar = { id: string; icone: string; quantidade: number; opcoes: number[] };
+export type AtividadeContar = AtividadeBase & { tipo: "contar"; itens: ItemContar[] };
+
+export type Operacao = "+" | "-";
+export type ItemFato = { id: string; a: number; b: number; operacao: Operacao; opcoes: number[] };
+export type AtividadeSomarSubtrair = AtividadeBase & {
+  tipo: "somar_subtrair";
+  apoio: "icones" | "reta" | "nenhum";
+  itens: ItemFato[];
+};
+
+export type ItemSilaba = {
+  id: string;
+  modo: "completar" | "trocar";
+  /** Palavra de partida (só em trocar). */
+  palavra: string | null;
+  /** Palavra de chegada (só em trocar). */
+  alvo: string | null;
+  /** Sílabas com `null` no lugar da que a criança escolhe. */
+  pecas: (string | null)[];
+  posicao: number;
+  opcoes: string[];
+};
+export type AtividadeEscolherSilaba = AtividadeBase & { tipo: "escolher_silaba"; itens: ItemSilaba[] };
+
 export type Atividade =
   | AtividadeHistoria
   | AtividadeConversa
@@ -108,7 +170,13 @@ export type Atividade =
   | AtividadePalmas
   | AtividadeFicha
   | AtividadeMontarPalavras
-  | AtividadeFrase;
+  | AtividadeFrase
+  | AtividadeEscolha
+  | AtividadeOrdenar
+  | AtividadeParear
+  | AtividadeContar
+  | AtividadeSomarSubtrair
+  | AtividadeEscolherSilaba;
 
 export type AulaCrianca = {
   id: number;
@@ -128,17 +196,23 @@ export type AulaCrianca = {
   atividades: Atividade[];
 };
 
-/** Resposta genérica de POST .../atividades/{ordem}/responder. */
+/** Resposta genérica de POST .../atividades/{ordem}/responder (docs/atividades.md). */
 export type ResultadoResposta = {
   correta: boolean;
   item: string;
   mensagem: string;
   dica: string | null;
+  /** Só a partir da 2ª tentativa errada do item. */
   resposta_correta: unknown;
   xp_ganho: number;
+  tentativas: number;
+  /** Acertou ou já viu a resposta: pode seguir. */
+  resolvido: boolean;
+  revisao_agendada: boolean;
   extra: Record<string, unknown>;
   xp_total: number;
   nivel: number;
+  conquistas: Conquista[];
 };
 
 export type TipoTentativa =
