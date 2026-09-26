@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Crianca\AtividadeController;
 use App\Http\Controllers\Api\Crianca\AudioController;
 use App\Http\Controllers\Api\Crianca\AulaController;
 use App\Http\Controllers\Api\Crianca\EntradaController;
@@ -28,6 +29,7 @@ Route::prefix('crianca')->group(function () {
         Route::get('/aulas/{aula}', [AulaController::class, 'show'])->whereNumber('aula');
         Route::post('/aulas/{aula}/iniciar', [AulaController::class, 'iniciar'])->whereNumber('aula');
         Route::post('/aulas/{aula}/etapas/{etapa}/concluir', [AulaController::class, 'concluirEtapa'])->whereNumber(['aula', 'etapa']);
+        Route::post('/aulas/{aula}/atividades/{ordem}/responder', [AtividadeController::class, 'responder'])->whereNumber(['aula', 'ordem']);
         Route::post('/aulas/{aula}/tentativas', [AulaController::class, 'tentativa'])->whereNumber('aula');
         Route::post('/aulas/{aula}/producao', [AulaController::class, 'producao'])->whereNumber('aula');
         Route::post('/aulas/{aula}/concluir', [AulaController::class, 'concluir'])->whereNumber('aula');

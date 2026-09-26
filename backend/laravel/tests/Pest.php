@@ -8,6 +8,7 @@ use Database\Seeders\ConteudoInicialSeeder;
 use Database\Seeders\DicionarioSeeder;
 use Database\Seeders\OpcoesVisuaisSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 /*
@@ -42,9 +43,16 @@ function progresso(Crianca $crianca, Aula $aula, string $status): void
         ['crianca_id' => $crianca->id, 'aula_id' => $aula->id],
         [
             'status' => $status,
-            'etapa_atual' => $status === CriancaAula::CONCLUIDA ? 8 : 1,
+            // Concluída = tela de conquista, a "etapa" N+1 (N atividades).
+            'etapa_atual' => $status === CriancaAula::CONCLUIDA ? $aula->atividades()->count() + 1 : 1,
             'iniciada_em' => now(),
             'concluida_em' => $status === CriancaAula::CONCLUIDA ? now() : null,
         ],
     );
+}
+
+/** PNG real de 1×1 (sem depender da extensão GD), para testes de upload. */
+function pngFalso(string $nome): UploadedFile
+{
+    return UploadedFile::fake()->createWithContent($nome, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='));
 }

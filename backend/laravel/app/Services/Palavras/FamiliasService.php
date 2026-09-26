@@ -2,6 +2,7 @@
 
 namespace App\Services\Palavras;
 
+use App\Enums\Disciplina;
 use App\Models\Aula;
 use App\Models\AulaFamilia;
 use App\Models\AulaSilaba;
@@ -46,6 +47,7 @@ class FamiliasService
     {
         $ids = Aula::query()
             ->publicadas()
+            ->daDisciplina(Disciplina::Portugues)
             ->where(fn ($q) => $q->where('fase', '<', $aula->fase)
                 ->orWhere(fn ($q2) => $q2->where('fase', $aula->fase)->where('ordem', '<=', $aula->ordem)))
             ->pluck('id')

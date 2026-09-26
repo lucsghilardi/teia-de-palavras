@@ -4,9 +4,13 @@ Portal de alfabetização infantil (método Paulo Freire). Ver `README.md` para
 subir o projeto e o plano de fases.
 
 ## Regras de negócio inegociáveis
-- Cada aula tem UMA palavra geradora; sílabas geram famílias (TE → TA TE TI TO TU).
+- Uma aula pertence a uma disciplina (`App\Enums\Disciplina`: portugues, matematica, geografia,
+  historia) e é uma sequência de atividades (`aula_atividades`; tipos em `App\Services\Atividades\RegistroAtividades`,
+  formato do `config` em `docs/atividades.md`). Tipo novo = avaliador novo no registro + componente no front.
+- Aula de Português tem UMA palavra geradora; sílabas geram famílias (TE → TA TE TI TO TU).
 - Famílias ACUMULAM entre aulas: sílabas de aulas anteriores seguem disponíveis.
-- Nunca mostrar "errado", nota ou ranking à criança. Tentativa inválida → dica gentil; acerto → celebração.
+- Progresso da criança: `etapa_atual` vai de 1 a N+1 (N atividades; N+1 é a conquista). Nada de `Aula::ETAPAS`.
+- Nunca mostrar "errado", nota ou ranking à criança. Resposta que não acerta → mensagem curta + dica; acerto → celebração.
 - Palavra válida descoberta entra na Teia de Palavras da criança.
 - Áudio: gravação aprovada > arquivo da aula > Web Speech API pt-BR.
 - LGPD: criança tem só apelido, avatar e turma. Cadastro pelo responsável com consentimento. Áudios em disco privado.

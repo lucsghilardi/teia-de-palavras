@@ -11,7 +11,7 @@ beforeEach(fn () => semearConteudo());
 
 it('semeia as 10 missões: Fase 1 publicada e Fase 2 em rascunho', function () {
     expect(Aula::count())->toBe(10)
-        ->and(Aula::where('fase', 1)->publicadas()->pluck('palavra_geradora')->all())
+        ->and(Aula::where('fase', 1)->publicadas()->ordenadas()->pluck('palavra_geradora')->all())
         ->toBe(['TEIA', 'BONECA', 'PULO', 'MOLA', 'SALVA'])
         ->and(Aula::where('fase', 2)->where('status', 'rascunho')->count())->toBe(5);
 });

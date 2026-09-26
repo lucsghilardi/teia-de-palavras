@@ -11,12 +11,6 @@ beforeEach(function () {
     $this->educador = User::factory()->create();
 });
 
-/** PNG real de 1×1 (sem depender da extensão GD). */
-function pngFalso(string $nome): UploadedFile
-{
-    return UploadedFile::fake()->createWithContent($nome, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='));
-}
-
 function criarAulaPelaApi(string $palavra = 'TEIA'): array
 {
     return test()->comoAdulto(test()->educador)

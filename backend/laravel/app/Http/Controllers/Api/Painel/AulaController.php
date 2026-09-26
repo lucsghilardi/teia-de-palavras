@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Painel;
 
+use App\Enums\Disciplina;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Painel\AtualizarAulaRequest;
 use App\Http\Requests\Painel\MidiaAulaRequest;
@@ -25,11 +26,11 @@ class AulaController extends Controller
         private readonly AulaMidiaService $midia,
     ) {}
 
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', Aula::class);
 
-        return AulaResumoResource::collection($this->listar());
+        return AulaResumoResource::collection($this->listar(Disciplina::tryFrom((string) $request->query('disciplina', ''))));
     }
 
     public function store(NovaAulaRequest $request): JsonResponse
@@ -126,11 +127,12 @@ class AulaController extends Controller
         return response()->json(['familia' => SugestorFamilia::para($dados['silaba'])]);
     }
 
-    private function listar()
+    private function listar(?Disciplina $disciplina = null)
     {
         return Aula::query()
+            ->when($disciplina, fn ($q) => $q->daDisciplina($disciplina))
             ->ordenadas()
-            ->withCount(['silabas', 'palavras', 'historiaPaginas', 'perguntas'])
+            ->withCount(['silabas', 'palavras', 'historiaPaginas', 'perguntas', 'atividades'])
             ->get();
     }
 }

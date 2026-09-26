@@ -41,34 +41,53 @@ edita. `/painel/users` continua só admin.
     consentimento: {versao_texto, aceito_em}|null, created_at }`
 
 ## Aulas (CMS)
-- `GET /painel/aulas` → `AulaResumo[]` ordenado por `fase, ordem`
-  - `AulaResumo = { id, slug, titulo, fase, ordem, palavra_geradora, status, pre_requisito_aula_id,
-      palavra_imagem_url|null, totais: {silabas, palavras, paginas, perguntas}, updated_at }`
-- `POST /painel/aulas` `{titulo, palavra_geradora, fase}` → 201 `Aula` (rascunho; slug e ordem gerados;
-   sílabas/famílias sugeridas automaticamente a partir da palavra, editáveis depois)
+Cada aula pertence a uma **disciplina** (`portugues` | `matematica` | `geografia` | `historia`; lista em
+`config/disciplinas.php`) e é uma sequência de **atividades** (`aula_atividades`). Em Português a aula
+também tem palavra geradora, sílabas, famílias, história, conversa e dicionário, que as atividades
+legadas (`historia`, `conversa`, `palavra`, `palmas`, `ficha`, `montar_palavras`, `frase`) leem.
+Os tipos de atividade e o formato do `config` de cada um estão em `docs/atividades.md`.
+
+- `GET /painel/aulas?disciplina=` → `AulaResumo[]` ordenado por disciplina (ordem dos planetas), `fase, ordem`
+  - `AulaResumo = { id, slug, disciplina, titulo, rotulo, descricao, habilidade_bncc, fase, ordem,
+      palavra_geradora|null, status, pre_requisito_aula_id, palavra_imagem_url|null,
+      totais: {silabas, palavras, paginas, perguntas, atividades}, updated_at }`
+  - `rotulo` é o que o nó do mapa mostra: o cadastrado, senão a palavra geradora, senão o título.
+- `POST /painel/aulas` `{titulo, disciplina?, palavra_geradora, fase, rotulo?, descricao?, habilidade_bncc?}` → 201 `Aula`
+  (rascunho; slug e ordem gerados por disciplina+fase; pré-requisito = última aula da disciplina).
+  `disciplina` padrão `portugues`. `palavra_geradora` é obrigatória só em Português (sílabas/famílias
+  sugeridas automaticamente); nas outras disciplinas é ignorada. Português nasce com a sequência legada
+  de 7 atividades; as outras disciplinas nascem sem atividades.
 - `GET /painel/aulas/{id}` → `Aula`
-- `PUT /painel/aulas/{id}` → `Aula` (documento completo; filhos são sincronizados)
+- `PUT /painel/aulas/{id}` → `Aula` (documento completo; filhos são sincronizados). A disciplina não muda.
   ```
-  { titulo, palavra_geradora, fase, pre_requisito_aula_id|null,
-    silabas: [ { texto: "TE", familia: ["TA","TE","TI","TO","TU"] }, { texto: "I", familia: ["A","E","I","O","U"] }, { texto: "A", familia: [] } ],
-    historia_paginas: [ { id?, texto } ],          // ordem = posição no array; imagem/áudio via /midia
-    perguntas: [ { id?, texto } ],
-    palavras: [ { id?, palavra: "TATU", silabas: ["TA","TU"], destaque: true } ] }
+  { titulo, palavra_geradora, fase, pre_requisito_aula_id|null, rotulo?, descricao?, habilidade_bncc?,
+    silabas: [ { texto: "TE", familia: ["TA","TE","TI","TO","TU"] }, ... ],   // só Português
+    historia_paginas: [ { id?, texto } ],          // só Português; ordem = posição; imagem/áudio via /midia
+    perguntas: [ { id?, texto } ],                 // só Português
+    palavras: [ { id?, palavra: "TATU", silabas: ["TA","TU"], destaque: true } ],   // só Português
+    atividades?: [ { id?, tipo, titulo?, instrucao?, config? } ] }   // ordem = posição; imagem via /midia
   ```
-- `POST /painel/aulas/{id}/publicar` → `Aula` (422 se faltar: ≥1 sílaba, ≥1 página, ≥1 palavra)
+  - Em Português `silabas`, `historia_paginas`, `perguntas` e `palavras` são obrigatórios (`present`);
+    nas outras disciplinas são ignorados e o documento pode trazer só `atividades`.
+  - `atividades` ausente mantém as atuais (e garante a sequência padrão se a aula não tiver nenhuma).
+    Com `id` atualiza (mantendo a imagem), sem `id` cria, ausentes são apagadas. `tipo` precisa existir
+    no registro e `config` é validado pelo avaliador do tipo (422 em `atividades.{i}.tipo|config`).
+- `POST /painel/aulas/{id}/publicar` → `Aula` (422 se faltar: ≥1 atividade; em Português também ≥1 sílaba,
+  ≥1 página, ≥1 palavra)
 - `POST /painel/aulas/{id}/despublicar` → `Aula`
-- `PUT /painel/aulas/reordenar` `{ ordem: [aula_id, ...] }` → `AulaResumo[]` (reordena dentro da mesma fase)
+- `PUT /painel/aulas/reordenar` `{ ordem: [aula_id, ...] }` → `AulaResumo[]` (reordena dentro da mesma disciplina e fase)
 - `DELETE /painel/aulas/{id}` → 204 (só rascunho sem progresso de criança; senão 422)
-- `POST /painel/aulas/{id}/midia` multipart `{ alvo: "palavra_imagem"|"palavra_audio"|"pagina_imagem"|"pagina_audio"|"pergunta_audio"|"palavra_dicionario_imagem"|"palavra_dicionario_audio", alvo_id?, arquivo }`
+- `POST /painel/aulas/{id}/midia` multipart `{ alvo: "palavra_imagem"|"palavra_audio"|"pagina_imagem"|"pagina_audio"|"pergunta_audio"|"palavra_dicionario_imagem"|"palavra_dicionario_audio"|"atividade_imagem", alvo_id?, arquivo }`
   → `{ url }` (imagem: jpg/png/webp ≤ 5 MB; áudio: mp3/m4a/ogg/webm/wav ≤ 10 MB; disco público)
 - `DELETE /painel/aulas/{id}/midia` `{ alvo, alvo_id? }` → 204
 - `POST /painel/silabas/sugerir-familia` `{silaba: "TE"}` → `{ familia: ["TA","TE","TI","TO","TU"] }`
-- `Aula = { id, slug, titulo, fase, ordem, status, palavra_geradora, palavra_imagem_url, palavra_audio_url,
-    pre_requisito_aula_id, criada_por: {id,name},
+- `Aula = { id, slug, disciplina, titulo, rotulo|null, descricao|null, habilidade_bncc|null, fase, ordem, status,
+    palavra_geradora|null, palavra_imagem_url, palavra_audio_url, pre_requisito_aula_id, criada_por: {id,name},
     silabas: [ { id, texto, ordem, audio_url, familia: [ {id, texto, audio_url} ] } ],
     historia_paginas: [ { id, ordem, texto, imagem_url, audio_url } ],
     perguntas: [ { id, ordem, texto, audio_url } ],
     palavras: [ { id, palavra, silabas: [...], destaque, imagem_url, audio_url } ],
+    atividades: [ { id, ordem, tipo, titulo, instrucao, config, imagem_url, avaliada } ],
     created_at, updated_at }`
 
 ## Dicionário geral
@@ -87,3 +106,4 @@ edita. `/painel/users` continua só admin.
 - Palavras são comparadas sem acento e em caixa alta (`palavra_normalizada`), mas exibidas como cadastradas.
 - Famílias acumulam entre aulas: `FamiliasService::disponiveisPara(crianca, aula)`.
 - Desbloqueio: aula disponível se publicada e sem pré-requisito, ou com pré-requisito concluído.
+- Progresso: `crianca_aulas.etapa_atual` vai de 1 a N+1, em que N é o número de atividades e N+1 é a tela de conquista.

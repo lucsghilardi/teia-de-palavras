@@ -54,12 +54,15 @@ Regras gerais:
 
 ## Mapa
 
-`GET /crianca/mapa` → 200
+`GET /crianca/mapa?disciplina=` → 200
 ```
-{ missoes: [ { id, titulo, fase, ordem, palavra_geradora, palavra_imagem_url,
+{ missoes: [ { id, titulo, descricao, disciplina, rotulo, fase, ordem, palavra_geradora|null, palavra_imagem_url,
                status: "disponivel"|"em_andamento"|"concluida"|"bloqueada",
-               etapa_atual: 1..8|null } ] }        // só aulas publicadas, na ordem
+               etapa_atual: 1..N+1|null, total_atividades: N } ] }   // só aulas publicadas, na ordem
 ```
+- `disciplina` (`portugues|matematica|geografia|historia`) filtra um planeta; sem ela vêm todas, na
+  ordem disciplina → fase → ordem. `rotulo` é o que o nó do mapa mostra.
+- `etapa_atual` vai de 1 a `N+1`: `N` é o número de atividades e `N+1` é a tela de conquista.
 
 ## Aula
 
@@ -68,9 +71,18 @@ Regras gerais:
 
 ```
 AulaCrianca = {
-  id, titulo, fase, palavra_geradora, palavra_imagem_url, palavra_audio_url,
-  status, etapa_atual,                      // 1..8; concluída continua 8 (pode rever)
-  etapas: ["missao","conversa","palavra","palmas","ficha","criacao","producao","conquista"],
+  id, titulo, descricao, disciplina, rotulo, fase,
+  palavra_geradora|null, palavra_imagem_url, palavra_audio_url,
+  status, etapa_atual,                      // 1..N+1; concluída continua N+1 (pode rever)
+  total_atividades,                         // N
+  etapas: [ ...tipos das atividades, "conquista" ],   // compatibilidade; use `atividades`
+  atividades: [ { ordem, tipo, titulo, instrucao, imagem_url, avaliada, ...conteudo do tipo } ],
+  // Conteúdo por tipo (docs/atividades.md), sem nunca trazer a resposta certa:
+  //   historia → { paginas }        conversa → { perguntas }      palavra → { palavra, imagem_url, audio_url }
+  //   palmas → { silabas }          ficha → { linhas }
+  //   montar_palavras → { pecas, metas, teia_total, minimo_palavras }   frase → { teia, palavrinhas, minimo }
+  // Chaves abaixo (história, perguntas, palmas, ficha, peças, metas, teia, palavrinhas) seguem no topo
+  // por compatibilidade com o app atual e saem numa fase seguinte:
   historia:  [ { texto, imagem_url, audio_url } ],
   perguntas: [ { texto, audio_url } ],
   palmas:    [ { texto, audio_url } ],       // sílabas da palavra geradora, em ordem
@@ -83,8 +95,18 @@ AulaCrianca = {
 ```
 
 `POST /crianca/aulas/{id}/etapas/{n}/concluir` → 200 `{ etapa_atual }`
-- Conclui a etapa `n` (1..7) e avança para `n+1`. Repetir uma etapa já passada é ok (não volta).
-- 422 `{ message }` se `n` > `etapa_atual` (não pula etapas). 403 se trancada.
+- Conclui a atividade `n` (1..N) e avança para `n+1`. Repetir uma etapa já passada é ok (não volta).
+- 422 `{ message }` se `n` > `etapa_atual` (não pula etapas) ou `n` > N. 403 se trancada.
+
+`POST /crianca/aulas/{id}/atividades/{n}/responder` `{ item?, ...resposta do tipo }` → 200
+```
+{ correta, item, mensagem, dica|null, resposta_correta|null, xp_ganho, extra, xp_total, nivel }
+```
+- Só para atividades com `avaliada: true` (422 nas outras; 404 se `n` não existe; 403 se trancada).
+- O corpo depende do tipo (`docs/atividades.md`). Nos tipos legados de Português, `extra` traz a
+  resposta completa da tentativa (`montar_palavras` → mesmo formato de `/tentativas`;
+  `frase` → mesmo formato de `/producao`).
+- `mensagem` e `dica` nunca dizem "errado" e podem ser faladas.
 
 `POST /crianca/aulas/{id}/tentativas` `{ silabas: ["TA","TU"] }` → 200
 ```
@@ -103,7 +125,7 @@ Palavra válida e nova entra na Teia e vale 1 estrela. Repetida não duplica.
   estrelas, conquistas: Conquista[],
   palavras_da_missao: [ { palavra, audio_url } ] }   // descobertas nesta aula
 ```
-422 se a criança ainda não chegou na etapa 8. Concluir de novo não dá estrelas extras.
+422 se a criança ainda não chegou na etapa N+1. Concluir de novo não dá estrelas extras.
 
 ## Teia de Palavras
 

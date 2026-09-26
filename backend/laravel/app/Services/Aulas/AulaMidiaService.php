@@ -3,6 +3,7 @@
 namespace App\Services\Aulas;
 
 use App\Models\Aula;
+use App\Models\AulaAtividade;
 use App\Models\AulaHistoriaPagina;
 use App\Models\AulaPalavra;
 use App\Models\AulaPergunta;
@@ -23,6 +24,7 @@ class AulaMidiaService
         'pergunta_audio' => [AulaPergunta::class, 'audio_path', 'audio'],
         'palavra_dicionario_imagem' => [AulaPalavra::class, 'imagem_path', 'imagem'],
         'palavra_dicionario_audio' => [AulaPalavra::class, 'audio_path', 'audio'],
+        'atividade_imagem' => [AulaAtividade::class, 'imagem_path', 'imagem'],
     ];
 
     public function salvar(Aula $aula, string $alvo, ?int $alvoId, UploadedFile $arquivo): string

@@ -15,7 +15,11 @@ class AulaResumoResource extends JsonResource
         return [
             'id' => $this->id,
             'slug' => $this->slug,
+            'disciplina' => $this->disciplina,
             'titulo' => $this->titulo,
+            'rotulo' => $this->rotuloExibido(),
+            'descricao' => $this->descricao,
+            'habilidade_bncc' => $this->habilidade_bncc,
             'fase' => $this->fase,
             'ordem' => $this->ordem,
             'palavra_geradora' => $this->palavra_geradora,
@@ -27,6 +31,7 @@ class AulaResumoResource extends JsonResource
                 'palavras' => (int) ($this->palavras_count ?? 0),
                 'paginas' => (int) ($this->historia_paginas_count ?? 0),
                 'perguntas' => (int) ($this->perguntas_count ?? 0),
+                'atividades' => (int) ($this->atividades_count ?? 0),
             ],
             'updated_at' => $this->updated_at,
         ];
