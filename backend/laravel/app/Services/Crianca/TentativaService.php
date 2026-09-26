@@ -26,15 +26,16 @@ class TentativaService
     /**
      * @param  list<string>  $silabas
      * @param  list<string>|null  $disponiveis  peças normalizadas; null = famílias acumuladas da criança
+     * @param  string  $origem  como a palavra entra na Teia: criacao | dupla
      * @return array<string, mixed> resposta de docs/api-crianca.md (tentativas)
      */
-    public function tentar(Crianca $crianca, Aula $aula, array $silabas, ?array $disponiveis = null): array
+    public function tentar(Crianca $crianca, Aula $aula, array $silabas, ?array $disponiveis = null, string $origem = 'criacao'): array
     {
         $resultado = $disponiveis === null
             ? $this->validador->validar($crianca, $aula, $silabas)
             : $this->validador->validarCom($disponiveis, $aula, $silabas, $crianca);
 
-        $nova = $this->teia->registrar($crianca, $resultado, $aula, $silabas);
+        $nova = $this->teia->registrar($crianca, $resultado, $aula, $silabas, $origem);
         $stats = $this->gamificacao->darEstrelas($crianca, $nova ? (int) config('teia.estrelas.palavra') : 0);
         $conquistas = $nova ? $this->gamificacao->avaliarConquistas($crianca) : [];
 

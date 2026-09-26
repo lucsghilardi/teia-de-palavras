@@ -23,6 +23,7 @@ import { celebrar } from "@/components/crianca/aula/celebrar";
 import { Ilustracao } from "@/components/crianca/aula/ilustracao";
 import { falasDeConquistas, narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
 import { useTratarSessao } from "@/components/crianca/aula/sessao";
+import { useTentarPalavra } from "@/components/crianca/atividades/envio-resposta";
 import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { Peca } from "@/components/crianca/ui/peca";
@@ -158,6 +159,8 @@ export function MontarPalavras({
   const { crianca, atualizar } = useCrianca();
   const tratarSessao = useTratarSessao();
   const reduzido = useMovimentoReduzido();
+  // A Roda troca o destino da tentativa (dupla ou peças da turma); sem provedor, vai para a missão.
+  const tentarPersonalizado = useTentarPalavra();
   const { daAula, anteriores } = useMemo(() => organizarPecas(atividade.pecas), [atividade.pecas]);
   const audioDaPeca = useMemo(() => new Map(atividade.pecas.map((p) => [p.texto, p.audio_url])), [atividade.pecas]);
 
@@ -225,7 +228,7 @@ export function MontarPalavras({
     setEnviando(true);
 
     try {
-      const r = await tentarPalavra(aula.id, silabas);
+      const r = tentarPersonalizado ? await tentarPersonalizado(silabas) : await tentarPalavra(aula.id, silabas);
 
       if (r.valida && r.palavra) {
         const palavra = r.palavra;

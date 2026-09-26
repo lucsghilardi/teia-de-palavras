@@ -8,6 +8,7 @@ use App\Models\Gravacao;
 use App\Models\MiniAula;
 use App\Models\MiniAulaEntrega;
 use App\Models\Turma;
+use App\Models\TurmaSessao;
 use App\Models\User;
 use App\Services\Atividades\RegistroAtividades;
 use App\Services\MiniAulas\MiniAulaService;
@@ -56,6 +57,8 @@ class PrepararE2e extends Command
             ['educador_user_id' => $educador->id, 'nome' => 'E2E', 'ativa' => true],
         );
         $turma->update(['ativa' => true]);
+        // Nenhuma roda sobra de uma rodada anterior.
+        TurmaSessao::where('turma_id', $turma->id)->delete();
 
         // Recria a criança a cada rodada: progresso zerado e id novo, o que
         // também zera o teto de tentativas de entrada (chave = criança + IP)

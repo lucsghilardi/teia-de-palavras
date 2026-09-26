@@ -10,6 +10,7 @@ export const breadcrumbMap: Record<string, string> = {
   dicionario: "Dicionário",
   amizades: "Amizades",
   "mini-aulas": "Mini-aulas",
+  rodas: "Rodas",
   progresso: "Progresso",
   configuracoes: "Configurações",
   usuarios: "Usuários",

@@ -31,4 +31,15 @@ class Dupla extends Model
     {
         return $this->hasMany(DuplaTentativa::class, 'dupla_id');
     }
+
+    public function tem(int $criancaId): bool
+    {
+        return (int) $this->crianca_a_id === $criancaId || (int) $this->crianca_b_id === $criancaId;
+    }
+
+    /** O par de $criancaId. */
+    public function outra(int $criancaId): int
+    {
+        return (int) $this->crianca_a_id === $criancaId ? (int) $this->crianca_b_id : (int) $this->crianca_a_id;
+    }
 }

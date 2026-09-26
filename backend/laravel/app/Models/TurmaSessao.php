@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -54,5 +55,24 @@ class TurmaSessao extends Model
     public function duplas(): HasMany
     {
         return $this->hasMany(Dupla::class, 'turma_sessao_id');
+    }
+
+    /** Rodas ainda em uso (aguardando ou em andamento). */
+    public function scopeAbertas(Builder $query): Builder
+    {
+        return $query->whereIn('status', [self::AGUARDANDO, self::EM_ANDAMENTO]);
+    }
+
+    public function ehAberta(): bool
+    {
+        return $this->status !== self::ENCERRADA;
+    }
+
+    /** @return array{pagina: int, item: int} */
+    public function estadoAtual(): array
+    {
+        $estado = is_array($this->estado) ? $this->estado : [];
+
+        return ['pagina' => max(0, (int) ($estado['pagina'] ?? 0)), 'item' => max(0, (int) ($estado['item'] ?? 0))];
     }
 }

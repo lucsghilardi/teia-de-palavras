@@ -7,6 +7,7 @@ import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
 import { celebrar } from "@/components/crianca/aula/celebrar";
 import { falasDeConquistas, narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
 import { useTratarSessao } from "@/components/crianca/aula/sessao";
+import { useEnviarProducao } from "@/components/crianca/atividades/envio-resposta";
 import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { useCrianca } from "@/context/CriancaContext";
@@ -34,6 +35,7 @@ const CHIP =
  * criança + palavrinhas (O, A, UM, TEM...). (Ditar por voz: fase futura.)
  */
 export function Frase({ aula, atividade, minusculas, aoConcluir, definirInstrucao, mostrarConquistas }: PropsAtividade<AtividadeFrase>) {
+  const enviarPersonalizado = useEnviarProducao();
   const { atualizar } = useCrianca();
   const tratarSessao = useTratarSessao();
   const reduzido = useMovimentoReduzido();
@@ -93,7 +95,7 @@ export function Frase({ aula, atividade, minusculas, aoConcluir, definirInstruca
     setEnviando(true);
 
     try {
-      const r = await enviarProducao(aula.id, [...frase]);
+      const r = enviarPersonalizado ? await enviarPersonalizado([...frase]) : await enviarProducao(aula.id, [...frase]);
 
       celebrar(reduzido);
       atualizar({ estrelas: r.estrelas });

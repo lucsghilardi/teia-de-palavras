@@ -9,6 +9,7 @@ import { CabecalhoEu } from "@/components/crianca/galaxia/cabecalho-eu";
 import { CartaoAmigos } from "@/components/crianca/galaxia/cartao-amigos";
 import { CartaoMissao } from "@/components/crianca/galaxia/cartao-missao";
 import { CartaoRevisao } from "@/components/crianca/galaxia/cartao-revisao";
+import { CartaoRoda } from "@/components/crianca/galaxia/cartao-roda";
 import { Planeta } from "@/components/crianca/galaxia/planeta";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { useCrianca } from "@/context/CriancaContext";
@@ -110,6 +111,8 @@ export function Galaxia() {
 
         {galaxia ? (
           <>
+            <CartaoRoda minusculas={minusculas} />
+
             <section aria-label={COPY.galaxia.escolhasDoDia} className="flex flex-col gap-3">
               <h2 className="text-xl font-extrabold text-[var(--c-tinta-suave)]">{exibir(COPY.galaxia.escolhasDoDia, minusculas)}</h2>
               <ul className="grid gap-3 sm:grid-cols-2">
