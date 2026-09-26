@@ -17,3 +17,4 @@ O E2E prepara a turma de teste chamando `php artisan teia:preparar-e2e --json`. 
 usa o compose de desenvolvimento (`docker compose exec -T backend …`); para rodar sem Docker,
 defina `E2E_PREPARAR_CMD` com o comando local, por exemplo
 `E2E_PREPARAR_CMD="php artisan teia:preparar-e2e --json"` executado a partir de `backend/laravel`.
+Se o Chromium do Playwright não estiver baixado, `E2E_CHROMIUM=/caminho/do/chromium` usa um já instalado.

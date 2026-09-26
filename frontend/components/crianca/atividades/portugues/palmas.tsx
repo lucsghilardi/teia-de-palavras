@@ -6,23 +6,25 @@ import { useState } from "react";
 import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
 import { celebrar } from "@/components/crianca/aula/celebrar";
 import { narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
-import type { PropsEtapa } from "@/components/crianca/aula/tipos";
+import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { corDaPeca } from "@/components/crianca/ui/peca";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
 import { exibir } from "@/lib/exibir";
 import { sons } from "@/lib/sons";
 import { cn } from "@/lib/utils";
+import type { AtividadePalmas } from "@/types/CriancaApp";
 
 /**
- * Etapa 4 — PALMAS: a palavra escondida em caixinhas, uma por sílaba. Cada
- * palma revela e fala a próxima sílaba. Na última, a palavra inteira é falada
- * devagar, sílaba por sílaba, e comemoramos. Palmas extras só repetem.
+ * PALMAS: a palavra escondida em caixinhas, uma por sílaba. Cada palma revela
+ * e fala a próxima sílaba. Na última, a palavra inteira é falada devagar,
+ * sílaba por sílaba, e comemoramos. Palmas extras só repetem.
  */
-export function EtapaPalmas({ aula, minusculas, aoConcluir, definirInstrucao }: PropsEtapa) {
+export function Palmas({ aula, atividade, minusculas, aoConcluir, definirInstrucao }: PropsAtividade<AtividadePalmas>) {
   const reduzido = useMovimentoReduzido();
+  const palavra = aula.palavra_geradora ?? aula.rotulo;
   const silabas =
-    aula.palmas.length > 0 ? aula.palmas : [{ texto: aula.palavra_geradora, audio_url: aula.palavra_audio_url }];
+    atividade.silabas.length > 0 ? atividade.silabas : [{ texto: palavra, audio_url: aula.palavra_audio_url }];
   const total = silabas.length;
   const [batidas, setBatidas] = useState(0);
   const [destacada, setDestacada] = useState<number | null>(null);
@@ -32,7 +34,7 @@ export function EtapaPalmas({ aula, minusculas, aoConcluir, definirInstrucao }: 
   const completo = batidas >= total;
 
   const instrucao = {
-    texto: `Vamos bater palmas! Uma palma para cada pedacinho da palavra ${aula.palavra_geradora}. Toque no botão de palmas.`,
+    texto: `Vamos bater palmas! Uma palma para cada pedacinho da palavra ${palavra}. Toque no botão de palmas.`,
   };
   const narrou = useNarracaoDeChegada("palmas", [instrucao], instrucao, definirInstrucao);
 

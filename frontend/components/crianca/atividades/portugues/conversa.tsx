@@ -4,20 +4,21 @@ import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
-import { Pontinhos } from "@/components/crianca/aula/etapas/pontinhos";
+import { Pontinhos } from "@/components/crianca/aula/pontinhos";
 import { narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
-import type { PropsEtapa } from "@/components/crianca/aula/tipos";
+import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { exibir } from "@/lib/exibir";
+import type { AtividadeConversa } from "@/types/CriancaApp";
 
 const CONVIDAR = "Converse com as pessoas perto de você!";
 
 /**
- * Etapa 2 — CONVERSA: uma pergunta por vez, falada. Não há resposta certa:
- * a criança conversa com quem está perto. (Gravar a resposta: fase futura.)
+ * CONVERSA: uma pergunta por vez, falada. Não há resposta certa: a criança
+ * conversa com quem está perto. (Gravar a resposta: fase futura.)
  */
-export function EtapaConversa({ aula, minusculas, aoConcluir, definirInstrucao }: PropsEtapa) {
-  const perguntas = aula.perguntas;
+export function Conversa({ atividade, minusculas, aoConcluir, definirInstrucao }: PropsAtividade<AtividadeConversa>) {
+  const perguntas = atividade.perguntas;
   const [indice, setIndice] = useState(0);
   const atual = perguntas[indice] ?? null;
   const ultima = indice >= perguntas.length - 1;

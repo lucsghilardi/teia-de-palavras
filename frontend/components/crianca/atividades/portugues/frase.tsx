@@ -7,7 +7,7 @@ import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
 import { celebrar } from "@/components/crianca/aula/celebrar";
 import { falasDeConquistas, narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
 import { useTratarSessao } from "@/components/crianca/aula/sessao";
-import type { PropsEtapa } from "@/components/crianca/aula/tipos";
+import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { useCrianca } from "@/context/CriancaContext";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
@@ -18,9 +18,9 @@ import { sons } from "@/lib/sons";
 import { cn } from "@/lib/utils";
 import { ApiError } from "@/services/apiError";
 import { enviarProducao } from "@/services/crianca";
+import type { AtividadeFrase } from "@/types/CriancaApp";
 
 const MAX_FRASE = 8;
-const MIN_FRASE = 2;
 
 const INSTRUCAO = {
   texto: "Toque nas palavras para montar uma frase sobre a missão. Depois, toque no aviãozinho para enviar.",
@@ -30,14 +30,18 @@ const CHIP =
   "flex min-h-16 min-w-16 items-center justify-center gap-2 rounded-2xl px-4 font-black touch-manipulation select-none transition-transform active:translate-y-1 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]";
 
 /**
- * Etapa 7 — PRODUÇÃO: montar uma frase curta com as palavras da Teia da
+ * FRASE (produção): montar uma frase curta com as palavras da Teia da
  * criança + palavrinhas (O, A, UM, TEM...). (Ditar por voz: fase futura.)
  */
-export function EtapaProducao({ aula, minusculas, aoConcluir, definirInstrucao, mostrarConquistas }: PropsEtapa) {
+export function Frase({ aula, atividade, minusculas, aoConcluir, definirInstrucao, mostrarConquistas }: PropsAtividade<AtividadeFrase>) {
   const { atualizar } = useCrianca();
   const tratarSessao = useTratarSessao();
   const reduzido = useMovimentoReduzido();
-  const palavras = useMemo(() => palavrasDaProducao(aula.teia, aula.palavrinhas), [aula.teia, aula.palavrinhas]);
+  const MIN_FRASE = Math.max(1, atividade.minimo);
+  const palavras = useMemo(
+    () => palavrasDaProducao(atividade.teia, atividade.palavrinhas),
+    [atividade.teia, atividade.palavrinhas],
+  );
   const audioDa = useMemo(() => new Map(palavras.map((p) => [p.palavra, p.audio_url])), [palavras]);
   const daTeia = palavras.filter((p) => !p.palavrinha);
   const palavrinhas = palavras.filter((p) => p.palavrinha);

@@ -6,8 +6,6 @@ import { exibir } from "@/lib/exibir";
 import { cn } from "@/lib/utils";
 import type { Missao, StatusMissao } from "@/types/CriancaApp";
 
-export const TOTAL_ETAPAS = 8;
-
 export const ROTULO_STATUS: Record<StatusMissao, string> = {
   disponivel: "disponível",
   em_andamento: "em andamento",
@@ -17,7 +15,7 @@ export const ROTULO_STATUS: Record<StatusMissao, string> = {
 
 /** Nome acessível do nó: "Missão TEIA, disponível". */
 export function rotuloMissao(missao: Missao): string {
-  return `Missão ${missao.palavra_geradora.toLocaleUpperCase("pt-BR")}, ${ROTULO_STATUS[missao.status]}`;
+  return `Missão ${missao.rotulo.toLocaleUpperCase("pt-BR")}, ${ROTULO_STATUS[missao.status]}`;
 }
 
 const CIRCULO: Record<StatusMissao, string> = {
@@ -34,11 +32,11 @@ function IconeStatus({ status, className }: { status: StatusMissao; className?: 
   return <Play className={cn("fill-current", className)} strokeWidth={2.5} />;
 }
 
-/** Anel de progresso (etapa_atual / 8) em volta de uma missão em andamento. */
-function AnelProgresso({ etapa }: { etapa: number }) {
+/** Anel de progresso (etapa_atual / N+1) em volta de uma missão em andamento. */
+function AnelProgresso({ etapa, total }: { etapa: number; total: number }) {
   const raio = 46;
   const volta = 2 * Math.PI * raio;
-  const fracao = Math.min(1, Math.max(0, etapa / TOTAL_ETAPAS));
+  const fracao = Math.min(1, Math.max(0, etapa / Math.max(1, total)));
 
   return (
     <svg viewBox="0 0 100 100" aria-hidden className="pointer-events-none absolute -inset-2.5 size-[calc(100%+1.25rem)] -rotate-90">
@@ -88,7 +86,9 @@ export function NoMissao({
           status === "disponivel" && "animate-crianca-pulso",
         )}
       >
-        {status === "em_andamento" && missao.etapa_atual ? <AnelProgresso etapa={missao.etapa_atual} /> : null}
+        {status === "em_andamento" && missao.etapa_atual ? (
+          <AnelProgresso etapa={missao.etapa_atual} total={missao.total_atividades + 1} />
+        ) : null}
 
         {temImagem ? (
           // eslint-disable-next-line @next/next/no-img-element -- host da mídia muda por ambiente
@@ -132,7 +132,7 @@ export function NoMissao({
           trancada ? "bg-[#F1EDE7] text-[#9C9388]" : "bg-white text-[var(--c-tinta)]",
         )}
       >
-        {exibir(missao.palavra_geradora, minusculas)}
+        {exibir(missao.rotulo, minusculas)}
       </span>
     </button>
   );

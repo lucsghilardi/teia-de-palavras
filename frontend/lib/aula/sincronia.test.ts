@@ -30,7 +30,7 @@ function servidorFalso(inicial = 1) {
 describe("criarSincronizador", () => {
   it("envia as etapas em ordem mesmo quando pedidas sem esperar", async () => {
     const srv = servidorFalso(1);
-    const sinc = criarSincronizador(srv.enviar, 1);
+    const sinc = criarSincronizador(srv.enviar, 1, 8);
 
     const r = await Promise.all([sinc.concluir(1), sinc.concluir(2), sinc.concluir(3)]);
 
@@ -43,7 +43,7 @@ describe("criarSincronizador", () => {
   it("tenta de novo uma vez", async () => {
     const srv = servidorFalso(1);
     srv.falhas.set(1, 1);
-    const sinc = criarSincronizador(srv.enviar, 1);
+    const sinc = criarSincronizador(srv.enviar, 1, 8);
 
     expect(await sinc.concluir(1)).toBe(true);
     expect(srv.chamadas).toEqual([1, 1]);
@@ -53,7 +53,7 @@ describe("criarSincronizador", () => {
     const srv = servidorFalso(1);
     srv.falhas.set(1, 2);
     const aoConfirmar = vi.fn();
-    const sinc = criarSincronizador(srv.enviar, 1, aoConfirmar);
+    const sinc = criarSincronizador(srv.enviar, 1, 8, aoConfirmar);
 
     expect(await sinc.concluir(1)).toBe(false);
     expect(sinc.confirmada()).toBe(1);
@@ -66,18 +66,27 @@ describe("criarSincronizador", () => {
 
   it("não reenvia etapas que o servidor já passou", async () => {
     const srv = servidorFalso(5);
-    const sinc = criarSincronizador(srv.enviar, 5);
+    const sinc = criarSincronizador(srv.enviar, 5, 8);
 
     expect(await sinc.concluir(2)).toBe(true);
     expect(srv.chamadas).toEqual([]);
   });
 
-  it("nunca envia a etapa 8 (conclusão é outra rota)", async () => {
+  it("nunca envia a conquista (etapa N+1): a conclusão é outra rota", async () => {
     const srv = servidorFalso(7);
-    const sinc = criarSincronizador(srv.enviar, 7);
+    const sinc = criarSincronizador(srv.enviar, 7, 8);
 
     expect(await sinc.concluir(8)).toBe(true);
     expect(srv.chamadas).toEqual([7]);
     expect(sinc.confirmada()).toBe(8);
+  });
+
+  it("respeita o total da missão (uma missão de 3 atividades para na 3)", async () => {
+    const srv = servidorFalso(1);
+    const sinc = criarSincronizador(srv.enviar, 1, 4);
+
+    expect(await sinc.concluir(4)).toBe(true);
+    expect(srv.chamadas).toEqual([1, 2, 3]);
+    expect(sinc.confirmada()).toBe(4);
   });
 });

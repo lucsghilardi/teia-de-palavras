@@ -2,10 +2,7 @@
  * Ajudantes puros sobre o conteúdo da aula (paleta, metas, dicas, frase).
  */
 import { normalizarPalavra } from "@/lib/silabas";
-import type { AulaCrianca } from "@/types/CriancaApp";
-
-type Peca = AulaCrianca["pecas"][number];
-type Meta = AulaCrianca["metas"][number];
+import type { Meta, PalavraDaTeia, PecaSilaba as Peca } from "@/types/CriancaApp";
 
 /** Paleta da Criação: sem repetição, sílabas desta aula primeiro (ordem original preservada). */
 export function organizarPecas(pecas: Peca[]): { daAula: Peca[]; anteriores: Peca[] } {
@@ -49,7 +46,7 @@ export function dicaDaCriacao(metas: Meta[], achadasAgora: string[] = []): strin
 
 /** Palavras da Produção: a Teia da criança + palavrinhas, sem repetir. */
 export function palavrasDaProducao(
-  teia: AulaCrianca["teia"],
+  teia: PalavraDaTeia[],
   palavrinhas: string[],
 ): { palavra: string; audio_url: string | null; palavrinha: boolean }[] {
   const vistas = new Set<string>();

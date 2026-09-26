@@ -6,12 +6,14 @@ import { cancelarNarracao, type Trecho } from "@/components/crianca/aula/narrado
 import { TrilhaEtapas } from "@/components/crianca/aula/trilha-etapas";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { BotaoOuvir } from "@/components/crianca/ui/botao-ouvir";
+import type { Atividade } from "@/types/CriancaApp";
 
 /**
- * Topo do player: voltar ao mapa (esquerda), trilha das 8 etapas (centro;
+ * Topo do player: voltar ao mapa (esquerda), trilha das etapas (centro;
  * numa segunda linha em telas estreitas), estrelas e o alto-falante (direita).
  */
 export function BarraAula({
+  atividades,
   etapaAtual,
   etapaVisivel,
   concluidas,
@@ -20,13 +22,14 @@ export function BarraAula({
   estrelas,
   mostrarVoltar = true,
 }: {
+  atividades: Atividade[];
   etapaAtual: number;
   etapaVisivel: number;
   concluidas: number[];
   aoIr: (etapa: number) => void;
   instrucao: Trecho;
   estrelas: number | null;
-  /** Na etapa 8 o botão grande "Voltar ao mapa" fica no conteúdo. */
+  /** Na conquista o botão grande "Voltar ao mapa" fica no conteúdo. */
   mostrarVoltar?: boolean;
 }) {
   const router = useRouter();
@@ -46,7 +49,7 @@ export function BarraAula({
       </div>
 
       <nav aria-label="Trilha da missão" className="order-3 w-full min-w-0 lg:order-2 lg:w-auto lg:flex-1">
-        <TrilhaEtapas etapaAtual={etapaAtual} etapaVisivel={etapaVisivel} concluidas={concluidas} aoIr={aoIr} />
+        <TrilhaEtapas atividades={atividades} etapaAtual={etapaAtual} etapaVisivel={etapaVisivel} concluidas={concluidas} aoIr={aoIr} />
       </nav>
 
       <div className="order-2 ml-auto flex shrink-0 items-center gap-2 lg:order-3 lg:ml-0">

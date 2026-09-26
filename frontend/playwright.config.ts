@@ -8,6 +8,8 @@ import { defineConfig, devices } from "@playwright/test";
  *   npm run test:e2e            # nesta pasta
  *
  * Cada teste zera a turma E2E com `php artisan teia:preparar-e2e`.
+ * Sem Docker: E2E_PREPARAR_CMD="php artisan teia:preparar-e2e --json" (roda em
+ * backend/laravel) e, se preciso, E2E_CHROMIUM com o caminho de um Chromium local.
  */
 export default defineConfig({
   testDir: "./e2e",
@@ -18,6 +20,8 @@ export default defineConfig({
   reporter: [["list"]],
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3005",
+    // Sem download: aponte um Chromium já instalado (ex.: E2E_CHROMIUM=/opt/pw-browsers/chromium).
+    ...(process.env.E2E_CHROMIUM ? { launchOptions: { executablePath: process.env.E2E_CHROMIUM } } : {}),
     locale: "pt-BR",
     // O botão do "próximo passo" pulsa sem parar; sem movimento, o Playwright
     // o considera estável. Também é assim que parte das crianças usa o app.

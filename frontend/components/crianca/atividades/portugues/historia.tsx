@@ -4,23 +4,24 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
-import { Pontinhos } from "@/components/crianca/aula/etapas/pontinhos";
+import { Pontinhos } from "@/components/crianca/aula/pontinhos";
 import { Ilustracao } from "@/components/crianca/aula/ilustracao";
 import { useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
-import type { PropsEtapa } from "@/components/crianca/aula/tipos";
+import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { exibir } from "@/lib/exibir";
 import { cn } from "@/lib/utils";
+import type { AtividadeHistoria } from "@/types/CriancaApp";
 
 /**
- * Etapa 1 — MISSÃO: a história em páginas de tela cheia. A narração toca
- * sozinha em cada página; o texto aparece grande, mas a criança escuta.
+ * HISTÓRIA: páginas de tela cheia. A narração toca sozinha em cada página;
+ * o texto aparece grande, mas a criança escuta.
  */
-export function EtapaMissao({ aula, minusculas, aoConcluir, definirInstrucao }: PropsEtapa) {
+export function Historia({ aula, atividade, minusculas, aoConcluir, definirInstrucao }: PropsAtividade<AtividadeHistoria>) {
   const paginas =
-    aula.historia.length > 0
-      ? aula.historia
-      : [{ texto: aula.titulo, imagem_url: aula.palavra_imagem_url, audio_url: null }];
+    atividade.paginas.length > 0
+      ? atividade.paginas
+      : [{ texto: atividade.titulo ?? aula.titulo, imagem_url: atividade.imagem_url ?? aula.palavra_imagem_url, audio_url: null }];
   const [pagina, setPagina] = useState(0);
   const atual = paginas[Math.min(pagina, paginas.length - 1)];
   const primeira = pagina === 0;

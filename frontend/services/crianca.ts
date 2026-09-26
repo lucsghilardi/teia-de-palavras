@@ -8,6 +8,7 @@ import type {
   Pulso,
   ResultadoConclusao,
   ResultadoProducao,
+  ResultadoResposta,
   ResultadoTentativa,
   Teia,
   TurmaEntrada,
@@ -85,7 +86,8 @@ export async function sair() {
 
 export const buscarEu = () => criancaFetch<Eu>("/eu");
 export const pulso = () => post<Pulso>("/sessao/pulso");
-export const buscarMapa = () => criancaFetch<{ missoes: Missao[] }>("/mapa");
+export const buscarMapa = (disciplina?: string) =>
+  criancaFetch<{ missoes: Missao[] }>(disciplina ? `/mapa?disciplina=${encodeURIComponent(disciplina)}` : "/mapa");
 export const buscarTeia = () => criancaFetch<Teia>("/teia");
 
 // ---------- Aula ----------
@@ -103,3 +105,7 @@ export const enviarProducao = (id: number, palavras: string[]) =>
   post<ResultadoProducao>(`/aulas/${id}/producao`, { palavras });
 
 export const concluirAula = (id: number) => post<ResultadoConclusao>(`/aulas/${id}/concluir`);
+
+/** Resposta genérica a uma atividade avaliada (o corpo depende do tipo; ver docs/atividades.md). */
+export const responderAtividade = (id: number, ordem: number, resposta: Record<string, unknown>) =>
+  post<ResultadoResposta>(`/aulas/${id}/atividades/${ordem}/responder`, resposta);

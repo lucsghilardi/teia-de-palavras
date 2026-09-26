@@ -23,7 +23,7 @@ import { celebrar } from "@/components/crianca/aula/celebrar";
 import { Ilustracao } from "@/components/crianca/aula/ilustracao";
 import { falasDeConquistas, narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
 import { useTratarSessao } from "@/components/crianca/aula/sessao";
-import type { PropsCriacao } from "@/components/crianca/aula/tipos";
+import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { Peca } from "@/components/crianca/ui/peca";
 import { useCrianca } from "@/context/CriancaContext";
@@ -34,9 +34,9 @@ import { exibir } from "@/lib/exibir";
 import { sons } from "@/lib/sons";
 import { cn } from "@/lib/utils";
 import { tentarPalavra } from "@/services/crianca";
-import type { AulaCrianca } from "@/types/CriancaApp";
+import type { AtividadeMontarPalavras, PecaSilaba } from "@/types/CriancaApp";
 
-type PecaAula = AulaCrianca["pecas"][number];
+type PecaAula = PecaSilaba;
 type Voo = { id: number; palavra: string; de: { x: number; y: number }; para: { x: number; y: number } };
 
 const INSTRUCAO = {
@@ -142,23 +142,24 @@ function AreaBandeja({
 }
 
 /**
- * Etapa 6 — CRIAÇÃO: juntar sílabas (desta aula e das anteriores) para
- * descobrir palavras. Palavra válida → comemoração, entra na Teia. Inválida →
- * dica gentil falada; a bandeja fica para a criança ajustar.
+ * MONTAR PALAVRAS (criação): juntar sílabas (desta aula e das anteriores)
+ * para descobrir palavras. Palavra válida → comemoração, entra na Teia.
+ * Inválida → dica gentil falada; a bandeja fica para a criança ajustar.
  */
-export function EtapaCriacao({
+export function MontarPalavras({
   aula,
+  atividade,
   minusculas,
   aoConcluir,
   definirInstrucao,
   mostrarConquistas,
   aoDescobrir,
-}: PropsCriacao) {
+}: PropsAtividade<AtividadeMontarPalavras>) {
   const { crianca, atualizar } = useCrianca();
   const tratarSessao = useTratarSessao();
   const reduzido = useMovimentoReduzido();
-  const { daAula, anteriores } = useMemo(() => organizarPecas(aula.pecas), [aula.pecas]);
-  const audioDaPeca = useMemo(() => new Map(aula.pecas.map((p) => [p.texto, p.audio_url])), [aula.pecas]);
+  const { daAula, anteriores } = useMemo(() => organizarPecas(atividade.pecas), [atividade.pecas]);
+  const audioDaPeca = useMemo(() => new Map(atividade.pecas.map((p) => [p.texto, p.audio_url])), [atividade.pecas]);
 
   const [bandeja, setBandeja] = useState<Bandeja>(BANDEJA_VAZIA);
   const [achadas, setAchadas] = useState<{ palavra: string; audio_url: string | null }[]>([]);
@@ -179,8 +180,8 @@ export function EtapaCriacao({
     useSensor(TouchSensor, { activationConstraint: { delay: 160, tolerance: 8 } }),
   );
 
-  const podeContinuar = achadas.length > 0 || aula.metas.some((m) => m.encontrada) || aula.metas.length === 0;
-  const totalTeia = crianca?.teia_total ?? aula.teia.length;
+  const podeContinuar = achadas.length > 0 || atividade.metas.some((m) => m.encontrada) || atividade.metas.length === 0;
+  const totalTeia = crianca?.teia_total ?? atividade.teia_total;
 
   const porNaBandeja = (silaba: string) => {
     if (cheia(bandeja)) {
@@ -214,7 +215,7 @@ export function EtapaCriacao({
   };
 
   const dica = () => {
-    void narrar(dicaDaCriacao(aula.metas, achadas.map((a) => a.palavra)));
+    void narrar(dicaDaCriacao(atividade.metas, achadas.map((a) => a.palavra)));
   };
 
   const formar = async () => {
@@ -310,7 +311,7 @@ export function EtapaCriacao({
               aria-label="Palavras escondidas da missão"
               className="order-2 flex w-full flex-wrap items-center justify-center gap-2 sm:order-1 sm:w-auto sm:min-w-0 sm:flex-1 sm:justify-start"
             >
-              {aula.metas.map((m, i) => (
+              {atividade.metas.map((m, i) => (
                 <li key={`${m.palavra}-${i}`}>
                   {m.encontrada ? (
                     <button

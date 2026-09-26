@@ -4,19 +4,20 @@ import { useState } from "react";
 
 import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
 import { narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
-import type { PropsEtapa } from "@/components/crianca/aula/tipos";
+import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { Peca } from "@/components/crianca/ui/peca";
 import { exibir } from "@/lib/exibir";
 import { sons } from "@/lib/sons";
+import type { AtividadeFicha } from "@/types/CriancaApp";
 
 const INSTRUCAO = { texto: "Toque nas pecinhas para ouvir." };
 
 /**
- * Etapa 5 — FICHA DE DESCOBERTA: uma linha por sílaba da palavra geradora,
- * com a família dela (TEI → TA TE TI TO TU). Tocar numa peça fala a sílaba.
+ * FICHA DE DESCOBERTA: uma linha por sílaba da palavra geradora, com a
+ * família dela (TEI → TA TE TI TO TU). Tocar numa peça fala a sílaba.
  * "Continuar" está sempre ali e pulsa depois de 3 toques.
  */
-export function EtapaFicha({ aula, minusculas, aoConcluir, definirInstrucao }: PropsEtapa) {
+export function Ficha({ atividade, minusculas, aoConcluir, definirInstrucao }: PropsAtividade<AtividadeFicha>) {
   const [toques, setToques] = useState(0);
   const [ativa, setAtiva] = useState<string | null>(null);
   useNarracaoDeChegada("ficha", [INSTRUCAO], INSTRUCAO, definirInstrucao);
@@ -31,7 +32,7 @@ export function EtapaFicha({ aula, minusculas, aoConcluir, definirInstrucao }: P
   return (
     <section aria-label="Ficha de descoberta" className="flex flex-1 flex-col gap-4 px-3 pb-4 sm:px-6">
       <div className="flex flex-1 flex-col justify-center gap-3 sm:gap-4">
-        {aula.ficha.map((linha, l) => (
+        {atividade.linhas.map((linha, l) => (
           <div
             key={`${linha.silaba}-${l}`}
             role="group"
@@ -70,7 +71,7 @@ export function EtapaFicha({ aula, minusculas, aoConcluir, definirInstrucao }: P
           </div>
         ))}
 
-        {aula.ficha.length === 0 && (
+        {atividade.linhas.length === 0 && (
           <p aria-hidden className="text-center text-8xl">
             🧩
           </p>

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { celebrar } from "@/components/crianca/aula/celebrar";
 import { falasDeConquistas, narrar, type Trecho } from "@/components/crianca/aula/narrador";
-import type { PropsConquista } from "@/components/crianca/aula/tipos";
+import type { PropsConquista } from "@/components/crianca/atividades/tipos";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { useCrianca } from "@/context/CriancaContext";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
@@ -16,18 +16,18 @@ import type { ResultadoConclusao } from "@/types/CriancaApp";
 const FALA_FINAL = { texto: "Missão concluída!" };
 
 /**
- * Etapa 8 — CONQUISTA: conclui a aula no servidor (uma vez), comemora e mostra
- * estrelas, palavras descobertas nesta missão e medalhas. A aula pode ser
- * revista depois — nada aqui trava.
+ * CONQUISTA (etapa N+1): conclui a missão no servidor (uma vez), comemora e
+ * mostra estrelas, palavras descobertas nesta missão e medalhas. A missão
+ * pode ser revista depois — nada aqui trava.
  */
-export function EtapaConquista({
+export function TelaConquista({
   aula,
   minusculas,
   definirInstrucao,
   mostrarConquistas,
   concluirMissao,
   estrelasNoInicio,
-}: PropsConquista & { estrelasNoInicio: number | null }) {
+}: PropsConquista) {
   const router = useRouter();
   const reduzido = useMovimentoReduzido();
   const { crianca } = useCrianca();
@@ -54,7 +54,7 @@ export function EtapaConquista({
       const proxima = r?.desbloqueadas[0];
 
       if (proxima) {
-        extra.push({ texto: `Você desbloqueou a próxima missão: ${proxima.palavra_geradora}!` });
+        extra.push({ texto: `Você desbloqueou a próxima missão: ${proxima.palavra_geradora ?? proxima.titulo}!` });
       }
 
       extra.push(...falasDeConquistas(r?.conquistas ?? []));
@@ -71,7 +71,11 @@ export function EtapaConquista({
 
   const palavras =
     resultado?.palavras_da_missao ??
-    aula.metas.filter((m) => m.encontrada).map((m) => ({ palavra: m.palavra, audio_url: m.audio_url }));
+    aula.atividades.flatMap((a) =>
+      a.tipo === "montar_palavras"
+        ? a.metas.filter((m) => m.encontrada).map((m) => ({ palavra: m.palavra, audio_url: m.audio_url }))
+        : [],
+    );
   const proxima = resultado?.desbloqueadas[0] ?? null;
   const ganhas = resultado && estrelasAntes !== null ? Math.max(0, resultado.estrelas - estrelasAntes) : null;
   const estrelasTotal = resultado?.estrelas ?? crianca?.estrelas ?? null;

@@ -1,7 +1,9 @@
 /**
- * Motor do player de aula: estado puro (sem React, sem rede) das 8 etapas.
+ * Motor do player de missão: estado puro (sem React, sem rede) das N
+ * atividades mais a tela de conquista.
  *
- *  - `etapaAtual`   a fronteira: a etapa mais adiantada que a criança já liberou (1..8).
+ *  - `total`        N+1: as atividades da missão e, por último, a conquista.
+ *  - `etapaAtual`   a fronteira: a etapa mais adiantada que a criança já liberou (1..total).
  *  - `etapaVisivel` a etapa que está na tela; pode voltar para rever (≤ etapaAtual).
  *  - `concluidas`   etapas já terminadas, em ordem crescente.
  *
@@ -9,19 +11,18 @@
  * (ver `sincronia.ts`): o motor avança na hora, sem esperar o servidor.
  */
 import { normalizarPalavra } from "@/lib/silabas";
-import { ETAPAS, type AulaCrianca, type Etapa } from "@/types/CriancaApp";
-
-export const TOTAL_ETAPAS = ETAPAS.length; // 8
+import type { Atividade, AulaCrianca } from "@/types/CriancaApp";
 
 export type EstadoAula = {
   aula: AulaCrianca | null;
+  total: number;
   etapaAtual: number;
   etapaVisivel: number;
   concluidas: number[];
 };
 
 export type AcaoAula =
-  /** Aula recebida de POST /aulas/{id}/iniciar. */
+  /** Missão recebida de POST /aulas/{id}/iniciar. */
   | { tipo: "carregar"; aula: AulaCrianca }
   /** Tocar num ícone da trilha. Só vale para etapas já liberadas (≤ etapaAtual). */
   | { tipo: "irPara"; etapa: number }
@@ -29,27 +30,35 @@ export type AcaoAula =
   | { tipo: "concluirEtapa"; etapa: number }
   /** O servidor confirmou `etapa_atual` (nunca faz a criança voltar). */
   | { tipo: "sincronizar"; etapaAtual: number }
-  /** Palavra válida formada na Criação: marca a meta e entra na Teia da aula. */
+  /** Palavra válida formada: marca a meta e entra na Teia da missão. */
   | { tipo: "descobrirPalavra"; palavra: string; audio_url: string | null }
   /** POST /aulas/{id}/concluir respondeu. */
   | { tipo: "concluirAula" };
 
 export const estadoInicial: EstadoAula = {
   aula: null,
+  total: 1,
   etapaAtual: 1,
   etapaVisivel: 1,
   concluidas: [],
 };
 
-/** Qualquer número vira uma etapa válida (1..8). */
-export function limitarEtapa(n: number): number {
-  if (!Number.isFinite(n)) return 1;
-
-  return Math.min(TOTAL_ETAPAS, Math.max(1, Math.trunc(n)));
+/** Quantas etapas a missão tem, contando a conquista (N+1). */
+export function totalEtapas(aula: Pick<AulaCrianca, "atividades">): number {
+  return aula.atividades.length + 1;
 }
 
-function ehEtapa(n: number): boolean {
-  return Number.isInteger(n) && n >= 1 && n <= TOTAL_ETAPAS;
+/** Qualquer número vira uma etapa válida (1..total). */
+export function limitarEtapa(n: number, total: number): number {
+  const teto = Math.max(1, Math.trunc(total) || 1);
+
+  if (!Number.isFinite(n)) return 1;
+
+  return Math.min(teto, Math.max(1, Math.trunc(n)));
+}
+
+function ehEtapa(n: number, total: number): boolean {
+  return Number.isInteger(n) && n >= 1 && n <= total;
 }
 
 function intervalo(de: number, ate: number): number[] {
@@ -64,27 +73,35 @@ function unir(lista: number[], novos: number[]): number[] {
   return Array.from(new Set([...lista, ...novos])).sort((a, b) => a - b);
 }
 
-export function nomeDaEtapa(n: number): Etapa {
-  return ETAPAS[limitarEtapa(n) - 1];
+/** A atividade na tela, ou null quando a etapa visível é a conquista. */
+export function atividadeVisivel(estado: EstadoAula): Atividade | null {
+  if (!estado.aula) return null;
+
+  return estado.aula.atividades[estado.etapaVisivel - 1] ?? null;
+}
+
+export function ehConquista(estado: EstadoAula): boolean {
+  return estado.aula !== null && estado.etapaVisivel === estado.total;
 }
 
 export function podeIrPara(estado: EstadoAula, n: number): boolean {
-  return estado.aula !== null && ehEtapa(n) && n <= estado.etapaAtual;
+  return estado.aula !== null && ehEtapa(n, estado.total) && n <= estado.etapaAtual;
 }
 
 export function motorAula(estado: EstadoAula, acao: AcaoAula): EstadoAula {
   switch (acao.tipo) {
     case "carregar": {
       const { aula } = acao;
+      const total = totalEtapas(aula);
 
       // Missão já concluída: tudo liberado e ela recomeça do início (rever/rejogar).
       if (aula.status === "concluida") {
-        return { aula, etapaAtual: TOTAL_ETAPAS, etapaVisivel: 1, concluidas: intervalo(1, TOTAL_ETAPAS) };
+        return { aula, total, etapaAtual: total, etapaVisivel: 1, concluidas: intervalo(1, total) };
       }
 
-      const etapaAtual = limitarEtapa(aula.etapa_atual);
+      const etapaAtual = limitarEtapa(aula.etapa_atual, total);
 
-      return { aula, etapaAtual, etapaVisivel: etapaAtual, concluidas: intervalo(1, etapaAtual - 1) };
+      return { aula, total, etapaAtual, etapaVisivel: etapaAtual, concluidas: intervalo(1, etapaAtual - 1) };
     }
 
     case "irPara":
@@ -93,9 +110,9 @@ export function motorAula(estado: EstadoAula, acao: AcaoAula): EstadoAula {
     case "concluirEtapa": {
       const n = acao.etapa;
 
-      if (!estado.aula || !ehEtapa(n) || n > estado.etapaAtual) return estado;
+      if (!estado.aula || !ehEtapa(n, estado.total) || n > estado.etapaAtual) return estado;
 
-      const proxima = Math.min(TOTAL_ETAPAS, n + 1);
+      const proxima = Math.min(estado.total, n + 1);
 
       return {
         ...estado,
@@ -108,7 +125,7 @@ export function motorAula(estado: EstadoAula, acao: AcaoAula): EstadoAula {
     case "sincronizar": {
       if (!estado.aula) return estado;
 
-      const doServidor = limitarEtapa(acao.etapaAtual);
+      const doServidor = limitarEtapa(acao.etapaAtual, estado.total);
 
       if (doServidor <= estado.etapaAtual) return estado;
 
@@ -126,19 +143,31 @@ export function motorAula(estado: EstadoAula, acao: AcaoAula): EstadoAula {
 
       if (alvo === "") return estado;
 
-      const aula = estado.aula;
-      const jaNaTeia = aula.teia.some((p) => normalizarPalavra(p.palavra) === alvo);
+      const nova = { palavra: acao.palavra, audio_url: acao.audio_url };
+      const atividades = estado.aula.atividades.map((a): Atividade => {
+        if (a.tipo === "montar_palavras") {
+          const jaTinha = a.metas.some((m) => normalizarPalavra(m.palavra) === alvo && m.encontrada);
+          const novaNaTeia = !jaTinha;
 
-      return {
-        ...estado,
-        aula: {
-          ...aula,
-          metas: aula.metas.map((m) =>
-            !m.encontrada && normalizarPalavra(m.palavra) === alvo ? { ...m, encontrada: true } : m,
-          ),
-          teia: jaNaTeia ? aula.teia : [...aula.teia, { palavra: acao.palavra, audio_url: acao.audio_url }],
-        },
-      };
+          return {
+            ...a,
+            metas: a.metas.map((m) =>
+              !m.encontrada && normalizarPalavra(m.palavra) === alvo ? { ...m, encontrada: true } : m,
+            ),
+            teia_total: novaNaTeia ? a.teia_total + 1 : a.teia_total,
+          };
+        }
+
+        if (a.tipo === "frase") {
+          const jaNaTeia = a.teia.some((p) => normalizarPalavra(p.palavra) === alvo);
+
+          return jaNaTeia ? a : { ...a, teia: [...a.teia, nova] };
+        }
+
+        return a;
+      });
+
+      return { ...estado, aula: { ...estado.aula, atividades } };
     }
 
     case "concluirAula": {
@@ -146,9 +175,9 @@ export function motorAula(estado: EstadoAula, acao: AcaoAula): EstadoAula {
 
       return {
         ...estado,
-        aula: { ...estado.aula, status: "concluida", etapa_atual: TOTAL_ETAPAS },
-        etapaAtual: TOTAL_ETAPAS,
-        concluidas: intervalo(1, TOTAL_ETAPAS),
+        aula: { ...estado.aula, status: "concluida", etapa_atual: estado.total },
+        etapaAtual: estado.total,
+        concluidas: intervalo(1, estado.total),
       };
     }
   }

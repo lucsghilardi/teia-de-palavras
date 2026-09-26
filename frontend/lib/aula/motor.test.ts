@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { aulaTeia } from "./fixtures";
-import { estadoInicial, limitarEtapa, motorAula, nomeDaEtapa, podeIrPara, type EstadoAula } from "./motor";
+import { atividadesTeia, aulaTeia, criacaoDe, fraseDe } from "./fixtures";
+import { atividadeVisivel, ehConquista, estadoInicial, limitarEtapa, motorAula, podeIrPara, totalEtapas, type EstadoAula } from "./motor";
 
 const carregar = (parcial = {}) => motorAula(estadoInicial, { tipo: "carregar", aula: aulaTeia(parcial) });
 
@@ -23,6 +23,20 @@ describe("motorAula · carregar", () => {
   it("limita etapa_atual fora do intervalo", () => {
     expect(carregar({ etapa_atual: 99 }).etapaAtual).toBe(8);
     expect(carregar({ etapa_atual: 0 }).etapaAtual).toBe(1);
+  });
+
+  it("o total vem das atividades da missão (N+1, com a conquista)", () => {
+    expect(carregar().total).toBe(8);
+    expect(totalEtapas({ atividades: atividadesTeia().slice(0, 3) })).toBe(4);
+
+    const curta = motorAula(estadoInicial, {
+      tipo: "carregar",
+      aula: aulaTeia({ atividades: atividadesTeia().slice(0, 3), total_atividades: 3, etapa_atual: 9 }),
+    });
+
+    expect(curta.total).toBe(4);
+    expect(curta.etapaAtual).toBe(4);
+    expect(ehConquista(curta)).toBe(true);
   });
 
   it("aula concluída: tudo liberado e recomeça do início para rever", () => {
@@ -126,37 +140,41 @@ describe("motorAula · sincronizar", () => {
 });
 
 describe("motorAula · descobrirPalavra", () => {
-  it("marca a meta (sem acento, sem caixa) e põe na Teia", () => {
+  it("marca a meta (sem acento, sem caixa) e põe na Teia da frase", () => {
     const e = motorAula(carregar({ etapa_atual: 6 }), { tipo: "descobrirPalavra", palavra: "tatu", audio_url: "/a.mp3" });
 
-    expect(e.aula?.metas.find((m) => m.palavra === "TATU")?.encontrada).toBe(true);
-    expect(e.aula?.teia).toContainEqual({ palavra: "tatu", audio_url: "/a.mp3" });
+    expect(criacaoDe(e.aula!).metas.find((m) => m.palavra === "TATU")?.encontrada).toBe(true);
+    expect(criacaoDe(e.aula!).teia_total).toBe(2);
+    expect(fraseDe(e.aula!).teia).toContainEqual({ palavra: "tatu", audio_url: "/a.mp3" });
   });
 
   it("não duplica palavra que já está na Teia", () => {
     const e = motorAula(carregar(), { tipo: "descobrirPalavra", palavra: "TIA", audio_url: null });
 
-    expect(e.aula?.teia.filter((p) => p.palavra === "TIA")).toHaveLength(1);
+    expect(fraseDe(e.aula!).teia.filter((p) => p.palavra === "TIA")).toHaveLength(1);
+    expect(criacaoDe(e.aula!).teia_total).toBe(1);
   });
 
   it("palavra fora das metas ainda entra na Teia", () => {
     const e = motorAula(carregar(), { tipo: "descobrirPalavra", palavra: "TETO", audio_url: null });
 
-    expect(e.aula?.metas.every((m) => m.palavra !== "TETO")).toBe(true);
-    expect(e.aula?.teia.map((p) => p.palavra)).toContain("TETO");
+    expect(criacaoDe(e.aula!).metas.every((m) => m.palavra !== "TETO")).toBe(true);
+    expect(fraseDe(e.aula!).teia.map((p) => p.palavra)).toContain("TETO");
   });
 
   it("compara ignorando acentos", () => {
-    const aula = aulaTeia({
-      metas: [{ palavra: "BONÉ", silabas: ["BO", "NÉ"], imagem_url: null, audio_url: null, encontrada: false }],
-    });
-    const e = motorAula(motorAula(estadoInicial, { tipo: "carregar", aula }), {
+    const atividades = atividadesTeia().map((a) =>
+      a.tipo === "montar_palavras"
+        ? { ...a, metas: [{ palavra: "BONÉ", silabas: ["BO", "NÉ"], imagem_url: null, audio_url: null, encontrada: false }] }
+        : a,
+    );
+    const e = motorAula(motorAula(estadoInicial, { tipo: "carregar", aula: aulaTeia({ atividades }) }), {
       tipo: "descobrirPalavra",
       palavra: "BONE",
       audio_url: null,
     });
 
-    expect(e.aula?.metas[0].encontrada).toBe(true);
+    expect(criacaoDe(e.aula!).metas[0].encontrada).toBe(true);
   });
 });
 
@@ -171,14 +189,23 @@ describe("motorAula · concluirAula", () => {
 
 describe("ajudantes", () => {
   it("limitarEtapa", () => {
-    expect(limitarEtapa(Number.NaN)).toBe(1);
-    expect(limitarEtapa(4.7)).toBe(4);
-    expect(limitarEtapa(-3)).toBe(1);
+    expect(limitarEtapa(Number.NaN, 8)).toBe(1);
+    expect(limitarEtapa(4.7, 8)).toBe(4);
+    expect(limitarEtapa(-3, 8)).toBe(1);
+    expect(limitarEtapa(9, 8)).toBe(8);
+    expect(limitarEtapa(5, 0)).toBe(1);
   });
 
-  it("nomeDaEtapa", () => {
-    expect(nomeDaEtapa(1)).toBe("missao");
-    expect(nomeDaEtapa(6)).toBe("criacao");
-    expect(nomeDaEtapa(8)).toBe("conquista");
+  it("atividadeVisivel e ehConquista", () => {
+    const e = carregar({ etapa_atual: 6 });
+
+    expect(atividadeVisivel(e)?.tipo).toBe("montar_palavras");
+    expect(ehConquista(e)).toBe(false);
+
+    const fim = motorAula(carregar({ etapa_atual: 7 }), { tipo: "concluirEtapa", etapa: 7 });
+
+    expect(atividadeVisivel(fim)).toBeNull();
+    expect(ehConquista(fim)).toBe(true);
+    expect(atividadeVisivel(estadoInicial)).toBeNull();
   });
 });
