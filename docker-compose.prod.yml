@@ -1,0 +1,113 @@
+name: teia_prod
+
+# Produção. Diferenças para o docker-compose.yml (dev):
+#  - o código vai dentro das imagens (nenhum bind mount)
+#  - nginx + php-fpm e Next standalone, sem `artisan serve` nem `npm run dev`
+#  - só duas portas, e no loopback: frontend (3002) e o nginx do backend (8003),
+#    este último apenas para o nginx do host encaminhar o websocket /app.
+#  - storage/ do Laravel em volume nomeado: mídia das aulas e áudios das crianças.
+
+services:
+  postgres:
+    image: postgres:16
+    env_file:
+      - ./backend/laravel/.env
+    volumes:
+      - teia_prod_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  php:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+      target: app
+    image: teia/backend:latest
+    working_dir: /var/www/laravel
+    volumes:
+      - ./backend/laravel/.env:/var/www/laravel/.env:ro
+      - teia_prod_storage:/var/www/laravel/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+      target: web
+    image: teia/backend-web:latest
+    ports:
+      # Só para o nginx do host repassar wss://<dominio>/app (Reverb).
+      - "127.0.0.1:8003:80"
+    depends_on:
+      - php
+      - reverb
+    restart: unless-stopped
+
+  queue:
+    image: teia/backend:latest
+    working_dir: /var/www/laravel
+    command: php artisan queue:work --sleep=1 --tries=3 --timeout=120
+    volumes:
+      - ./backend/laravel/.env:/var/www/laravel/.env:ro
+      - teia_prod_storage:/var/www/laravel/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  scheduler:
+    image: teia/backend:latest
+    working_dir: /var/www/laravel
+    command: php artisan schedule:work
+    volumes:
+      - ./backend/laravel/.env:/var/www/laravel/.env:ro
+      - teia_prod_storage:/var/www/laravel/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  reverb:
+    image: teia/backend:latest
+    working_dir: /var/www/laravel
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    volumes:
+      - ./backend/laravel/.env:/var/www/laravel/.env:ro
+      - teia_prod_storage:/var/www/laravel/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: teia/frontend:latest
+    env_file:
+      # NEXT_PUBLIC_* são embutidos no build; o Dockerfile copia este arquivo
+      # antes do `next build`. INTERNAL_API_URL é lido em tempo de execução.
+      - ./frontend/.env.production
+    environment:
+      NODE_ENV: production
+      INTERNAL_API_URL: http://backend/api
+    ports:
+      - "127.0.0.1:3002:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  teia_prod_pgdata:
+    name: teia_prod_pgdata
+  # storage/app/public (mídia das aulas) e storage/app/private/gravacoes
+  # (áudios das crianças). Perder este volume perde todos os arquivos.
+  teia_prod_storage:
+    name: teia_prod_storage

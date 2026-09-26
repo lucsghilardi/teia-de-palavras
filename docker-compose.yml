@@ -1,0 +1,107 @@
+name: teia
+
+# Desenvolvimento. Portas publicadas só no loopback e deslocadas (5437, 8005,
+# 8085, 3005) para não colidir com os outros projetos desta máquina.
+
+services:
+  postgres:
+    image: postgres:16
+    # Lê POSTGRES_DB / POSTGRES_USER / POSTGRES_PASSWORD do .env do Laravel.
+    env_file:
+      - ./backend/laravel/.env
+    ports:
+      - "127.0.0.1:5437:5432"
+    volumes:
+      - teia_pgdata:/var/lib/postgresql/data
+      # Cria o banco `teia_test` (testes) — só roda em volume recém-criado.
+      - ./deploy/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    image: teia/backend-dev
+    working_dir: /var/www/laravel
+    # O Laravel lê o .env montado via volume (sem env_file aqui, para que
+    # APP_KEY / JWT_SECRET não sejam mascarados pelo ambiente do container).
+    environment:
+      PHP_CLI_SERVER_WORKERS: 4
+    command: php artisan serve --host=0.0.0.0 --port=8000
+    volumes:
+      - ./backend:/var/www
+    ports:
+      - "127.0.0.1:8005:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  queue:
+    build: ./backend
+    image: teia/backend-dev
+    working_dir: /var/www/laravel
+    command: php artisan queue:work --sleep=1 --tries=3 --timeout=120
+    volumes:
+      - ./backend:/var/www
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  scheduler:
+    build: ./backend
+    image: teia/backend-dev
+    working_dir: /var/www/laravel
+    command: php artisan schedule:work
+    volumes:
+      - ./backend:/var/www
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Servidor WebSocket (modo turma). O Laravel publica eventos em
+  # http://reverb:8080; o navegador conecta em ws://localhost:8085.
+  reverb:
+    build: ./backend
+    image: teia/backend-dev
+    working_dir: /var/www/laravel
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    volumes:
+      - ./backend:/var/www
+    ports:
+      - "127.0.0.1:8085:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8005/api
+      INTERNAL_API_URL: http://backend:8000/api
+      NEXT_PUBLIC_REVERB_HOST: localhost
+      NEXT_PUBLIC_REVERB_PORT: "8085"
+      NEXT_PUBLIC_REVERB_SCHEME: http
+      # NEXT_PUBLIC_REVERB_APP_KEY vem de frontend/.env (igual ao REVERB_APP_KEY do backend).
+    command: sh -c "npm install --include=optional && npm run dev"
+    volumes:
+      - ./frontend:/app
+      - teia_frontend_node_modules:/app/node_modules
+    ports:
+      - "3005:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  teia_pgdata:
+    name: teia_pgdata
+  teia_frontend_node_modules:
+    name: teia_frontend_node_modules

@@ -1,0 +1,58 @@
+# Imagem de produção do Laravel. O código vai DENTRO da imagem; quem serve HTTP
+# é o nginx do estágio `web`, falando com o php-fpm do estágio `app`.
+#
+#   target: app  -> php-fpm (serviços php, queue, scheduler, reverb)
+#   target: web  -> nginx servindo public/ e repassando .php e /app (websocket)
+
+# ---------- app (php-fpm) ----------
+FROM php:8.3-fpm AS app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      git \
+      unzip \
+      libzip-dev \
+      libpq-dev \
+    && docker-php-ext-install -j"$(nproc)" zip pdo pdo_pgsql pcntl opcache \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+COPY php/uploads.ini /usr/local/etc/php/conf.d/99-uploads.ini
+COPY php/opcache.ini /usr/local/etc/php/conf.d/99-opcache.ini
+
+WORKDIR /var/www/laravel
+
+# composer.json/lock antes do código preserva o cache desta camada.
+COPY laravel/composer.json laravel/composer.lock ./
+RUN composer install \
+      --no-dev \
+      --no-scripts \
+      --no-autoloader \
+      --prefer-dist \
+      --no-interaction
+
+COPY laravel/ ./
+
+# storage/app/private/gravacoes guarda os áudios das crianças (disco privado,
+# servidos por rota autenticada). storage/app/public guarda a mídia das aulas.
+RUN composer dump-autoload --no-dev --optimize --classmap-authoritative \
+ && mkdir -p storage/app/private/gravacoes storage/app/public \
+             storage/framework/cache storage/framework/sessions storage/framework/views \
+             storage/logs bootstrap/cache \
+ && chown -R www-data:www-data storage bootstrap/cache
+
+# Sem config:cache aqui: em tempo de build o .env não existe. Os caches são
+# gerados pelo deploy.sh, com o .env já no lugar.
+
+USER www-data
+EXPOSE 9000
+CMD ["php-fpm"]
+
+# ---------- web (nginx) ----------
+FROM nginx:alpine AS web
+
+COPY nginx/laravel.conf /etc/nginx/conf.d/default.conf
+COPY --from=app /var/www/laravel/public /var/www/laravel/public
+
+EXPOSE 80
