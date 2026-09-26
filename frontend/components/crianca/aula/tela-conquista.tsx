@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Network, Rocket, Star, Trophy } from "lucide-react";
+import { ArrowLeft, Mic, Network, Rocket, Star, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -153,6 +153,10 @@ export function TelaConquista({
       <div className="mt-auto flex flex-wrap items-center justify-center gap-4 pt-2">
         <BotaoGrande rotulo={COPY.missao.voltar} cor="neutra" tamanho={96} className="px-8" onClick={() => router.push(`/app/planeta/${aula.disciplina}`)}>
           <ArrowLeft className="size-12" aria-hidden />
+        </BotaoGrande>
+        {/* Aprender ensinando: a criança grava uma mini-aula sobre a missão que acabou de fazer. */}
+        <BotaoGrande rotulo={COPY.amigos.darAula} cor="destaque" tamanho={96} className="px-8" onClick={() => router.push(`/app/amigos/nova?aula=${aula.id}`)}>
+          <Mic className="size-12" aria-hidden />
         </BotaoGrande>
         {proxima && (
           <BotaoGrande

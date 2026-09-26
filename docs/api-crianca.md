@@ -176,6 +176,54 @@ amanhã). Intervalos, tamanho da sessão e a caixa "dominada" em `config/teia.ph
 ```
 Só o próprio caminho da criança: nunca há ranking nem comparação.
 
+## Base dos amigos (mini-aulas)
+
+Aprender ensinando: a criança escolhe um **modelo** (desafio de um item gerado da missão) e grava a
+voz explicando; ela nunca digita. A aula fica `pendente` até um adulto aprovar no painel; depois é
+**entregue** às crianças da mesma turma e das turmas amigas (amizade aceita pelos dois responsáveis).
+De um amigo a criança só vê apelido e avatar. Reações são fixas (`valeu`, `aprendi`, `top`): não há
+texto livre entre crianças. Limites em `config/teia.php` (`mini_aulas`): 10 por dia, 60 s, 2 MB,
+mimes webm/mp4/m4a/ogg/mp3/wav.
+
+`GET /crianca/mini-aulas/modelos?aula_id=&semente=` → 200
+```
+{ aula: { id, titulo, rotulo, disciplina }, semente,
+  modelos: [ { chave, tipo, titulo, fala } ],     // até 3; `fala` é o que o app diz ao tocar
+  limite_segundos }
+```
+404 se a missão está trancada para a criança. Outra `semente` sorteia outros modelos ("outro").
+
+`POST /crianca/mini-aulas` multipart `{ aula_id, modelo (chave), semente, duracao_ms?, audio }` → 201
+```
+{ id, status: "pendente", titulo, mensagem }      // "Sua aula foi para um adulto olhar..."
+```
+422 em `audio` (tipo/tamanho ou teto diário), `duracao_ms` (longa demais), `modelo` (não existe mais).
+O modelo é regenerado no servidor a partir da chave: o corpo da criança nunca define o desafio.
+
+`GET /crianca/mini-aulas/minhas` → 200 `{ mini_aulas: [ { id, titulo, disciplina, tipo, status, respondidas, reacoes: {valeu?, aprendi?, top?}, created_at } ] }`
+(quantos amigos responderam, nunca quem nem quem foi melhor)
+
+`GET /crianca/mini-aulas/recebidas` → 200
+```
+{ novas,                                           // entregas ainda não respondidas
+  entregas: [ { id, status: "recebida"|"respondida", correta|null, reacao|null,
+                mini_aula: { id, titulo, disciplina, tipo, autor: { apelido, avatar: OpcaoVisual },
+                             audio_url, created_at } } ] }   // novas primeiro; só mini-aulas aprovadas
+```
+`audio_url` é `/api/crianca-proxy/audios/{id}`: `GET /crianca/audios/{gravacao}` serve o áudio só a
+crianças da mesma turma ou de turma amiga, só se aprovado (404 nos outros casos).
+
+`GET /crianca/mini-aulas/entregas/{id}` → 200 `{ ...entrega, atividade: Atividade }` (desafio montado
+como as atividades da missão, sem a resposta). 404 se não é da criança ou a aula não está aprovada.
+
+`POST /crianca/mini-aulas/entregas/{id}/responder` `{ item?, ...resposta do tipo }` → 200 — mesmo
+formato e política de `atividades/{ordem}/responder`: dica no 1º erro, resposta no 2º (item vai para a
+Revisão), XP só no primeiro acerto. A autora ganha XP por amigo que acerta, com teto por mini-aula.
+
+`POST /crianca/mini-aulas/entregas/{id}/reagir` `{ reacao: "valeu"|"aprendi"|"top" }` → 200 entrega.
+
+`GET /crianca/galaxia` traz `amigos.novas` com a mesma contagem de `recebidas.novas`.
+
 ## Teia de Palavras
 
 `GET /crianca/teia` → 200

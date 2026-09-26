@@ -97,6 +97,8 @@ export default function ConfiguracoesPage() {
         minutos_pausa: minutos,
         consentimento_versao: form.consentimento_versao.trim(),
         consentimento_texto: form.consentimento_texto.trim(),
+        amizade_termo_versao: form.amizade_termo_versao.trim(),
+        amizade_termo_texto: form.amizade_termo_texto.trim(),
       });
 
       setSalvas(atualizadas);
@@ -132,12 +134,14 @@ export default function ConfiguracoesPage() {
 
   const versaoMudou = form.consentimento_versao.trim() !== salvas.consentimento_versao;
   const textoMudou = form.consentimento_texto.trim() !== salvas.consentimento_texto.trim();
+  const versaoAmizadeMudou = form.amizade_termo_versao.trim() !== salvas.amizade_termo_versao;
+  const textoAmizadeMudou = form.amizade_termo_texto.trim() !== salvas.amizade_termo_texto.trim();
 
   return (
     <form onSubmit={handleSalvar} className="space-y-6">
       <PainelPageHeader
         title="Configurações"
-        description="Valem para todo o portal: nomes usados nas histórias, pausa das crianças e o termo de consentimento do cadastro."
+        description="Valem para todo o portal: nomes usados nas histórias, pausa das crianças, o termo de consentimento do cadastro e o termo de amizade entre turmas."
         actions={
           <Button type="submit" disabled={salvando}>
             {salvando ? <Spinner data-icon="inline-start" /> : <Save />}
@@ -247,6 +251,55 @@ export default function ConfiguracoesPage() {
                       Para saber qual texto cada responsável aceitou, atualize
                       também a versão do termo.
                     </p>
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+            </FieldGroup>
+          </CardContent>
+        </Card>
+
+        <Card className="xl:col-span-2">
+          <CardHeader>
+            <CardTitle>Termo de amizade entre turmas</CardTitle>
+            <CardDescription>
+              Mostrado ao responsável que aceita ligar a sua turma a outra (casa
+              de um amigo ou primo). Com a amizade aceita, as crianças das duas
+              turmas veem só apelido e avatar umas das outras e ouvem as
+              mini-aulas aprovadas. A versão aceita fica registrada na amizade.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FieldGroup className="gap-5">
+              <Field>
+                <FieldLabel htmlFor="config-amizade-versao">Versão do termo</FieldLabel>
+                <Input
+                  id="config-amizade-versao"
+                  value={form.amizade_termo_versao}
+                  onChange={(event) => alterar("amizade_termo_versao", event.target.value)}
+                  className="w-40 font-mono"
+                  disabled={salvando}
+                  required
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="config-amizade-termo">Texto do termo</FieldLabel>
+                <Textarea
+                  id="config-amizade-termo"
+                  value={form.amizade_termo_texto}
+                  onChange={(event) => alterar("amizade_termo_texto", event.target.value)}
+                  rows={6}
+                  className="min-h-40 leading-6"
+                  disabled={salvando}
+                  required
+                />
+              </Field>
+
+              {textoAmizadeMudou && !versaoAmizadeMudou ? (
+                <Alert variant="warning" role="status">
+                  <AlertTitle>Texto alterado sem mudar a versão</AlertTitle>
+                  <AlertDescription>
+                    <p>Atualize também a versão para saber qual texto cada responsável aceitou.</p>
                   </AlertDescription>
                 </Alert>
               ) : null}

@@ -35,7 +35,7 @@ edita. `/painel/users` continua só admin.
 - `PUT /painel/criancas/{id}` `{apelido, avatar_chave, usa_minusculas, narracao_automatica, turma_id}` → `Crianca`
 - `POST /painel/criancas/{id}/figura-secreta` `{figura_secreta_chave}` → `Crianca` (redefine e desbloqueia)
 - `POST /painel/criancas/{id}/solicitar-exclusao` → `Crianca` (marca `exclusao_solicitada_em`)
-- `DELETE /painel/criancas/{id}` → 204 (soft delete; áudios são apagados por job — Fase 4)
+- `DELETE /painel/criancas/{id}` → 204 (soft delete; mini-aulas e entregas somem na hora, o áudio na limpeza diária)
 - `Crianca = { id, apelido, avatar: OpcaoVisual, usa_minusculas, narracao_automatica, turma: {id, nome, codigo},
     responsavel: {id, name}, bloqueada_ate|null, exclusao_solicitada_em|null,
     consentimento: {versao_texto, aceito_em}|null, created_at }`
@@ -102,9 +102,46 @@ Os tipos de atividade e o formato do `config` de cada um estão em `docs/ativida
 - `DELETE /painel/dicionario/{id}` → 204
 - `Palavra = { id, palavra, palavra_normalizada, silabas, origem, aprovada, aprovada_em, created_at }`
 
+## Amizades entre turmas
+Duas turmas (casas) ficam amigas quando o responsável A gera um código e o responsável B aceita
+com o termo (`amizade_termo_*` das configurações). Só com a amizade **aceita** as mini-aulas e os
+áudios circulam entre as duas; qualquer lado encerra e as entregas trocadas somem. O código tem 8
+caracteres, uso único, vale 7 dias (`teia.mini_aulas.amizade_dias`). Educador vê as amizades das
+próprias turmas; admin vê todas.
+
+- `GET /painel/amizades` → `{ termo: { versao, texto }, amizades: Amizade[] }`
+- `POST /painel/amizades` `{ turma_id }` → 201 `Amizade` (pendente, com `codigo`; só o dono da turma)
+- `POST /painel/amizades/aceitar` `{ turma_id, codigo, termo_aceito: true }` → `Amizade` aceita.
+  422 em `codigo` (inválido, usado, vencido ou turmas já amigas), `turma_id` (a própria turma) ou
+  `termo_aceito` (falso).
+- `DELETE /painel/amizades/{id}` → `Amizade` encerrada (apaga as entregas de mini-aulas entre as duas turmas)
+- `Amizade = { id, status: "pendente"|"aceita"|"encerrada"|"vencida", codigo|null (só para quem gerou,
+    enquanto vale), turma: {id, nome}, turma_amiga: {id, nome}|null, gerada_por_mim, termo_versao,
+    expira_em, aceita_em, encerrada_em, created_at }` — `turma` é sempre a do lado de quem consulta.
+
+## Mini-aulas (fila do adulto)
+Uma mini-aula = um desafio de um item (gerado de uma missão, `docs/atividades.md`) + o áudio da
+criança (disco privado `local`, nunca público). Nasce `pendente` e só chega às crianças da turma da
+autora e das turmas amigas depois de **aprovada**. Recusar apaga o arquivo. Educador vê as das
+próprias turmas; admin todas.
+
+- `GET /painel/mini-aulas?status=pendente|aprovada|recusada` → `MiniAula[]` (mais novas primeiro, até 100)
+- `POST /painel/mini-aulas/{id}/aprovar` → `MiniAula` (aprova gravação + mini-aula, gera as entregas,
+  dá XP à autora e a medalha `professor_1`)
+- `POST /painel/mini-aulas/{id}/recusar` `{ motivo? }` → `MiniAula` (apaga o áudio e as entregas)
+- `GET /painel/mini-aulas/{id}/audio` → o áudio (Content-Type pela extensão gravada; 404 se recusada)
+- 403 se a autora não é de uma turma do educador.
+- `MiniAula = { id, status, disciplina, tipo, titulo, config, autor: { id, apelido, avatar: OpcaoVisual, turma: {id, nome} }|null,
+    aula_origem: { id, titulo, rotulo }|null, audio_url|null, duracao_ms, entregas, respondidas, motivo_recusa,
+    revisada_por, revisada_em, created_at }` — `config` traz a resposta certa (o adulto pode conferir).
+
+Limpeza (LGPD): `php artisan teia:limpar-gravacoes --dias=7` (agendado todo dia às 03:10) apaga do
+disco os áudios recusados/removidos há mais de N dias e os de crianças excluídas.
+
 ## Configurações
-- `GET /painel/configuracoes` → `{ heroi_nome, fabrica_nome, minutos_pausa, consentimento_versao, consentimento_texto }`
-- `PUT /painel/configuracoes` (mesmos campos) → idem
+- `GET /painel/configuracoes` → `{ heroi_nome, fabrica_nome, minutos_pausa, consentimento_versao, consentimento_texto,
+  amizade_termo_versao, amizade_termo_texto }`
+- `PUT /painel/configuracoes` (mesmos campos; os do termo de amizade são opcionais) → idem
 
 ## Regras que o backend garante
 - Palavras são comparadas sem acento e em caixa alta (`palavra_normalizada`), mas exibidas como cadastradas.

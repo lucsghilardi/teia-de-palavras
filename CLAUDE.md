@@ -18,6 +18,10 @@ subir o projeto e o plano de fases.
 - Palavra válida descoberta entra na Teia de Palavras da criança.
 - Áudio: gravação aprovada > arquivo da aula > Web Speech API pt-BR.
 - LGPD: criança tem só apelido, avatar e turma. Cadastro pelo responsável com consentimento. Áudios em disco privado.
+- Ensino entre pares: mini-aula (voz + desafio gerado de uma missão) só circula depois que um adulto aprova;
+  amizade entre turmas exige código de um responsável + aceite com termo do outro; áudio de criança só é servido
+  à própria turma e às turmas amigas (`AudioController`), recusa apaga o arquivo, `teia:limpar-gravacoes` purga;
+  crianças nunca trocam texto livre (reações fixas) e de um amigo veem só apelido e avatar.
 
 ## Arquitetura
 - Laravel 12 API-first em `backend/laravel`. Dois guards JWT (tymon): `api` (User: admin|educador) e `crianca` (Crianca).

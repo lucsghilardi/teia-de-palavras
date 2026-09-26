@@ -19,6 +19,8 @@ class ConfiguracoesRequest extends FormRequest
             'minutos_pausa' => ['required', 'integer', 'min:5', 'max:120'],
             'consentimento_versao' => ['required', 'string', 'max:20'],
             'consentimento_texto' => ['required', 'string', 'max:2000'],
+            'amizade_termo_versao' => ['sometimes', 'required', 'string', 'max:20'],
+            'amizade_termo_texto' => ['sometimes', 'required', 'string', 'max:2000'],
         ];
     }
 }

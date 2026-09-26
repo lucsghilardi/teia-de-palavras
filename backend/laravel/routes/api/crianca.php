@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Crianca\EntradaController;
 use App\Http\Controllers\Api\Crianca\GalaxiaController;
 use App\Http\Controllers\Api\Crianca\MapaController;
 use App\Http\Controllers\Api\Crianca\MedalhaController;
+use App\Http\Controllers\Api\Crianca\MiniAulaController;
 use App\Http\Controllers\Api\Crianca\PerfilController;
 use App\Http\Controllers\Api\Crianca\RevisaoController;
 use App\Http\Controllers\Api\Crianca\TeiaController;
@@ -32,6 +33,15 @@ Route::prefix('crianca')->group(function () {
         Route::get('/revisao', [RevisaoController::class, 'index']);
         Route::post('/revisao/{item}/responder', [RevisaoController::class, 'responder'])->whereNumber('item');
         Route::get('/audios/{gravacao}', AudioController::class)->whereNumber('gravacao');
+
+        // Base dos amigos: dar uma mini-aula e jogar as recebidas.
+        Route::get('/mini-aulas/modelos', [MiniAulaController::class, 'modelos']);
+        Route::post('/mini-aulas', [MiniAulaController::class, 'store'])->middleware('throttle:mini-aulas');
+        Route::get('/mini-aulas/minhas', [MiniAulaController::class, 'minhas']);
+        Route::get('/mini-aulas/recebidas', [MiniAulaController::class, 'recebidas']);
+        Route::get('/mini-aulas/entregas/{entrega}', [MiniAulaController::class, 'show'])->whereNumber('entrega');
+        Route::post('/mini-aulas/entregas/{entrega}/responder', [MiniAulaController::class, 'responder'])->whereNumber('entrega');
+        Route::post('/mini-aulas/entregas/{entrega}/reagir', [MiniAulaController::class, 'reagir'])->whereNumber('entrega');
 
         Route::get('/aulas/{aula}', [AulaController::class, 'show'])->whereNumber('aula');
         Route::post('/aulas/{aula}/iniciar', [AulaController::class, 'iniciar'])->whereNumber('aula');

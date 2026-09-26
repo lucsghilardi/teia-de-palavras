@@ -13,12 +13,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { listAulas, listCriancas, listTurmas } from "@/services/painel";
+import { listAulas, listCriancas, listMiniAulas, listTurmas } from "@/services/painel";
 
 type Contagens = {
   criancas: number | null;
   turmas: { total: number; ativas: number } | null;
   aulas: { total: number; publicadas: number } | null;
+  miniAulas: number | null;
 };
 
 type ItemResumo = {
@@ -36,10 +37,11 @@ function plural(total: number, singular: string, pluralTexto: string) {
 
 function montarResumo(contagens: Contagens | null): ItemResumo[] {
   const carregando = contagens === null;
-  const { criancas, turmas, aulas } = contagens ?? {
+  const { criancas, turmas, aulas, miniAulas } = contagens ?? {
     criancas: null,
     turmas: null,
     aulas: null,
+    miniAulas: null,
   };
 
   return [
@@ -74,10 +76,10 @@ function montarResumo(contagens: Contagens | null): ItemResumo[] {
       accent: "bg-violet-100 text-violet-700",
     },
     {
-      title: "Pendências",
-      value: "—",
-      description: "Gravações e atividades aguardando revisão. Disponível na Fase 4.",
-      href: "/painel/gravacoes",
+      title: "Mini-aulas pendentes",
+      value: carregando ? null : miniAulas === null ? "—" : String(miniAulas),
+      description: "Aulas gravadas pelas crianças esperando um adulto ouvir e aprovar.",
+      href: "/painel/mini-aulas",
       icon: ClipboardList,
       accent: "bg-rose-100 text-rose-700",
     },
@@ -91,11 +93,12 @@ export default function PainelHomePage() {
     let ativo = true;
 
     // Cada card falha sozinho: um erro numa lista não apaga os outros números.
-    Promise.allSettled([listCriancas(), listTurmas(), listAulas()]).then(
-      ([criancas, turmas, aulas]) => {
+    Promise.allSettled([listCriancas(), listTurmas(), listAulas(), listMiniAulas("pendente")]).then(
+      ([criancas, turmas, aulas, miniAulas]) => {
         if (!ativo) return;
 
         setContagens({
+          miniAulas: miniAulas.status === "fulfilled" ? miniAulas.value.length : null,
           criancas: criancas.status === "fulfilled" ? criancas.value.length : null,
           turmas:
             turmas.status === "fulfilled"

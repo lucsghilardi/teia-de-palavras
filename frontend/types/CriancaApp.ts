@@ -343,3 +343,55 @@ export type PalavraTeia = {
 };
 
 export type Teia = { total: number; palavras: PalavraTeia[] };
+
+// ---------- Base dos amigos (mini-aulas) ----------
+
+/** Um desafio pronto, gerado da missão; a criança escolhe um e grava a voz (nunca digita). */
+export type ModeloMiniAula = { chave: string; tipo: TipoAtividade; titulo: string; fala: string };
+
+export type ModelosMiniAula = {
+  aula: { id: number; titulo: string; rotulo: string; disciplina: Disciplina };
+  semente: number;
+  modelos: ModeloMiniAula[];
+  limite_segundos: number;
+};
+
+export type MiniAulaCriada = { id: number; status: "pendente"; titulo: string; mensagem: string };
+
+export type StatusMiniAula = "pendente" | "aprovada" | "recusada";
+
+export type Reacao = "valeu" | "aprendi" | "top";
+
+/** Uma mini-aula da própria criança: quantos amigos responderam e as reações (nunca quem foi melhor). */
+export type MinhaMiniAula = {
+  id: number;
+  titulo: string;
+  disciplina: Disciplina;
+  tipo: TipoAtividade;
+  status: StatusMiniAula;
+  respondidas: number;
+  reacoes: Partial<Record<Reacao, number>>;
+  created_at: string;
+};
+
+/** Uma mini-aula recebida de um amigo (só apelido e avatar do autor). */
+export type EntregaMiniAula = {
+  id: number;
+  status: "recebida" | "respondida";
+  correta: boolean | null;
+  reacao: Reacao | null;
+  mini_aula: {
+    id: number;
+    titulo: string;
+    disciplina: Disciplina;
+    tipo: TipoAtividade;
+    autor: { apelido: string; avatar: OpcaoVisual | null };
+    audio_url: string | null;
+    created_at: string;
+  };
+};
+
+export type MiniAulasRecebidas = { novas: number; entregas: EntregaMiniAula[] };
+
+/** A entrega aberta para jogar: o desafio montado, sem a resposta. */
+export type EntregaAberta = EntregaMiniAula & { atividade: Atividade };

@@ -8,6 +8,8 @@ use App\Models\CriancaAula;
 use App\Models\CriancaConquista;
 use App\Models\CriancaEstatistica;
 use App\Models\CriancaItem;
+use App\Models\MiniAula;
+use App\Models\MiniAulaEntrega;
 use App\Models\Producao;
 use App\Models\TeiaPalavra;
 
@@ -169,6 +171,10 @@ class GamificacaoCrianca
             'planeta_historia_1' => fn () => $this->concluiuNaDisciplina($crianca, 'historia'),
             'revisao_10' => fn () => $this->acertosNaRevisao($crianca) >= 10,
             'revisao_50' => fn () => $this->acertosNaRevisao($crianca) >= 50,
+            'professor_1' => fn () => MiniAula::where('autor_crianca_id', $crianca->id)->aprovadas()->exists(),
+            'professor_5' => fn () => MiniAula::where('autor_crianca_id', $crianca->id)->aprovadas()->count() >= 5,
+            'amigo_aprendeu' => fn () => MiniAulaEntrega::where('correta', true)->whereHas('miniAula', fn ($q) => $q->where('autor_crianca_id', $crianca->id))->exists(),
+            'aluno_1' => fn () => MiniAulaEntrega::where('crianca_id', $crianca->id)->where('status', MiniAulaEntrega::RESPONDIDA)->exists(),
         ];
     }
 }

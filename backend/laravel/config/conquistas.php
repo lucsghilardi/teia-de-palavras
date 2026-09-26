@@ -21,4 +21,8 @@ return [
     'planeta_historia_1' => ['titulo' => 'Pouso em História', 'descricao' => 'Você concluiu a sua primeira missão de História.', 'emoji' => '⏳', 'icone' => 'hourglass'],
     'revisao_10' => ['titulo' => 'Memória de foguete', 'descricao' => 'Você acertou 10 itens na revisão.', 'emoji' => '🚀', 'icone' => 'rocket'],
     'revisao_50' => ['titulo' => 'Memória de satélite', 'descricao' => 'Você acertou 50 itens na revisão.', 'emoji' => '🛰️', 'icone' => 'satellite'],
+    'professor_1' => ['titulo' => 'Primeira aula dada', 'descricao' => 'Uma mini-aula sua foi aprovada e chegou aos seus amigos.', 'emoji' => '🎓', 'icone' => 'mic'],
+    'professor_5' => ['titulo' => 'Professor da galáxia', 'descricao' => 'Cinco mini-aulas suas foram aprovadas.', 'emoji' => '🏫', 'icone' => 'school'],
+    'amigo_aprendeu' => ['titulo' => 'Um amigo aprendeu', 'descricao' => 'Alguém acertou o desafio de uma mini-aula sua.', 'emoji' => '💡', 'icone' => 'lightbulb'],
+    'aluno_1' => ['titulo' => 'Aluno de um amigo', 'descricao' => 'Você respondeu a sua primeira mini-aula.', 'emoji' => '🎧', 'icone' => 'ear'],
 ];

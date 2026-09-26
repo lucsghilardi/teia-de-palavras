@@ -21,7 +21,12 @@ export default defineConfig({
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3005",
     // Sem download: aponte um Chromium já instalado (ex.: E2E_CHROMIUM=/opt/pw-browsers/chromium).
-    ...(process.env.E2E_CHROMIUM ? { launchOptions: { executablePath: process.env.E2E_CHROMIUM } } : {}),
+    // O microfone falso grava um tom no lugar da voz: o gravador de mini-aulas roda de ponta a ponta.
+    launchOptions: {
+      ...(process.env.E2E_CHROMIUM ? { executablePath: process.env.E2E_CHROMIUM } : {}),
+      args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+    },
+    permissions: ["microphone"],
     locale: "pt-BR",
     // O botão do "próximo passo" pulsa sem parar; sem movimento, o Playwright
     // o considera estável. Também é assim que parte das crianças usa o app.

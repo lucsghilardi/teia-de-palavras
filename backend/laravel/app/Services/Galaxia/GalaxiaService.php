@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Crianca\MapaController;
 use App\Models\Crianca;
 use App\Models\CriancaAula;
 use App\Services\Aulas\DesbloqueioService;
+use App\Services\MiniAulas\MiniAulaService;
 use App\Services\Revisao\RevisaoService;
 use Illuminate\Support\Collection;
 
@@ -22,6 +23,7 @@ class GalaxiaService
     public function __construct(
         private readonly DesbloqueioService $desbloqueio,
         private readonly RevisaoService $revisao,
+        private readonly MiniAulaService $miniAulas,
     ) {}
 
     /** @return array<string, mixed> */
@@ -58,7 +60,7 @@ class GalaxiaService
             'planetas' => array_map(fn ($p) => collect($p)->except('jogado_em')->all(), $planetas),
             'escolhas_do_dia' => $escolhas,
             'revisao' => ['devidos' => $this->revisao->devidos($crianca)],
-            'amigos' => ['novas' => 0],
+            'amigos' => ['novas' => $this->miniAulas->novas($crianca)],
         ];
     }
 

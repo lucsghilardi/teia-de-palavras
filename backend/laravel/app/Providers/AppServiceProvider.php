@@ -46,6 +46,12 @@ class AppServiceProvider extends ServiceProvider
             ->by(sprintf('%s|%s', $request->input('crianca_id', '-'), $request->ip()))
             ->response(fn () => self::esperarUmPouquinho()));
 
+        // Mini-aulas gravadas: cinto contra abuso (conta toda tentativa, até as
+        // inválidas); o teto real de mini-aulas criadas por dia fica no serviço.
+        RateLimiter::for('mini-aulas', fn (Request $request) => Limit::perDay((int) config('teia.mini_aulas.por_dia', 10) * 5)
+            ->by('mini-aulas:'.($request->user('crianca')?->getAuthIdentifier() ?? $request->ip()))
+            ->response(fn () => response()->json(['message' => 'Você já gravou muitas aulas hoje. Amanhã tem mais!'], 429)));
+
         // Busca da turma pelo código (pública): trava adivinhação de códigos.
         RateLimiter::for('crianca-turma', fn (Request $request) => Limit::perMinute(30)
             ->by($request->ip())

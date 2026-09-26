@@ -33,6 +33,19 @@ return [
         'revisao_item' => 1,
     ],
 
+    // Mini-aulas gravadas pelas crianças (ensino entre pares).
+    'mini_aulas' => [
+        'por_dia' => 10,
+        'duracao_max_s' => 60,
+        'tamanho_max_kb' => 2048,
+        'mimes' => ['webm', 'weba', 'mp4', 'm4a', 'ogg', 'oga', 'opus', 'mp3', 'wav'],
+        'xp_dada' => 3,            // autora, quando um adulto aprova
+        'xp_respondida' => 1,      // quem responde certo
+        'xp_autora_por_acerto' => 1,
+        'teto_xp_autora' => 10,    // por mini-aula, somando os acertos dos amigos
+        'amizade_dias' => 7,       // validade do código de amizade
+    ],
+
     // Política de feedback: dica no 1º erro; a partir do 2º, a resposta certa.
     'tentativas_ate_resposta' => 2,
 

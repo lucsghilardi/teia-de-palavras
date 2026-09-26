@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Flag, Network, RefreshCw, Telescope } from "lucide-react";
+import { ArrowLeft, Flag, Mic, Network, RefreshCw, Telescope } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -160,6 +160,7 @@ export function MapaMissoes({ disciplina }: { disciplina: Disciplina }) {
   const missoes = estado.tipo === "pronto" ? estado.missoes : [];
   const atual =
     missoes.find((m) => m.status === "em_andamento") ?? missoes.find((m) => m.status === "disponivel") ?? null;
+  const ultimaConcluida = [...missoes].reverse().find((m) => m.status === "concluida") ?? null;
 
   let instrucao: string | null = null;
 
@@ -261,6 +262,28 @@ export function MapaMissoes({ disciplina }: { disciplina: Disciplina }) {
 
         {estado.tipo === "pronto" && missoes.length > 0 ? (
           <Trilha missoes={missoes} minusculas={minusculas} idAtual={idAtual} onTocar={tocarMissao} />
+        ) : null}
+
+        {/* Aprender ensinando: uma mini-aula sobre a última missão concluída deste planeta. */}
+        {ultimaConcluida ? (
+          <div className="mx-auto w-full max-w-lg pt-2">
+            <BotaoGrande
+              rotulo={COPY.amigos.darAulaSobre(ultimaConcluida.rotulo)}
+              cor="destaque"
+              redondo={false}
+              tamanho={80}
+              className="w-full justify-start gap-4 px-4 text-left"
+              onClick={() => router.push(`/app/amigos/nova?aula=${ultimaConcluida.id}`)}
+            >
+              <span aria-hidden className="flex size-14 shrink-0 items-center justify-center rounded-full bg-[var(--c-fundo)]/15">
+                <Mic className="size-8" strokeWidth={2.5} />
+              </span>
+              <span aria-hidden className="flex min-w-0 flex-1 flex-col leading-tight">
+                <span className="text-xl font-extrabold sm:text-2xl">{exibir(COPY.amigos.darAula, minusculas)}</span>
+                <span className="truncate text-base font-bold opacity-80">{exibir(`sobre ${ultimaConcluida.rotulo}`, minusculas)}</span>
+              </span>
+            </BotaoGrande>
+          </div>
         ) : null}
       </div>
     </main>

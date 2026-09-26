@@ -35,6 +35,8 @@ class ConfiguracaoController extends Controller
             'minutos_pausa' => (int) $todas['minutos_pausa'],
             'consentimento_versao' => $todas['consentimento_versao'],
             'consentimento_texto' => $todas['consentimento_texto'],
+            'amizade_termo_versao' => $todas['amizade_termo_versao'],
+            'amizade_termo_texto' => $todas['amizade_termo_texto'],
         ];
     }
 }
