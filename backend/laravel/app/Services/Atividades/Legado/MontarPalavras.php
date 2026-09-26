@@ -63,6 +63,7 @@ final class MontarPalavras extends Base
                 'palavra:'.$tentativa['palavra'],
                 [],
                 $tentativa,
+                xpCreditado: true,
             );
         }
 

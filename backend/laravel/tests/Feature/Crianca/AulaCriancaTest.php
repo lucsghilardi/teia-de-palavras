@@ -20,7 +20,7 @@ beforeEach(function () {
 });
 
 it('mapa mostra só missões publicadas com a primeira aberta', function () {
-    $missoes = $this->comoCrianca($this->crianca)->getJson('/api/crianca/mapa')->assertOk()->json('missoes');
+    $missoes = $this->comoCrianca($this->crianca)->getJson('/api/crianca/mapa?disciplina=portugues')->assertOk()->json('missoes');
 
     expect(array_column($missoes, 'palavra_geradora'))->toBe(['TEIA', 'BONECA', 'PULO', 'MOLA', 'SALVA'])
         ->and(array_column($missoes, 'status'))->toBe(['disponivel', 'bloqueada', 'bloqueada', 'bloqueada', 'bloqueada']);

@@ -21,11 +21,13 @@ final class ResultadoAtividade
         public readonly array $itensRevisao = [],
         public readonly array $extra = [],
         public readonly string $item = 'unico',
+        /** true quando o próprio avaliador já creditou o XP (tipos legados de Português). */
+        public readonly bool $xpCreditado = false,
     ) {}
 
-    public static function acerto(string $mensagem, int $xp = 1, string $item = 'unico', array $itensRevisao = [], array $extra = []): self
+    public static function acerto(string $mensagem, int $xp = 1, string $item = 'unico', array $itensRevisao = [], array $extra = [], bool $xpCreditado = false): self
     {
-        return new self(true, $mensagem, null, null, $xp, $itensRevisao, $extra, $item);
+        return new self(true, $mensagem, null, null, $xp, $itensRevisao, $extra, $item, $xpCreditado);
     }
 
     public static function erro(string $mensagem, ?string $dica, mixed $respostaCorreta = null, string $item = 'unico', array $itensRevisao = [], array $extra = []): self
@@ -36,7 +38,7 @@ final class ResultadoAtividade
     /** Mesmo resultado, sem a resposta correta (primeira tentativa). */
     public function semRespostaCorreta(): self
     {
-        return new self($this->correta, $this->mensagem, $this->dica, null, $this->xp, $this->itensRevisao, $this->extra, $this->item);
+        return new self($this->correta, $this->mensagem, $this->dica, null, $this->xp, $this->itensRevisao, $this->extra, $this->item, $this->xpCreditado);
     }
 
     /** @return array<string, mixed> */

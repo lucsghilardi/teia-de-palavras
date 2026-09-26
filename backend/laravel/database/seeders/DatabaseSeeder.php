@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             ConfiguracoesSeeder::class,
             DicionarioSeeder::class,
             ConteudoInicialSeeder::class,
+            ConteudoMatematicaSeeder::class,
         ]);
 
         if (app()->environment('local')) {

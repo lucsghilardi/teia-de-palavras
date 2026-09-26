@@ -58,6 +58,6 @@ final class Frase extends Base
             return ResultadoAtividade::erro('ainda não deu.', $e->getMessage(), null, 'frase');
         }
 
-        return ResultadoAtividade::acerto('você escreveu uma frase!', 0, 'frase', [], $producao);
+        return ResultadoAtividade::acerto('você escreveu uma frase!', 0, 'frase', [], $producao, xpCreditado: true);
     }
 }

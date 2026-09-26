@@ -6,7 +6,7 @@ use App\Services\Aulas\AtividadesPadrao;
 it('toda missão semeada de Português tem a sequência legada de 7 atividades', function () {
     semearConteudo();
 
-    Aula::with('atividades')->get()->each(function (Aula $aula) {
+    Aula::daDisciplina('portugues')->with('atividades')->get()->each(function (Aula $aula) {
         expect($aula->atividades->pluck('tipo')->all())->toBe(AtividadesPadrao::PORTUGUES)
             ->and($aula->atividades->pluck('ordem')->all())->toBe(range(1, 7))
             ->and($aula->disciplina)->toBe('portugues');

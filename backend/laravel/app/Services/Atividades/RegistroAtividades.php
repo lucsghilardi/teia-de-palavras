@@ -20,6 +20,15 @@ final class RegistroAtividades
         'ficha' => Legado\Ficha::class,
         'montar_palavras' => Legado\MontarPalavras::class,
         'frase' => Legado\Frase::class,
+        // Genéricos (config em JSON, avaliados no servidor; docs/atividades.md).
+        'escolha' => Escolha::class,
+        'verdadeiro_falso' => VerdadeiroFalso::class,
+        'ordenar' => Ordenar::class,
+        'linha_do_tempo' => Ordenar::class,
+        'parear' => Parear::class,
+        'contar' => Contar::class,
+        'somar_subtrair' => SomarSubtrair::class,
+        'escolher_silaba' => EscolherSilaba::class,
     ];
 
     /** @var array<string, AvaliadorAtividade> */

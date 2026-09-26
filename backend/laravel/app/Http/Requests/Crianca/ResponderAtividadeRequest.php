@@ -23,6 +23,12 @@ class ResponderAtividadeRequest extends FormRequest
             'silabas.*' => ['string', 'max:8'],
             'palavras' => ['sometimes', 'array', 'max:12'],
             'palavras.*' => ['string', 'max:40'],
+            'opcao' => ['sometimes', 'nullable', 'string', 'max:40'],
+            'valor' => ['sometimes', 'nullable', 'integer'],
+            'silaba' => ['sometimes', 'nullable', 'string', 'max:8'],
+            'b' => ['sometimes', 'nullable', 'string', 'max:40'],
+            'ordem' => ['sometimes', 'array', 'max:8'],
+            'ordem.*' => ['string', 'max:40'],
         ];
     }
 

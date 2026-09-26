@@ -20,10 +20,18 @@ return [
     // Palavrinhas de ligação oferecidas na etapa de Produção (frase).
     'palavrinhas' => ['O', 'A', 'E', 'É', 'UM', 'UMA', 'NO', 'NA', 'DO', 'DA', 'TEM', 'COM'],
 
-    // Estrelas são só da criança: nunca há ranking ou comparação.
+    // Estrelas (XP) são só da criança: nunca há ranking ou comparação.
     'estrelas' => [
         'palavra' => 1,
         'producao' => 1,
         'missao' => 3,
     ],
+
+    // XP das atividades genéricas: só no primeiro acerto de cada item.
+    'xp' => [
+        'atividade_item' => 1,
+    ],
+
+    // Política de feedback: dica no 1º erro; a partir do 2º, a resposta certa.
+    'tentativas_ate_resposta' => 2,
 ];

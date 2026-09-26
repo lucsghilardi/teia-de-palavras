@@ -6,16 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Crianca\ResponderAtividadeRequest;
 use App\Models\Aula;
 use App\Models\Crianca;
-use App\Services\Atividades\ContextoAtividade;
-use App\Services\Audio\ResolverAudio;
+use App\Services\Atividades\RespostaService;
 use App\Services\Aulas\DesbloqueioService;
-use App\Services\Crianca\GamificacaoCrianca;
 use Illuminate\Http\JsonResponse;
 
 /**
  * Resposta a uma atividade da missão (POST /aulas/{aula}/atividades/{ordem}/responder).
- * O avaliador do tipo decide se acertou; a resposta traz mensagem, dica e,
- * nos tipos legados de Português, a tentativa completa em `extra`.
+ * O avaliador do tipo decide se acertou; o RespostaService aplica a política
+ * de tentativas, o XP e os eventos.
  */
 class AtividadeController extends Controller
 {
@@ -23,16 +21,15 @@ class AtividadeController extends Controller
 
     public function __construct(
         private readonly DesbloqueioService $desbloqueio,
-        private readonly GamificacaoCrianca $gamificacao,
+        private readonly RespostaService $respostas,
     ) {}
 
     public function responder(ResponderAtividadeRequest $request, Aula $aula, int $ordem): JsonResponse
     {
         /** @var Crianca $crianca */
         $crianca = $request->user('crianca');
-        $linha = $this->desbloqueio->progressoOuIniciar($crianca, $aula);
 
-        if ($linha === null) {
+        if ($this->desbloqueio->progressoOuIniciar($crianca, $aula) === null) {
             return response()->json(['message' => self::TRANCADA], 403);
         }
 
@@ -46,21 +43,6 @@ class AtividadeController extends Controller
             return response()->json(['message' => 'Essa atividade não recebe resposta.'], 422);
         }
 
-        $contexto = new ContextoAtividade(
-            $crianca,
-            $aula,
-            ResolverAudio::para($crianca),
-            [],
-            ContextoAtividade::semente($crianca, $aula, $ordem),
-        );
-
-        $resultado = $atividade->avaliador()->avaliar($atividade->configArray(), $request->resposta(), $contexto);
-        $stats = $this->gamificacao->estatisticas($crianca);
-
-        return response()->json([
-            ...$resultado->toArray(),
-            'xp_total' => (int) $stats->xp_total,
-            'nivel' => (int) $stats->nivel,
-        ]);
+        return response()->json($this->respostas->responder($crianca, $aula, $atividade, $request->resposta()));
     }
 }

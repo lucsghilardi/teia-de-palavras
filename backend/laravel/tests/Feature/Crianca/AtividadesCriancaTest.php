@@ -95,8 +95,11 @@ it('mapa traz disciplina, rótulo e total de atividades, e filtra por disciplina
         ->and($missoes[0]['rotulo'])->toBe('TEIA')
         ->and($missoes[0]['total_atividades'])->toBe(7);
 
-    expect($this->comoCrianca($this->crianca)->getJson('/api/crianca/mapa?disciplina=matematica')->json('missoes'))->toBe([])
-        ->and($this->comoCrianca($this->crianca)->getJson('/api/crianca/mapa?disciplina=portugues')->json('missoes'))->toHaveCount(5);
+    $matematica = $this->comoCrianca($this->crianca)->getJson('/api/crianca/mapa?disciplina=matematica')->json('missoes');
+
+    expect(collect($matematica)->pluck('disciplina')->unique()->all())->toBe(['matematica'])
+        ->and($this->comoCrianca($this->crianca)->getJson('/api/crianca/mapa?disciplina=portugues')->json('missoes'))->toHaveCount(5)
+        ->and($this->comoCrianca($this->crianca)->getJson('/api/crianca/mapa?disciplina=quimica')->json('missoes'))->toHaveCount(5 + count($matematica));
 });
 
 it('etapa_atual nunca passa da conquista quando a missão encolhe', function () {

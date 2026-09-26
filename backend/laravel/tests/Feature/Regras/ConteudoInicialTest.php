@@ -10,14 +10,14 @@ use Database\Seeders\ConteudoInicialSeeder;
 beforeEach(fn () => semearConteudo());
 
 it('semeia as 10 missões: Fase 1 publicada e Fase 2 em rascunho', function () {
-    expect(Aula::count())->toBe(10)
-        ->and(Aula::where('fase', 1)->publicadas()->ordenadas()->pluck('palavra_geradora')->all())
+    expect(Aula::daDisciplina('portugues')->count())->toBe(10)
+        ->and(Aula::daDisciplina('portugues')->where('fase', 1)->publicadas()->ordenadas()->pluck('palavra_geradora')->all())
         ->toBe(['TEIA', 'BONECA', 'PULO', 'MOLA', 'SALVA'])
         ->and(Aula::where('fase', 2)->where('status', 'rascunho')->count())->toBe(5);
 });
 
 it('encadeia cada missão à anterior', function () {
-    $aulas = Aula::query()->ordenadas()->get();
+    $aulas = Aula::query()->daDisciplina('portugues')->ordenadas()->get();
 
     expect($aulas->first()->pre_requisito_aula_id)->toBeNull();
 
@@ -63,6 +63,6 @@ it('rodar o seed de novo não duplica nem sobrescreve edição do CMS', function
 
     $this->seed(ConteudoInicialSeeder::class);
 
-    expect(Aula::count())->toBe(10)
+    expect(Aula::daDisciplina('portugues')->count())->toBe(10)
         ->and(aulaDaPalavra('TEIA')->titulo)->toBe('Título editado');
 });
