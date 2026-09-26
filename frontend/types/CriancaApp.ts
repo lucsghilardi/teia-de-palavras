@@ -115,7 +115,10 @@ export type TipoAtividade =
   | "parear"
   | "contar"
   | "somar_subtrair"
-  | "escolher_silaba";
+  | "escolher_silaba"
+  | "dinheiro"
+  | "mapa_pontos"
+  | "ditado";
 
 type AtividadeBase = {
   /** Posição na missão, a partir de 1. */
@@ -208,6 +211,29 @@ export type ItemSilaba = {
 };
 export type AtividadeEscolherSilaba = AtividadeBase & { tipo: "escolher_silaba"; itens: ItemSilaba[] };
 
+export type Moeda = { id: string; valor: number };
+export type ItemDinheiro = { id: string; preco: number; moedas: Moeda[] };
+export type AtividadeDinheiro = AtividadeBase & { tipo: "dinheiro"; itens: ItemDinheiro[] };
+
+export type PontoMapa = { chave: string; rotulo: string; icone: string | null; x: number; y: number };
+export type AtividadeMapaPontos = AtividadeBase & {
+  tipo: "mapa_pontos";
+  cenario: string;
+  pontos: PontoMapa[];
+  itens: { id: string; texto: string }[];
+};
+
+export type ItemDitado = {
+  id: string;
+  audio_url: string | null;
+  /** A palavra em minúsculas, só para a voz do navegador: nunca vai para a tela. */
+  fala: string;
+  /** Quantas peças a palavra tem. */
+  tamanho: number;
+  opcoes: string[];
+};
+export type AtividadeDitado = AtividadeBase & { tipo: "ditado"; itens: ItemDitado[] };
+
 export type Atividade =
   | AtividadeHistoria
   | AtividadeConversa
@@ -221,7 +247,10 @@ export type Atividade =
   | AtividadeParear
   | AtividadeContar
   | AtividadeSomarSubtrair
-  | AtividadeEscolherSilaba;
+  | AtividadeEscolherSilaba
+  | AtividadeDinheiro
+  | AtividadeMapaPontos
+  | AtividadeDitado;
 
 export type AulaCrianca = {
   id: number;

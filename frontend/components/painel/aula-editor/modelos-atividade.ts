@@ -113,6 +113,41 @@ export const MODELOS_ATIVIDADE: ModeloAtividade[] = [
   },
 ];
 
+MODELOS_ATIVIDADE.push(
+  {
+    tipo: "dinheiro",
+    nome: "Dinheiro",
+    descricao: "Juntar moedas e notas (reais inteiros) para pagar o preço; qualquer combinação certa vale (EF02MA20).",
+    disciplinas: ["matematica"],
+    avaliada: true,
+    modelo: { itens: [{ preco: 7, moedas: [1, 1, 2, 5, 10] }, { preco: 12, moedas: [2, 5, 5, 10, 20] }] },
+  },
+  {
+    tipo: "mapa_pontos",
+    nome: "Mapa com pontos",
+    descricao: "Um cenário visto de cima (bairro ou escola) com lugares marcados; a criança toca no lugar pedido.",
+    disciplinas: ["geografia", "historia"],
+    avaliada: true,
+    modelo: {
+      cenario: "bairro",
+      pontos: [
+        { chave: "escola", rotulo: "a escola", icone: "school", x: 0.74, y: 0.25 },
+        { chave: "padaria", rotulo: "a padaria", icone: "store", x: 0.5, y: 0.52 },
+        { chave: "praca", rotulo: "a praça", icone: "tree", x: 0.2, y: 0.75 },
+      ],
+      perguntas: [{ alvo: "escola", texto: "Onde fica a escola?", dica: "Toque nos lugares para ouvir o nome." }],
+    },
+  },
+  {
+    tipo: "ditado",
+    nome: "Ditado",
+    descricao: "A criança ouve a palavra e monta com peças de sílaba (as certas entram sozinhas; opções são distratores).",
+    disciplinas: ["portugues"],
+    avaliada: true,
+    modelo: { itens: [{ palavra: "TETO", silabas: ["TE", "TO"], opcoes: ["TA", "TU"] }] },
+  },
+);
+
 export function modeloDoTipo(tipo: string): ModeloAtividade | undefined {
   return MODELOS_ATIVIDADE.find((m) => m.tipo === tipo);
 }

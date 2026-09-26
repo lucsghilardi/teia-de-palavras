@@ -12,9 +12,9 @@ import { sons } from "@/lib/sons";
 import { cn } from "@/lib/utils";
 import type { AtividadeEscolherSilaba, ItemSilaba } from "@/types/CriancaApp";
 
-function enunciado(item: ItemSilaba): string {
+function enunciado(item: ItemSilaba, minusculas: boolean): string {
   return item.modo === "trocar" && item.palavra && item.alvo
-    ? `troque uma sílaba de ${item.palavra} para formar ${item.alvo}.`
+    ? `troque uma sílaba de ${exibirPalavra(item.palavra, minusculas)} para formar ${exibirPalavra(item.alvo, minusculas)}.`
     : "qual sílaba falta?";
 }
 
@@ -38,7 +38,7 @@ export function EscolherSilaba({ aula, atividade, minusculas, aoConcluir, defini
   });
   const instrucao = { texto: atividade.instrucao ?? "toque na sílaba certa." };
 
-  useNarracaoDeChegada(`silaba-${item?.id ?? indice}`, item ? [{ texto: enunciado(item) }] : [instrucao], instrucao, definirInstrucao);
+  useNarracaoDeChegada(`silaba-${item?.id ?? indice}`, item ? [{ texto: enunciado(item, minusculas) }] : [instrucao], instrucao, definirInstrucao);
 
   if (!item) {
     return (
@@ -65,7 +65,7 @@ export function EscolherSilaba({ aula, atividade, minusculas, aoConcluir, defini
   return (
     <section aria-label="Escolher sílaba" className="flex flex-1 flex-col gap-4 px-3 pb-4 sm:px-6">
       <div key={item.id} className="animate-crianca-entrar flex flex-1 flex-col items-center justify-center gap-5">
-        <Enunciado texto={enunciado(item)} />
+        <Enunciado texto={enunciado(item, minusculas)} />
 
         <div role="group" aria-label="Palavra" className="flex flex-wrap items-center justify-center gap-2">
           {item.pecas.map((peca, i) =>

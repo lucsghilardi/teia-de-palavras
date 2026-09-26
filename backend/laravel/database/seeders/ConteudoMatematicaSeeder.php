@@ -201,11 +201,11 @@ class ConteudoMatematicaSeeder extends Seeder
                 'disciplina' => 'matematica',
                 'titulo' => 'Loja espacial',
                 'rotulo' => 'R$',
-                'descricao' => 'Moedas e notas na loja da base (entra no ar com a atividade de dinheiro).',
+                'descricao' => 'Juntar moedas e notas para pagar o preço certo na loja da base.',
                 'habilidade_bncc' => 'EF02MA20',
                 'fase' => 1,
                 'ordem' => 4,
-                'publicar' => false,
+                'publicar' => true,
                 'atividades' => [
                     [
                         'tipo' => 'historia',
@@ -225,6 +225,16 @@ class ConteudoMatematicaSeeder extends Seeder
                             'itens' => [['texto' => '1 real', 'icone' => 'coins'], ['texto' => '2 reais', 'icone' => 'banknote'], ['texto' => '5 reais', 'icone' => 'banknote'], ['texto' => '10 reais', 'icone' => 'banknote']],
                             'dica' => 'A moeda de 1 real vale menos que qualquer nota de dinheiro.',
                         ],
+                    ],
+                    [
+                        'tipo' => 'dinheiro',
+                        'titulo' => 'Pagar na loja',
+                        'instrucao' => 'Toque nas moedas e notas até juntar o preço certo. Depois toque em pagar.',
+                        'config' => ['itens' => [
+                            ['preco' => 7, 'moedas' => [1, 1, 2, 5, 10]],
+                            ['preco' => 12, 'moedas' => [2, 5, 5, 10, 20]],
+                            ['preco' => 15, 'moedas' => [1, 2, 2, 5, 10, 10]],
+                        ]],
                     ],
                     [
                         'tipo' => 'escolha',

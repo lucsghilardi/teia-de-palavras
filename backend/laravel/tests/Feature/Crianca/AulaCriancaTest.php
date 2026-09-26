@@ -10,6 +10,7 @@ use App\Models\Gravacao;
 use App\Models\Palavra;
 use App\Models\Silaba;
 use App\Models\TeiaPalavra;
+use Database\Seeders\ConteudoInicialSeeder;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
@@ -39,7 +40,7 @@ it('entrega a aula pronta para a criança', function () {
 
     expect($aula['status'])->toBe('em_andamento')
         ->and($aula['etapa_atual'])->toBe(1)
-        ->and($aula['etapas'])->toHaveCount(8)
+        ->and($aula['etapas'])->toHaveCount(count(ConteudoInicialSeeder::SEQUENCIA) + 1)
         ->and($aula['historia'][0]['texto'])->toContain('Fio')->not->toContain('{{heroi}}')
         ->and(array_column($aula['palmas'], 'texto'))->toBe(['TEI', 'A'])
         ->and(array_column($aula['ficha'][0]['membros'], 'texto'))->toBe(['TA', 'TE', 'TI', 'TO', 'TU'])
@@ -155,7 +156,7 @@ it('produção aceita palavras da Teia e palavrinhas', function () {
 it('só conclui a missão depois da última etapa, e concluir de novo não dá estrela extra', function () {
     $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$this->teia->id}/concluir")->assertStatus(422);
 
-    CriancaAula::where('crianca_id', $this->crianca->id)->update(['etapa_atual' => 8]);
+    CriancaAula::where('crianca_id', $this->crianca->id)->update(['etapa_atual' => $this->teia->totalAtividades() + 1]);
 
     $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$this->teia->id}/concluir")
         ->assertOk()

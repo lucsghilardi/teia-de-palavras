@@ -9,7 +9,7 @@ it('toda missão semeada de Português tem a sequência de 7 atividades (com esc
 
     Aula::daDisciplina('portugues')->with('atividades')->get()->each(function (Aula $aula) {
         expect($aula->atividades->pluck('tipo')->all())->toBe(ConteudoInicialSeeder::SEQUENCIA)
-            ->and($aula->atividades->pluck('ordem')->all())->toBe(range(1, 7))
+            ->and($aula->atividades->pluck('ordem')->all())->toBe(range(1, count(ConteudoInicialSeeder::SEQUENCIA)))
             ->and($aula->disciplina)->toBe('portugues');
     });
 });

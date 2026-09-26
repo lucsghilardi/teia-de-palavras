@@ -1,8 +1,9 @@
 "use client";
 
-import { ListChecks, Plus, Wand2 } from "lucide-react";
+import { Braces, ListChecks, Plus, SlidersHorizontal, Wand2 } from "lucide-react";
 import { useState } from "react";
 
+import { FormularioAtividade, temFormulario } from "@/components/painel/atividades/forms";
 import { MidiaField } from "@/components/painel/midia-field";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +41,8 @@ type AbaAtividadesProps = {
 export function AbaAtividades({ atividades, disciplina, onChange, midia }: AbaAtividadesProps) {
   const modelos = modelosPara(disciplina);
   const [tipoNovo, setTipoNovo] = useState<string>(modelos[0]?.tipo ?? "escolha");
+  /** Atividades em que o educador pediu o JSON em vez do formulário. */
+  const [emJson, setEmJson] = useState<Record<string, boolean>>({});
 
   function alterar(indice: number, patch: Partial<AtividadeRascunho>) {
     onChange(atividades.map((a, i) => (i === indice ? { ...a, ...patch } : a)));
@@ -82,9 +85,9 @@ export function AbaAtividades({ atividades, disciplina, onChange, midia }: AbaAt
         <AlertTitle>Como montar a missão</AlertTitle>
         <AlertDescription>
           <p>
-            Cada atividade tem um tipo e um <code className="rounded bg-sky-100 px-1 font-mono">config</code> em
-            JSON (formato em <code className="rounded bg-sky-100 px-1 font-mono">docs/atividades.md</code>). Use
-            “Modelo” para começar. A instrução é o que o alto-falante fala; o título aparece na trilha. Missões
+            Cada atividade tem um tipo e um conteúdo: os tipos mais comuns têm formulário; os outros usam um{" "}
+            <code className="rounded bg-sky-100 px-1 font-mono">config</code> em JSON (formato em{" "}
+            <code className="rounded bg-sky-100 px-1 font-mono">docs/atividades.md</code>). Use “Modelo” para começar. A instrução é o que o alto-falante fala; o título aparece na trilha. Missões
             curtas funcionam melhor: 3 a 7 atividades.
           </p>
         </AlertDescription>
@@ -100,7 +103,9 @@ export function AbaAtividades({ atividades, disciplina, onChange, midia }: AbaAt
             const rotulo = `atividade ${indice + 1}`;
             const semId = atividade.id === undefined;
             const modelo = modeloDoTipo(atividade.tipo);
-            const jsonValido = configDoTexto(atividade.config) !== null;
+            const configObjeto = configDoTexto(atividade.config);
+            const jsonValido = configObjeto !== null;
+            const comFormulario = temFormulario(atividade.tipo) && jsonValido && !emJson[atividade.chave];
 
             return (
               <li key={atividade.chave} className="space-y-4 rounded-xl border bg-card p-4 shadow-xs">
@@ -178,25 +183,51 @@ export function AbaAtividades({ atividades, disciplina, onChange, midia }: AbaAt
                 </div>
 
                 <Field>
-                  <div className="flex items-center justify-between gap-3">
-                    <FieldLabel htmlFor={`config-${atividade.chave}`}>Config (JSON)</FieldLabel>
-                    <Button type="button" size="sm" variant="ghost" onClick={() => usarModelo(indice)} disabled={!modelo}>
-                      <Wand2 />
-                      Modelo
-                    </Button>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <FieldLabel htmlFor={`config-${atividade.chave}`}>{comFormulario ? "Conteúdo" : "Config (JSON)"}</FieldLabel>
+                    <div className="flex items-center gap-1">
+                      {temFormulario(atividade.tipo) && jsonValido ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setEmJson((atual) => ({ ...atual, [atividade.chave]: !atual[atividade.chave] }))}
+                        >
+                          {comFormulario ? <Braces /> : <SlidersHorizontal />}
+                          {comFormulario ? "Editar JSON" : "Formulário"}
+                        </Button>
+                      ) : null}
+                      <Button type="button" size="sm" variant="ghost" onClick={() => usarModelo(indice)} disabled={!modelo}>
+                        <Wand2 />
+                        Modelo
+                      </Button>
+                    </div>
                   </div>
-                  <Textarea
-                    id={`config-${atividade.chave}`}
-                    value={atividade.config}
-                    onChange={(event) => alterar(indice, { config: event.target.value })}
-                    rows={8}
-                    spellCheck={false}
-                    aria-invalid={!jsonValido}
-                    className={cn("min-h-32 font-mono text-sm", !jsonValido && "border-destructive")}
-                  />
-                  <FieldDescription className={cn(!jsonValido && "text-destructive")}>
-                    {jsonValido ? "O backend valida o conteúdo ao salvar." : "JSON inválido: precisa ser um objeto { … }."}
-                  </FieldDescription>
+                  {comFormulario && configObjeto ? (
+                    <div id={`config-${atividade.chave}`}>
+                      <FormularioAtividade
+                        tipo={atividade.tipo}
+                        config={configObjeto}
+                        onChange={(novo) => alterar(indice, { config: configParaTexto(novo) })}
+                      />
+                      <FieldDescription>O backend valida o conteúdo ao salvar.</FieldDescription>
+                    </div>
+                  ) : (
+                    <>
+                      <Textarea
+                        id={`config-${atividade.chave}`}
+                        value={atividade.config}
+                        onChange={(event) => alterar(indice, { config: event.target.value })}
+                        rows={8}
+                        spellCheck={false}
+                        aria-invalid={!jsonValido}
+                        className={cn("min-h-32 font-mono text-sm", !jsonValido && "border-destructive")}
+                      />
+                      <FieldDescription className={cn(!jsonValido && "text-destructive")}>
+                        {jsonValido ? "O backend valida o conteúdo ao salvar." : "JSON inválido: precisa ser um objeto { … }."}
+                      </FieldDescription>
+                    </>
+                  )}
                 </Field>
 
                 <MidiaField

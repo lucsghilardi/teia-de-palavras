@@ -29,6 +29,9 @@ final class RegistroAtividades
         'contar' => Contar::class,
         'somar_subtrair' => SomarSubtrair::class,
         'escolher_silaba' => EscolherSilaba::class,
+        'dinheiro' => Dinheiro::class,
+        'mapa_pontos' => MapaPontos::class,
+        'ditado' => Ditado::class,
     ];
 
     /** @var array<string, AvaliadorAtividade> */

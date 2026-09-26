@@ -81,11 +81,11 @@ class ConteudoGeografiaSeeder extends Seeder
                 'disciplina' => 'geografia',
                 'titulo' => 'O mapa do bairro',
                 'rotulo' => 'mapa',
-                'descricao' => 'O bairro visto de cima (entra no ar com a atividade de mapa).',
+                'descricao' => 'O bairro visto de cima: achar os lugares no mapa.',
                 'habilidade_bncc' => 'EF02GE08',
                 'fase' => 1,
                 'ordem' => 2,
-                'publicar' => false,
+                'publicar' => true,
                 'atividades' => [
                     [
                         'tipo' => 'historia',
@@ -103,6 +103,26 @@ class ConteudoGeografiaSeeder extends Seeder
                             ['pergunta' => 'Como o bairro aparece num mapa?', 'opcoes' => ['Visto de cima', 'Visto de lado', 'Visto de baixo'], 'correta' => 0, 'dica' => 'Como a nave vê lá do alto.', 'explicacao' => 'O mapa mostra o bairro visto de cima.', 'icone' => 'map'],
                             ['pergunta' => 'Para que serve um mapa?', 'opcoes' => ['Para achar lugares sem se perder', 'Para contar estrelas', 'Para brincar de pipa'], 'correta' => 0, 'dica' => 'A tripulação usou para achar a escola.', 'explicacao' => 'O mapa ajuda a achar lugares.', 'icone' => 'compass'],
                         ]],
+                    ],
+                    [
+                        'tipo' => 'mapa_pontos',
+                        'titulo' => 'Ache no mapa',
+                        'instrucao' => 'Toque no lugar que a pergunta pede. Toque nos lugares para ouvir o nome.',
+                        'config' => [
+                            'cenario' => 'bairro',
+                            'pontos' => [
+                                ['chave' => 'casa', 'rotulo' => 'a casa do capitão', 'icone' => 'house', 'x' => 0.18, 'y' => 0.27],
+                                ['chave' => 'escola', 'rotulo' => 'a escola', 'icone' => 'school', 'x' => 0.74, 'y' => 0.25],
+                                ['chave' => 'padaria', 'rotulo' => 'a padaria', 'icone' => 'store', 'x' => 0.5, 'y' => 0.52],
+                                ['chave' => 'praca', 'rotulo' => 'a praça', 'icone' => 'tree', 'x' => 0.2, 'y' => 0.75],
+                                ['chave' => 'posto', 'rotulo' => 'o posto de saúde', 'icone' => 'hospital', 'x' => 0.78, 'y' => 0.74],
+                            ],
+                            'perguntas' => [
+                                ['alvo' => 'escola', 'texto' => 'Onde fica a escola?', 'dica' => 'Toque nos lugares para ouvir o nome de cada um.'],
+                                ['alvo' => 'padaria', 'texto' => 'Toque no lugar onde se compra pão.', 'dica' => 'Pão se compra na padaria.'],
+                                ['alvo' => 'praca', 'texto' => 'Onde a tripulação brinca ao ar livre?', 'dica' => 'É o lugar com árvores.'],
+                            ],
+                        ],
                     ],
                     [
                         'tipo' => 'ordenar',

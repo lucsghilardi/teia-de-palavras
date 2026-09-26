@@ -12,7 +12,7 @@ use Illuminate\Database\Seeder;
  *
  * Cada missão: história (3 páginas), perguntas de compreensão (escolha),
  * palavra geradora, ficha de descoberta, montar palavras, escolher sílaba
- * (EF02LP02) e frase. As palavras-meta e as famílias silábicas são as mesmas
+ * (EF02LP02), ditado (ouvir → montar) e frase. As palavras-meta e as famílias silábicas são as mesmas
  * da primeira versão (a progressão fonológica não mudou).
  *
  * Fase 1 (sílabas simples) entra publicada. Fase 2 (sílabas complexas) entra
@@ -24,7 +24,7 @@ use Illuminate\Database\Seeder;
  */
 class ConteudoInicialSeeder extends Seeder
 {
-    public const SEQUENCIA = ['historia', 'escolha', 'palavra', 'ficha', 'montar_palavras', 'escolher_silaba', 'frase'];
+    public const SEQUENCIA = ['historia', 'escolha', 'palavra', 'ficha', 'montar_palavras', 'escolher_silaba', 'ditado', 'frase'];
 
     public function run(AplicadorConteudo $aplicador): void
     {
@@ -53,10 +53,11 @@ class ConteudoInicialSeeder extends Seeder
             ['tipo' => 'ficha', 'config' => []],
             ['tipo' => 'montar_palavras', 'config' => []],
             ['tipo' => 'escolher_silaba', 'titulo' => 'Qual sílaba?', 'instrucao' => 'Toque na sílaba certa.', 'config' => ['itens' => $m['silabas_desafio']]],
+            ['tipo' => 'ditado', 'titulo' => 'Ditado', 'instrucao' => 'Ouça a palavra e monte com as peças.', 'config' => ['itens' => array_map(fn ($d) => ['palavra' => $d[0], 'silabas' => $d[1], 'opcoes' => $d[2]], $m['ditado'])]],
             ['tipo' => 'frase', 'config' => []],
         ];
 
-        unset($m['escolha'], $m['silabas_desafio']);
+        unset($m['escolha'], $m['silabas_desafio'], $m['ditado']);
 
         return $m;
     }
@@ -99,6 +100,7 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'completar', 'palavra' => 'TETO', 'silabas' => ['TE', 'TO'], 'oculta' => 0, 'opcoes' => ['TE', 'TA', 'TI'], 'dica' => 'A palavra começa com te.'],
                     ['modo' => 'trocar', 'de' => 'TIA', 'silabas' => ['TI', 'A'], 'para' => 'TIO', 'posicao' => 1, 'opcoes' => ['O', 'A', 'E'], 'dica' => 'Troque só o último pedaço.'],
                 ],
+                'ditado' => [['TATU', ['TA', 'TU'], ['TO', 'TE']], ['TETO', ['TE', 'TO'], ['TA', 'TI']]],
                 'palavras' => [['TEIA', true], 'TATU', 'TIA', 'TIO', 'TETO'],
             ],
             [
@@ -126,6 +128,7 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'completar', 'palavra' => 'BOCA', 'silabas' => ['BO', 'CA'], 'oculta' => 0, 'opcoes' => ['BO', 'BA', 'BE'], 'dica' => 'A palavra começa com bo.'],
                     ['modo' => 'trocar', 'de' => 'CANO', 'silabas' => ['CA', 'NO'], 'para' => 'CABO', 'posicao' => 1, 'opcoes' => ['BO', 'NO', 'CO'], 'dica' => 'Troque o último pedaço.'],
                 ],
+                'ditado' => [['BOCA', ['BO', 'CA'], ['NE', 'CO']], ['CUBO', ['CU', 'BO'], ['CA', 'BA']]],
                 'palavras' => [['BONECA', true], 'BOCA', 'BONÉ', 'CUBO', 'CANO', 'NABO'],
             ],
             [
@@ -153,6 +156,7 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'completar', 'palavra' => 'PIPA', 'silabas' => ['PI', 'PA'], 'oculta' => 0, 'opcoes' => ['PI', 'PA', 'PU'], 'dica' => 'A palavra começa com pi.'],
                     ['modo' => 'trocar', 'de' => 'LUPA', 'silabas' => ['LU', 'PA'], 'para' => 'LULA', 'posicao' => 1, 'opcoes' => ['LA', 'PA', 'PO'], 'dica' => 'Troque o último pedaço.'],
                 ],
+                'ditado' => [['PIPA', ['PI', 'PA'], ['PU', 'PO']], ['LUPA', ['LU', 'PA'], ['LO', 'PU']]],
                 'palavras' => [['PULO', true], 'PIPA', 'LUPA', 'LULA', 'PIPOCA'],
             ],
             [
@@ -180,6 +184,7 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'trocar', 'de' => 'MOLA', 'silabas' => ['MO', 'LA'], 'para' => 'MALA', 'posicao' => 0, 'opcoes' => ['MA', 'ME', 'MU'], 'dica' => 'Troque o primeiro pedaço.'],
                     ['modo' => 'completar', 'palavra' => 'CAMA', 'silabas' => ['CA', 'MA'], 'oculta' => 1, 'opcoes' => ['MA', 'MO', 'ME'], 'dica' => 'ca... ma.'],
                 ],
+                'ditado' => [['MALA', ['MA', 'LA'], ['MO', 'LE']], ['CAMA', ['CA', 'MA'], ['CO', 'ME']]],
                 'palavras' => [['MOLA', true], 'MALA', 'LAMA', 'MOLE', 'CAMA'],
             ],
             [
@@ -207,6 +212,7 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'completar', 'palavra' => 'VILA', 'silabas' => ['VI', 'LA'], 'oculta' => 0, 'opcoes' => ['VI', 'VA', 'VO'], 'dica' => 'A palavra começa com vi.'],
                     ['modo' => 'completar', 'palavra' => 'VALE', 'silabas' => ['VA', 'LE'], 'oculta' => 1, 'opcoes' => ['LE', 'LA', 'LO'], 'dica' => 'va... le.'],
                 ],
+                'ditado' => [['SALA', ['SA', 'LA'], ['SE', 'VA']], ['VILA', ['VI', 'LA'], ['VA', 'LO']]],
                 'palavras' => [['SALVA', true], 'SALA', 'VALE', 'VILA'],
             ],
 
@@ -230,6 +236,7 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'completar', 'palavra' => 'ARANHA', 'silabas' => ['A', 'RA', 'NHA'], 'oculta' => 2, 'opcoes' => ['NHA', 'NHO', 'NHE'], 'dica' => 'a... ra... nha.'],
                     ['modo' => 'completar', 'palavra' => 'LINHA', 'silabas' => ['LI', 'NHA'], 'oculta' => 0, 'opcoes' => ['LI', 'LA', 'LU'], 'dica' => 'A palavra começa com li.'],
                 ],
+                'ditado' => [['UNHA', ['U', 'NHA'], ['A', 'NHO']], ['LINHA', ['LI', 'NHA'], ['LA', 'NHO']]],
                 'palavras' => [['ARANHA', true], 'UNHA', 'NINHO', 'LINHA', 'MINHOCA', 'RATO'],
             ],
             [
@@ -251,6 +258,7 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'completar', 'palavra' => 'HERÓI', 'silabas' => ['HE', 'RÓI'], 'oculta' => 0, 'opcoes' => ['HE', 'HA', 'HO'], 'dica' => 'A palavra começa com he.'],
                     ['modo' => 'completar', 'palavra' => 'HORA', 'silabas' => ['HO', 'RA'], 'oculta' => 1, 'opcoes' => ['RA', 'RO', 'RE'], 'dica' => 'ho... ra.'],
                 ],
+                'ditado' => [['HORA', ['HO', 'RA'], ['HA', 'RO']], ['HINO', ['HI', 'NO'], ['HO', 'NA']]],
                 'palavras' => [['HERÓI', true], 'HORA', 'HINO', 'HÁBITO'],
             ],
             [
@@ -272,6 +280,7 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'completar', 'palavra' => 'FÁBRICA', 'silabas' => ['FÁ', 'BRI', 'CA'], 'oculta' => 1, 'opcoes' => ['BRI', 'BRA', 'BRO'], 'dica' => 'fá... bri... ca.'],
                     ['modo' => 'completar', 'palavra' => 'FOCA', 'silabas' => ['FO', 'CA'], 'oculta' => 0, 'opcoes' => ['FO', 'FA', 'FU'], 'dica' => 'A palavra começa com fo.'],
                 ],
+                'ditado' => [['FOCA', ['FO', 'CA'], ['FA', 'CO']], ['COBRA', ['CO', 'BRA'], ['CA', 'BRO']]],
                 'palavras' => [['FÁBRICA', true], 'FACA', 'FOCA', 'COBRA', 'BRAVO', 'FUBÁ'],
             ],
             [
@@ -293,6 +302,7 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'completar', 'palavra' => 'MÁSCARA', 'silabas' => ['MÁS', 'CA', 'RA'], 'oculta' => 0, 'opcoes' => ['MÁS', 'MES', 'MOS'], 'dica' => 'A palavra começa com más.'],
                     ['modo' => 'completar', 'palavra' => 'CARA', 'silabas' => ['CA', 'RA'], 'oculta' => 1, 'opcoes' => ['RA', 'RO', 'RE'], 'dica' => 'ca... ra.'],
                 ],
+                'ditado' => [['CARA', ['CA', 'RA'], ['CO', 'RE']], ['RAMO', ['RA', 'MO'], ['RO', 'MA']]],
                 'palavras' => [['MÁSCARA', true], 'MOSCA', 'CARA', 'RAMO'],
             ],
             [
@@ -314,6 +324,7 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'completar', 'palavra' => 'BRINQUEDO', 'silabas' => ['BRIN', 'QUE', 'DO'], 'oculta' => 1, 'opcoes' => ['QUE', 'QUI', 'QUA'], 'dica' => 'brin... que... do.'],
                     ['modo' => 'completar', 'palavra' => 'DEDO', 'silabas' => ['DE', 'DO'], 'oculta' => 1, 'opcoes' => ['DO', 'DA', 'DU'], 'dica' => 'de... do.'],
                 ],
+                'ditado' => [['DEDO', ['DE', 'DO'], ['DA', 'DU']], ['QUILO', ['QUI', 'LO'], ['QUE', 'LA']]],
                 'palavras' => [['BRINQUEDO', true], 'BRINCO', 'QUILO', 'QUEDA', 'DEDO', 'QUIABO'],
             ],
         ];

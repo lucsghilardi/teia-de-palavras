@@ -42,9 +42,9 @@ conquista com pontos, itens novos e medalhas.
 
 | Planeta | O que a criança faz | BNCC (2º ano) |
 |---|---|---|
-| **Português** | História, perguntas de compreensão, palavra geradora, ficha de famílias silábicas, montar palavras, escolher a sílaba que falta, escrever uma frase | EF02LP02 |
-| **Matemática** | Contar em grupos de 10, somar e subtrair com apoio (ícones → reta → símbolos), dezenas e unidades, ordenar números | EF02MA01, 04, 05, 20 |
-| **Geografia** | Casa e rua, vizinhos, pontos de referência, direita e esquerda, campo e cidade | EF02GE01, 04, 08, 10 |
+| **Português** | História, perguntas de compreensão, palavra geradora, ficha de famílias silábicas, montar palavras, escolher a sílaba que falta, ditado (ouvir e montar), escrever uma frase | EF02LP02 |
+| **Matemática** | Contar em grupos de 10, somar e subtrair com apoio (ícones → reta → símbolos), dezenas e unidades, ordenar números, pagar com moedas e notas | EF02MA01, 04, 05, 20 |
+| **Geografia** | Casa e rua, vizinhos, achar lugares num mapa visto de cima, pontos de referência, direita e esquerda, campo e cidade | EF02GE01, 04, 08, 10 |
 | **História** | Ontem, hoje e amanhã, a própria linha do tempo, família, trabalhos da comunidade | EF02HI01, 03, 06, 10 |
 
 Três combinados que o sistema nunca quebra:
@@ -79,17 +79,18 @@ da base são configuráveis, e as histórias se adaptam a eles.
 | Português | Matemática | Geografia | História |
 |---|---|---|---|
 | A nave Teia: **TEIA** | Somar para decolar (7 + 5) | Minha casa e minha rua | Ontem, hoje, amanhã |
-| A boneca-robô: **BONECA** | Contar até 100 | O mapa do bairro (rascunho) | Minha linha do tempo |
+| A boneca-robô: **BONECA** | Contar até 100 | O mapa do bairro | Minha linha do tempo |
 | O pulo na lua: **PULO** | Dezenas e unidades | Caminhos e referências | Minha família |
-| A mola do robô: **MOLA** | Loja espacial (rascunho) | Campo e cidade | Trabalhos da comunidade |
+| A mola do robô: **MOLA** | Loja espacial | Campo e cidade | Trabalhos da comunidade |
 | Juntos salvamos a vila: **SALVA** | | | |
 | + 5 missões da Fase 2 (rascunho) | | | |
 
 Conteúdo é dado, não código: cada atividade é um JSON validado pelo backend
-([`docs/atividades.md`](docs/atividades.md)), editável no painel. Tipos hoje:
-`historia`, `escolha`, `verdadeiro_falso`, `ordenar`, `linha_do_tempo`, `parear`,
-`contar`, `somar_subtrair`, `escolher_silaba` e os de Português (`palavra`,
-`ficha`, `montar_palavras`, `frase`, `conversa`, `palmas`).
+([`docs/atividades.md`](docs/atividades.md)), editável no painel (com formulário para os
+tipos mais comuns). Tipos hoje: `historia`, `escolha`, `verdadeiro_falso`, `ordenar`,
+`linha_do_tempo`, `parear`, `contar`, `somar_subtrair`, `dinheiro`, `mapa_pontos`,
+`escolher_silaba`, `ditado` e os de Português (`palavra`, `ficha`, `montar_palavras`,
+`frase`, `conversa`, `palmas`).
 
 ## O que já funciona
 
@@ -204,7 +205,7 @@ cd frontend && npm run test:e2e                # missões TEIA e 7 + 5, Revisão
 ## Próximos passos
 
 - [x] Motor de atividades por tipo, quatro planetas, revisão espaçada, nível e medalhas, tema Espaço
-- [ ] Atividades de dinheiro, mapa e ditado; formulários amigáveis no painel
+- [x] Atividades de dinheiro, mapa e ditado; formulários amigáveis no painel
 - [ ] Amizades entre turmas e mini-aulas gravadas pelas crianças (aprovadas por um adulto)
 - [ ] Duplas ao vivo (a *Roda*, contrato em `docs/api-roda.md`)
 - [ ] Progresso da criança no painel

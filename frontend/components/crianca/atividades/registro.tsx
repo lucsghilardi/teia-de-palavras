@@ -5,12 +5,15 @@ import {
   BookOpen,
   Calculator,
   CheckCheck,
+  Coins,
+  Ear,
   Hand,
   Hash,
   Hourglass,
   Link,
   ListChecks,
   ListOrdered,
+  MapPinned,
   MessageCircle,
   Pencil,
   Puzzle,
@@ -21,8 +24,11 @@ import {
 } from "lucide-react";
 
 import { Contar } from "@/components/crianca/atividades/genericas/contar";
+import { Dinheiro } from "@/components/crianca/atividades/genericas/dinheiro";
+import { Ditado } from "@/components/crianca/atividades/genericas/ditado";
 import { Escolha } from "@/components/crianca/atividades/genericas/escolha";
 import { EscolherSilaba } from "@/components/crianca/atividades/genericas/escolher-silaba";
+import { MapaPontos } from "@/components/crianca/atividades/genericas/mapa-pontos";
 import { Ordenar } from "@/components/crianca/atividades/genericas/ordenar";
 import { Parear } from "@/components/crianca/atividades/genericas/parear";
 import { SomarSubtrair } from "@/components/crianca/atividades/genericas/somar-subtrair";
@@ -73,6 +79,12 @@ export function AtividadeAtual(props: PropsAtividade) {
       return <SomarSubtrair {...resto} atividade={atividade} />;
     case "escolher_silaba":
       return <EscolherSilaba {...resto} atividade={atividade} />;
+    case "dinheiro":
+      return <Dinheiro {...resto} atividade={atividade} />;
+    case "mapa_pontos":
+      return <MapaPontos {...resto} atividade={atividade} />;
+    case "ditado":
+      return <Ditado {...resto} atividade={atividade} />;
   }
 }
 
@@ -93,6 +105,9 @@ export const ICONE_TIPO: Record<TipoAtividade | "conquista", LucideIcon> = {
   contar: Hash,
   somar_subtrair: Calculator,
   escolher_silaba: SpellCheck,
+  dinheiro: Coins,
+  mapa_pontos: MapPinned,
+  ditado: Ear,
   conquista: Trophy,
 };
 
@@ -113,5 +128,8 @@ export const NOME_FALADO_TIPO: Record<TipoAtividade | "conquista", string> = {
   contar: "Contar",
   somar_subtrair: "Somar e subtrair",
   escolher_silaba: "Escolher a sílaba",
+  dinheiro: "Pagar com moedas e notas",
+  mapa_pontos: "Achar no mapa",
+  ditado: "Ditado",
   conquista: "Conquista",
 };

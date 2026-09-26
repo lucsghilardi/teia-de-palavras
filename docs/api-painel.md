@@ -47,7 +47,7 @@ também tem palavra geradora, sílabas, famílias, história, conversa e dicion�
 legadas (`historia`, `conversa`, `palavra`, `palmas`, `ficha`, `montar_palavras`, `frase`) leem.
 Aula nova de Português nasce com `historia, conversa, palavra, ficha, montar_palavras, frase`
 (`AtividadesPadrao::PORTUGUES`); as missões semeadas usam `historia, escolha, palavra, ficha,
-montar_palavras, escolher_silaba, frase`. Para reaplicar o conteúdo semeado num banco antigo:
+montar_palavras, escolher_silaba, ditado, frase`. Para reaplicar o conteúdo semeado num banco antigo:
 `php artisan teia:reaplicar-conteudo --todas --forcar` (sem `--forcar` só lista).
 Os tipos de atividade e o formato do `config` de cada um estão em `docs/atividades.md`.
 

@@ -37,7 +37,7 @@ async function tocarEnquantoHouver(page: Page, nome: string, maximo = 20) {
 }
 
 async function etapaAtual(page: Page, n: number) {
-  await expect(page.getByRole("button", { name: `Etapa ${n} de 8`, exact: true })).toHaveAttribute("aria-current", "step");
+  await expect(page.getByRole("button", { name: `Etapa ${n} de 9`, exact: true })).toHaveAttribute("aria-current", "step");
   await botoesGrandes(page.locator("body"));
   await cabeNaTela(page);
   await capturar(page, `etapa-${n}`);
@@ -102,7 +102,7 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await cabeNaTela(page);
   await capturar(page, "galaxia");
   await expect(page.getByRole("button", { name: "Planeta Português", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Planeta Geografia", exact: true })).toContainText("0 de 3");
+  await expect(page.getByRole("button", { name: "Planeta Geografia", exact: true })).toContainText("0 de 4");
 
   // ---------- Planeta Português: a trilha de missões ----------
   await tocar(page, "Planeta Português");
@@ -178,8 +178,28 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await capturar(page, "etapa-6-depois");
   await tocar(page, "Continuar");
 
-  // ---------- 7. Produção: uma frase curta ----------
+  // ---------- 7. Ditado: ouvir e montar TATU e TETO ----------
   await etapaAtual(page, 7);
+  await expect(botao(page, "Conferir")).toBeDisabled();
+  await tocar(page, "Ouvir a palavra");
+  // Montagem que não é a palavra: dica, sem "errado"; a bandeja fica para ajustar.
+  await tocar(page, "Sílaba TU");
+  await tocar(page, "Sílaba TA");
+  await tocar(page, "Conferir");
+  await semPalavrasProibidas(page);
+  await tocar(page, "Apagar");
+  await tocar(page, "Sílaba TA");
+  await tocar(page, "Sílaba TU");
+  await tocar(page, "Conferir");
+  await tocar(page, "Próximo");
+  await tocar(page, "Sílaba TE");
+  await tocar(page, "Sílaba TO");
+  await tocar(page, "Conferir");
+  await capturar(page, "etapa-7-depois");
+  await tocar(page, "Continuar");
+
+  // ---------- 8. Produção: uma frase curta ----------
+  await etapaAtual(page, 8);
   await expect(botao(page, "Enviar frase")).toBeDisabled();
   for (const palavra of ["O", "TATU", "TEM", "TETO"]) {
     await tocar(page, `Palavra ${palavra}`);
@@ -187,14 +207,14 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await tocar(page, "Ouvir minha frase");
   await tocar(page, "Enviar frase");
   await botoesGrandes(page.locator("body"));
-  await capturar(page, "etapa-7-depois");
+  await capturar(page, "etapa-8-depois");
   await tocar(page, "Continuar");
 
-  // ---------- 8. Conquista: próximo capítulo desbloqueado ----------
+  // ---------- 9. Conquista: próximo capítulo desbloqueado ----------
   await expect(botao(page, "Próxima missão")).toBeVisible();
   await botoesGrandes(page.locator("body"));
   await cabeNaTela(page);
-  await capturar(page, "etapa-8");
+  await capturar(page, "etapa-9");
   await expect(botao(page, "Palavra TATU")).toBeVisible();
   await expect(botao(page, "Palavra TETO")).toBeVisible();
   await tocar(page, "Voltar ao planeta");

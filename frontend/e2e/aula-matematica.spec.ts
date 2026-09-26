@@ -109,5 +109,5 @@ test("criança completa a missão de Matemática só com toques, com dica no err
   // Na Galáxia, o planeta mostra o progresso e a Matemática sai das missões do dia.
   await tocar(page, "Voltar à Galáxia");
   await expect(page).toHaveURL(/\/app$/);
-  await expect(page.getByRole("button", { name: "Planeta Matemática", exact: true })).toContainText("1 de 3");
+  await expect(page.getByRole("button", { name: "Planeta Matemática", exact: true })).toContainText("1 de 4");
 });

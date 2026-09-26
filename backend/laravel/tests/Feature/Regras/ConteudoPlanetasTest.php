@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Artisan;
 beforeEach(fn () => semearConteudo());
 
 it('semeia as missões de Geografia e História com habilidade da BNCC e atividades válidas', function () {
-    foreach (['geografia' => ['EF02GE', 4, 3], 'historia' => ['EF02HI', 4, 4]] as $disciplina => [$prefixo, $total, $publicadas]) {
+    foreach (['geografia' => ['EF02GE', 4, 4], 'historia' => ['EF02HI', 4, 4], 'matematica' => ['EF02MA', 4, 4]] as $disciplina => [$prefixo, $total, $publicadas]) {
         $aulas = Aula::daDisciplina($disciplina)->with('atividades')->ordenadas()->get();
 
         expect($aulas)->toHaveCount($total)
@@ -60,11 +60,17 @@ it('as missões de Português têm 3 páginas na Fase 1, duas perguntas de compr
     foreach (Aula::daDisciplina('portugues')->with(['atividades', 'historiaPaginas', 'palavras'])->get() as $aula) {
         $escolha = $aula->atividades->firstWhere('tipo', 'escolha');
         $silaba = $aula->atividades->firstWhere('tipo', 'escolher_silaba');
+        $ditado = $aula->atividades->firstWhere('tipo', 'ditado');
         $palavras = $aula->palavras->pluck('palavra')->all();
 
         expect($aula->historiaPaginas)->toHaveCount($aula->fase === 1 ? 3 : 2)
             ->and($escolha->configArray()['itens'])->toHaveCount(2)
-            ->and(count($silaba->configArray()['itens']))->toBeGreaterThanOrEqual(2);
+            ->and(count($silaba->configArray()['itens']))->toBeGreaterThanOrEqual(2)
+            ->and($ditado->configArray()['itens'])->toHaveCount(2);
+
+        foreach ($ditado->configArray()['itens'] as $item) {
+            expect(in_array($item['palavra'], $palavras, true))->toBeTrue("{$item['palavra']} não é palavra da missão {$aula->slug}");
+        }
 
         foreach ($silaba->configArray()['itens'] as $item) {
             $alvo = $item['modo'] === 'completar' ? $item['palavra'] : $item['para'];
@@ -82,7 +88,7 @@ it('teia:reaplicar-conteudo lista sem --forcar e sobrescreve com --forcar', func
 
     expect(Artisan::output())->toContain('já existe')
         ->and($teia->fresh()->titulo)->toBe('Editada no CMS')
-        ->and($teia->atividades()->count())->toBe(6);
+        ->and($teia->atividades()->count())->toBe(count(ConteudoInicialSeeder::SEQUENCIA) - 1);
 
     Artisan::call('teia:reaplicar-conteudo', ['--slug' => ['missao-1-a-teia-do-bairro'], '--forcar' => true]);
 

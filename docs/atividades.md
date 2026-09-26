@@ -92,5 +92,32 @@ Dica gerada: "comece no 7 e conte mais 5: 8, 9, 10…".
 Criança: `{ itens: [ { id, modo, palavra e alvo (só em trocar), pecas: ["TA", null], posicao, opcoes } ] }`.
 Resposta: `{ item: "e1", silaba: "TU" }`. A sílaba correta entra nas opções automaticamente.
 
-## Ainda por vir
-`dinheiro` (EF02MA20), `mapa_pontos` (Geografia) e `ditado` (ouvir → montar) chegam na Fase 6.
+### `dinheiro` (EF02MA20)
+```json
+{ "itens": [ { "id": "d1", "preco": 7, "moedas": [1, 1, 2, 5, 10], "dica": "..." } ] }
+```
+Valores em reais inteiros (1, 2, 5, 10, 20, 50, 100); o config só é aceito se alguma combinação
+das moedas soma o preço. Criança: `{ itens: [ { id, preco, moedas: [ { id, valor } ] } ] }`.
+Resposta: `{ item: "d1", escolhidas: ["m3", "m4"] }` (ids das moedas): qualquer combinação que
+some o preço vale. Dica gerada: "você juntou 5; faltam 2 reais." / "passou 3 reais. tire uma moeda.".
+`resposta_correta`: a combinação com menos moedas (`{ escolhidas, valores, preco }`).
+
+### `mapa_pontos` (Geografia)
+```json
+{ "cenario": "bairro",
+  "pontos": [ { "chave": "escola", "rotulo": "a escola", "icone": "school", "x": 0.74, "y": 0.25 } ],
+  "perguntas": [ { "id": "p1", "alvo": "escola", "texto": "Onde fica a escola?", "dica": "..." } ] }
+```
+`cenario`: `bairro` | `escola` (desenhos do app em `frontend/public/cenarios/`); `x`/`y` são frações
+da largura/altura. Criança: `{ cenario, pontos, itens: [ { id, texto } ] }` (sem o alvo); tocar num
+ponto fala o rótulo. Resposta: `{ item: "p1", ponto: "escola" }`. `resposta_correta`: `{ ponto, rotulo }`.
+
+### `ditado` (ouvir → montar)
+```json
+{ "itens": [ { "id": "d1", "palavra": "TETO", "silabas": ["TE", "TO"], "opcoes": ["TA", "TU"], "dica": "..." } ] }
+```
+`silabas` é opcional (o silabador separa); `opcoes` são os distratores (as sílabas certas entram
+sozinhas). Criança: `{ itens: [ { id, audio_url, fala, tamanho, opcoes } ] }`: `audio_url` é a
+gravação/áudio da palavra quando existe e `fala` é a palavra em minúsculas para a voz do navegador
+(a tela nunca mostra `fala`). Resposta: `{ item: "d1", silabas: ["TE", "TO"] }`. Dica gerada: quantos
+pedaços a palavra tem ou o primeiro pedaço. `resposta_correta`: `{ silabas, palavra }`.
