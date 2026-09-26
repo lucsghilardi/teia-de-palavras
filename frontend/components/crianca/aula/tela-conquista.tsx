@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowLeft, Network, Rocket, Star, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -7,13 +8,16 @@ import { celebrar } from "@/components/crianca/aula/celebrar";
 import { falasDeConquistas, narrar, type Trecho } from "@/components/crianca/aula/narrador";
 import type { PropsConquista } from "@/components/crianca/atividades/tipos";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
+import { Icone } from "@/components/crianca/ui/icone";
 import { useCrianca } from "@/context/CriancaContext";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
-import { exibir } from "@/lib/exibir";
+import { COPY } from "@/lib/copy";
+import { exibir, exibirPalavra } from "@/lib/exibir";
 import { sons } from "@/lib/sons";
+import { cn } from "@/lib/utils";
 import type { ResultadoConclusao } from "@/types/CriancaApp";
 
-const FALA_FINAL = { texto: "Missão concluída!" };
+const FALA_FINAL = { texto: COPY.missao.concluida };
 
 /**
  * CONQUISTA (etapa N+1): conclui a missão no servidor (uma vez), comemora e
@@ -83,11 +87,9 @@ export function TelaConquista({
   return (
     <section aria-label="Conquista" className="flex flex-1 flex-col items-center gap-5 px-3 pb-6 sm:px-6">
       <div className="animate-crianca-entrar flex flex-col items-center gap-2 pt-2">
-        <span aria-hidden className="text-[clamp(5rem,20vmin,10rem)] leading-none drop-shadow-[0_8px_0_rgba(0,0,0,0.08)]">
-          🏆
-        </span>
-        <h2 className="text-center text-[clamp(2rem,6vw,3.5rem)] font-black leading-tight text-[var(--c-teia)]">
-          {exibir("Missão concluída!", minusculas)}
+        <Trophy aria-hidden className="size-[clamp(5rem,18vmin,9rem)] fill-[var(--c-alerta)]/20 text-[var(--c-alerta)]" strokeWidth={1.75} />
+        <h2 className="text-center text-[clamp(2rem,6vw,3.5rem)] font-black leading-tight text-[var(--c-alerta)]">
+          {exibir(COPY.missao.concluida, minusculas)}
         </h2>
       </div>
 
@@ -95,16 +97,14 @@ export function TelaConquista({
         role="img"
         aria-label={
           ganhas !== null && ganhas > 0
-            ? `Você ganhou ${ganhas} estrelas`
+            ? `Você ganhou ${COPY.comum.pontos(ganhas)}`
             : estrelasTotal !== null
-              ? `${estrelasTotal} estrelas`
-              : "Estrelas"
+              ? COPY.comum.pontos(estrelasTotal)
+              : "Pontos"
         }
-        className="flex items-center gap-3 rounded-full bg-white px-6 py-3 text-4xl font-black shadow-[0_6px_0_var(--c-sol-sombra)] ring-4 ring-[var(--c-sol)]"
+        className="flex items-center gap-3 rounded-full bg-[var(--c-superficie)] px-6 py-3 text-4xl font-black shadow-[0_6px_0_var(--c-alerta-sombra)] ring-4 ring-[var(--c-alerta)]"
       >
-        <span aria-hidden className={pronto && !reduzido ? "animate-crianca-pulso" : undefined}>
-          ⭐
-        </span>
+        <Star aria-hidden className={cn("size-10 fill-[var(--c-alerta)] text-[var(--c-alerta)]", pronto && !reduzido && "animate-crianca-pulso")} />
         <span aria-hidden>{ganhas !== null && ganhas > 0 ? `+${ganhas}` : (estrelasTotal ?? "…")}</span>
       </div>
 
@@ -119,10 +119,10 @@ export function TelaConquista({
                   sons.toque();
                   void narrar({ texto: p.palavra, audio_url: p.audio_url });
                 }}
-                className="animate-crianca-entrar flex min-h-16 items-center gap-2 rounded-2xl bg-[var(--c-teia)] px-4 text-3xl font-black text-white shadow-[0_5px_0_var(--c-teia-sombra)] touch-manipulation transition-transform active:translate-y-1 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]"
+                className="animate-crianca-entrar flex min-h-16 items-center gap-2 rounded-2xl bg-[var(--c-portugues)] px-4 text-3xl font-black text-[var(--c-fundo)] shadow-[0_5px_0_var(--c-teia-sombra)] touch-manipulation transition-transform active:translate-y-1 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]"
               >
-                <span aria-hidden>🕸️</span>
-                {exibir(p.palavra, minusculas)}
+                <Network aria-hidden className="size-7" strokeWidth={2.5} />
+                {exibirPalavra(p.palavra, minusculas)}
               </button>
             </li>
           ))}
@@ -140,11 +140,9 @@ export function TelaConquista({
                   sons.conquista();
                   void narrar(`${c.titulo}. ${c.descricao}`);
                 }}
-                className="animate-crianca-entrar flex min-h-20 items-center gap-3 rounded-3xl bg-white px-4 py-2 shadow-[0_5px_0_var(--c-sol-sombra)] ring-4 ring-[var(--c-sol)] touch-manipulation focus-visible:outline-none focus-visible:ring-[var(--c-foco)]"
+                className="animate-crianca-entrar flex min-h-20 items-center gap-3 rounded-3xl bg-[var(--c-superficie)] px-4 py-2 shadow-[0_5px_0_var(--c-alerta-sombra)] ring-4 ring-[var(--c-alerta)] touch-manipulation focus-visible:outline-none focus-visible:ring-[var(--c-foco)]"
               >
-                <span aria-hidden className="text-5xl leading-none">
-                  {c.emoji || "🏅"}
-                </span>
+                <Icone nome={c.icone} aria-hidden className="size-12 text-[var(--c-alerta)]" strokeWidth={2.25} />
                 <span className="text-xl font-black">{exibir(c.titulo, minusculas)}</span>
               </button>
             </li>
@@ -153,23 +151,19 @@ export function TelaConquista({
       )}
 
       <div className="mt-auto flex flex-wrap items-center justify-center gap-4 pt-2">
-        <BotaoGrande rotulo="Voltar ao mapa" cor="branco" tamanho={96} className="px-8" onClick={() => router.push("/app")}>
-          <span aria-hidden className="text-5xl leading-none">
-            🗺️
-          </span>
+        <BotaoGrande rotulo={COPY.missao.voltar} cor="neutra" tamanho={96} className="px-8" onClick={() => router.push(`/app/planeta/${aula.disciplina}`)}>
+          <ArrowLeft className="size-12" aria-hidden />
         </BotaoGrande>
         {proxima && (
           <BotaoGrande
-            rotulo="Próxima missão"
-            cor="grama"
+            rotulo={COPY.missao.proxima}
+            cor="sucesso"
             tamanho={96}
             destaque
             className="animate-crianca-entrar px-8"
             onClick={() => router.push(`/app/missao/${proxima.id}`)}
           >
-            <span aria-hidden className="text-5xl leading-none">
-              🚀
-            </span>
+            <Rocket className="size-12" aria-hidden />
           </BotaoGrande>
         )}
       </div>

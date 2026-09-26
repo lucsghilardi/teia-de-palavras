@@ -33,6 +33,7 @@ class PerfilController extends Controller
             'apelido' => $crianca->apelido,
             'avatar' => $crianca->avatar ? new OpcaoVisualResource($crianca->avatar) : null,
             'usa_minusculas' => (bool) $crianca->usa_minusculas,
+            'narracao_automatica' => (bool) $crianca->narracao_automatica,
             'turma' => ['id' => $crianca->turma->id, 'nome' => $crianca->turma->nome],
             'estrelas' => (int) $stats->xp_total,
             ...GamificacaoCrianca::resumoNivel((int) $stats->xp_total),

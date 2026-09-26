@@ -53,9 +53,11 @@ it('usa só personagens originais nos textos (sem marcas de terceiros)', functio
     expect($textos)->toContain('{{heroi}}')->toContain('{{fabrica}}');
 });
 
-it('semeia 12 avatares e 9 figuras secretas', function () {
-    expect(OpcaoVisual::avatares()->count())->toBe(12)
-        ->and(OpcaoVisual::figuras()->count())->toBe(9);
+it('oferece 12 avatares espaciais e 9 figuras secretas, todos com ícone e cor', function () {
+    expect(OpcaoVisual::avatares()->ativas()->count())->toBe(12)
+        ->and(OpcaoVisual::avatares()->where('ativa', false)->count())->toBe(12)
+        ->and(OpcaoVisual::figuras()->ativas()->count())->toBe(9)
+        ->and(OpcaoVisual::whereNull('icone')->orWhereNull('cor')->count())->toBe(0);
 });
 
 it('rodar o seed de novo não duplica nem sobrescreve edição do CMS', function () {

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, QrCode } from "lucide-react";
 import { useId, useState } from "react";
 
 import { BarraTopo } from "@/components/crianca/comum/barra-topo";
@@ -23,7 +23,7 @@ export function mensagemTurma(erro: unknown): string {
   }
 
   if (erro instanceof ApiError && erro.status === 429) {
-    return "Muitas tentativas seguidas. Espere um minutinho e tente de novo.";
+    return "Muitas tentativas seguidas. Espere um minuto e tente de novo.";
   }
 
   return "Não consegui falar com a escola agora. Confira a internet e tente de novo.";
@@ -86,9 +86,7 @@ export function CodigoTurma({
       <BarraTopo instrucao={INSTRUCAO} />
 
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-6 px-4 pb-10 text-center">
-        <span aria-hidden className="text-7xl sm:text-8xl">
-          🧑‍🏫
-        </span>
+        <QrCode aria-hidden className="size-24 text-[var(--c-primaria)] sm:size-28" strokeWidth={1.75} />
 
         <h1 className="text-2xl font-extrabold leading-tight sm:text-3xl">
           Peça para um adulto digitar o código da turma
@@ -117,15 +115,15 @@ export function CodigoTurma({
             autoComplete="off"
             spellCheck={false}
             enterKeyHint="go"
-            className="h-24 w-full max-w-sm rounded-3xl border-4 border-[var(--c-borda)] bg-white px-4 text-center font-mono text-5xl font-black tracking-[0.3em] uppercase text-[var(--c-tinta)] placeholder:text-[var(--c-borda)] focus:border-[var(--c-ceu)] focus:outline-none sm:text-6xl"
+            className="h-24 w-full max-w-sm rounded-3xl border-4 border-[var(--c-borda)] bg-[var(--c-superficie)] px-4 text-center font-mono text-5xl font-black tracking-[0.3em] uppercase text-[var(--c-tinta)] placeholder:text-[var(--c-borda)] focus:border-[var(--c-primaria)] focus:outline-none sm:text-6xl"
           />
 
-          <p id={idAjuda} className="text-base font-semibold text-[color-mix(in_srgb,var(--c-tinta)_65%,transparent)]">
+          <p id={idAjuda} className="text-base font-semibold text-[var(--c-tinta-suave)]">
             6 letras e números, como aparece no painel da turma.
           </p>
 
           {erro ? (
-            <p role="alert" className="w-full max-w-sm rounded-2xl bg-[#FFE3D6] px-4 py-3 text-lg font-bold text-[#7A2E12]">
+            <p role="alert" className="w-full max-w-sm rounded-2xl bg-[var(--c-destaque)]/20 px-4 py-3 text-lg font-bold text-[var(--c-tinta)] ring-2 ring-[var(--c-destaque)]">
               {erro}
             </p>
           ) : null}
@@ -133,7 +131,7 @@ export function CodigoTurma({
           <BotaoGrande
             type="submit"
             rotulo="Confirmar código"
-            cor="grama"
+            cor="sucesso"
             redondo={false}
             tamanho={72}
             disabled={enviando}

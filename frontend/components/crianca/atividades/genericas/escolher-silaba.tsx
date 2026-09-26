@@ -7,7 +7,7 @@ import { classeDaOpcao, Enunciado, RodapeItens } from "@/components/crianca/ativ
 import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { useResposta } from "@/components/crianca/atividades/use-resposta";
 import { Peca } from "@/components/crianca/ui/peca";
-import { exibir } from "@/lib/exibir";
+import { exibirPalavra } from "@/lib/exibir";
 import { sons } from "@/lib/sons";
 import { cn } from "@/lib/utils";
 import type { AtividadeEscolherSilaba, ItemSilaba } from "@/types/CriancaApp";
@@ -86,11 +86,11 @@ export function EscolherSilaba({ aula, atividade, minusculas, aoConcluir, defini
                 aria-label={preenchida ? `sílaba ${preenchida}` : "sílaba que falta"}
                 role="img"
                 className={cn(
-                  "flex min-h-28 min-w-28 items-center justify-center rounded-[2rem] border-4 border-dashed border-[var(--c-teia)] bg-white/70 px-5 text-6xl font-black",
-                  preenchida ? "border-solid bg-white text-[var(--c-teia)]" : "text-black/20",
+                  "flex min-h-28 min-w-28 items-center justify-center rounded-[2rem] border-4 border-dashed border-[var(--c-portugues)] bg-[var(--c-superficie)] px-5 text-6xl font-black",
+                  preenchida ? "border-solid text-[var(--c-portugues)]" : "text-white/20",
                 )}
               >
-                {preenchida ? exibir(preenchida, minusculas) : "?"}
+                {preenchida ? exibirPalavra(preenchida, minusculas) : "?"}
               </div>
             ),
           )}

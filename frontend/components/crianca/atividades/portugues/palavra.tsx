@@ -7,7 +7,7 @@ import { Ilustracao } from "@/components/crianca/aula/ilustracao";
 import { narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
 import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
-import { exibir } from "@/lib/exibir";
+import { exibirPalavra } from "@/lib/exibir";
 import { sons } from "@/lib/sons";
 import type { AtividadePalavra } from "@/types/CriancaApp";
 
@@ -37,7 +37,7 @@ export function Palavra({ aula, atividade, minusculas, aoConcluir, definirInstru
           whileTap={reduzido ? undefined : { scale: 0.95 }}
           className="relative aspect-square w-[min(70vw,42vh)] max-w-sm shrink-0 touch-manipulation focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)] landscape:w-[min(40vw,50vh)] rounded-[2rem]"
         >
-          <Ilustracao src={imagem} emoji="🕸️" className="absolute inset-0 shadow-[0_8px_0_var(--c-borda)]" />
+          <Ilustracao src={imagem} icone="type" className="absolute inset-0 shadow-[0_8px_0_var(--c-borda)]" />
         </motion.button>
 
         <motion.button
@@ -45,9 +45,9 @@ export function Palavra({ aula, atividade, minusculas, aoConcluir, definirInstru
           aria-label={`Palavra ${texto}`}
           onClick={ouvir}
           whileTap={reduzido ? undefined : { scale: 0.93 }}
-          className="max-w-full touch-manipulation break-all rounded-[2rem] px-4 text-center font-black leading-none tracking-[0.08em] text-[var(--c-teia)] drop-shadow-[0_6px_0_var(--c-teia-sombra)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)] text-[clamp(4rem,17vw,11rem)] landscape:text-[clamp(4rem,12vw,10rem)]"
+          className="max-w-full touch-manipulation break-all rounded-[2rem] px-4 text-center font-black leading-none tracking-[0.08em] text-[var(--c-portugues)] drop-shadow-[0_0_28px_rgba(167,139,250,0.55)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)] text-[clamp(4rem,17vw,11rem)] landscape:text-[clamp(4rem,12vw,10rem)]"
         >
-          {exibir(texto, minusculas)}
+          {exibirPalavra(texto, minusculas)}
         </motion.button>
       </div>
 

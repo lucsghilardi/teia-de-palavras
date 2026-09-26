@@ -59,6 +59,11 @@ export function CriancaProvider({ children }: { children: React.ReactNode }) {
   return <CriancaContext.Provider value={valor}>{children}</CriancaContext.Provider>;
 }
 
+/** Mesmo contexto, mas sem exigir o provedor (telas de entrada, hooks compartilhados). */
+export function useCriancaOpcional(): Valor | null {
+  return useContext(CriancaContext);
+}
+
 export function useCrianca(): Valor {
   const valor = useContext(CriancaContext);
 

@@ -11,7 +11,7 @@ export function Pontinhos({ total, atual }: { total: number; atual: number }) {
           key={i}
           className={cn(
             "h-3 rounded-full transition-all duration-200",
-            i === atual ? "w-8 bg-[var(--c-teia)]" : i < atual ? "w-3 bg-[var(--c-teia)]/50" : "w-3 bg-black/15",
+            i === atual ? "w-8 bg-[var(--c-teia)]" : i < atual ? "w-3 bg-[var(--c-teia)]/50" : "w-3 bg-white/15",
           )}
         />
       ))}

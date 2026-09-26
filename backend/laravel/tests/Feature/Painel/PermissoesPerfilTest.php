@@ -68,7 +68,7 @@ it('educador não cadastra criança em turma alheia nem move a sua para lá', fu
     $this->comoAdulto($this->ana)->postJson('/api/painel/criancas', [
         'turma_id' => $this->turmaDoBeto->id,
         'apelido' => 'Intrusa',
-        'avatar_chave' => 'panda',
+        'avatar_chave' => 'satelite',
         'figura_secreta_chave' => 'sol',
         'consentimento' => ['aceito' => true, 'versao_texto' => 'v1'],
     ])->assertForbidden();
@@ -76,7 +76,7 @@ it('educador não cadastra criança em turma alheia nem move a sua para lá', fu
     $this->comoAdulto($this->ana)->putJson("/api/painel/criancas/{$this->criancaDaAna->id}", [
         'turma_id' => $this->turmaDoBeto->id,
         'apelido' => $this->criancaDaAna->apelido,
-        'avatar_chave' => 'raposa',
+        'avatar_chave' => 'nave',
     ])->assertForbidden();
 });
 

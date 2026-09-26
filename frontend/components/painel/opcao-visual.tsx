@@ -1,9 +1,10 @@
 "use client";
 
-import type { KeyboardEvent } from "react";
+import { createElement, type KeyboardEvent } from "react";
 import { Check } from "lucide-react";
 
 import { RemoteImage } from "@/components/painel/remote-image";
+import { iconePorNome } from "@/lib/icones";
 import { cn } from "@/lib/utils";
 import type { OpcaoVisual } from "@/types/OpcaoVisual";
 
@@ -16,7 +17,7 @@ type OpcaoVisualIconeProps = {
   decorative?: boolean;
 };
 
-/** Mostra a imagem da opção (se houver) ou o emoji. */
+/** Mostra a imagem da opção (se houver), senão o ícone na cor da opção (emoji como reserva). */
 export function OpcaoVisualIcone({
   opcao,
   className,
@@ -49,18 +50,22 @@ export function OpcaoVisualIcone({
     );
   }
 
+  const temIcone = Boolean(opcao.icone);
+
   return (
     <span
       role={decorative ? undefined : "img"}
       aria-label={decorative ? undefined : opcao.rotulo}
       aria-hidden={decorative ? true : undefined}
+      style={temIcone ? { backgroundColor: opcao.cor ?? undefined } : undefined}
       className={cn(
         "inline-flex shrink-0 items-center justify-center leading-none select-none",
+        temIcone && "rounded-full text-slate-950",
         sizeClassName,
         className,
       )}
     >
-      {opcao.emoji}
+      {temIcone ? createElement(iconePorNome(opcao.icone), { className: "size-[60%]", strokeWidth: 2.25 }) : opcao.emoji}
     </span>
   );
 }

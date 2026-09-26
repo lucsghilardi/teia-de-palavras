@@ -10,6 +10,7 @@ import { Medalhas } from "@/components/crianca/eu/medalhas";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { useCrianca } from "@/context/CriancaContext";
 import { useFalarAoChegar } from "@/hooks/use-falar-ao-chegar";
+import { COPY } from "@/lib/copy";
 import { progressoDoNivel, textoDaSequencia, textoDoNivel } from "@/lib/crianca/nivel";
 import { rotuloRevisao } from "@/lib/crianca/revisao";
 import { exibir } from "@/lib/exibir";
@@ -56,7 +57,7 @@ export function PainelEu() {
     };
   }, [tentativa, recarregar, router]);
 
-  const minusculas = crianca?.usa_minusculas ?? false;
+  const minusculas = crianca?.usa_minusculas ?? true;
   const nivel = crianca?.nivel ?? 1;
   const xpNoNivel = crianca?.xp_no_nivel ?? 0;
   const xpParaProximo = crianca?.xp_para_proximo ?? null;
@@ -73,9 +74,9 @@ export function PainelEu() {
   useFalarAoChegar(instrucao);
 
   return (
-    <main className="flex min-h-dvh flex-col bg-[radial-gradient(circle_at_50%_0%,#F4EEFF_0%,var(--c-fundo)_60%)]">
+    <main className="flex min-h-dvh flex-col">
       <BarraTopo instrucao={instrucao ?? "Este é o seu painel."}>
-        <BotaoGrande rotulo="Voltar ao mapa" cor="branco" tamanho={64} onClick={() => router.push("/app")}>
+        <BotaoGrande rotulo={COPY.planeta.voltar} cor="neutra" tamanho={64} onClick={() => router.push("/app")}>
           <ArrowLeft className="size-9" aria-hidden />
         </BotaoGrande>
         <h1 className="truncate text-2xl font-black sm:text-3xl">{crianca ? exibir(crianca.apelido, minusculas) : " "}</h1>
@@ -84,7 +85,7 @@ export function PainelEu() {
       <div className="flex flex-1 flex-col items-center gap-6 px-4 pt-2 pb-8 sm:px-6">
         <section
           aria-label="Meu nível"
-          className="flex w-full max-w-3xl flex-col items-center gap-5 rounded-[2rem] bg-white/80 p-5 shadow-[0_6px_0_var(--c-borda)] sm:flex-row sm:items-center sm:gap-8"
+          className="flex w-full max-w-3xl flex-col items-center gap-5 rounded-[2rem] bg-[var(--c-superficie)] p-5 shadow-[0_6px_0_var(--c-borda)] sm:flex-row sm:items-center sm:gap-8"
         >
           <AnelNivel nivel={nivel} progresso={progressoDoNivel(xpNoNivel, xpParaProximo)} avatar={crianca?.avatar} />
 
@@ -117,12 +118,12 @@ export function PainelEu() {
             <BotaoGrande
               rotulo={falaSequencia}
               falaAoTocar={falaSequencia}
-              cor="branco"
+              cor="neutra"
               redondo={false}
               tamanho={80}
               className="w-full justify-start gap-4 px-5 text-2xl"
             >
-              <Flame className={sequencia > 0 ? "size-11 fill-[var(--c-foco)] text-[var(--c-foco)]" : "size-11 text-[var(--c-tinta)]/40"} aria-hidden />
+              <Flame className={sequencia > 0 ? "size-11 fill-[var(--c-destaque)] text-[var(--c-destaque)]" : "size-11 text-[var(--c-tinta)]/40"} aria-hidden />
               <span aria-hidden className="flex flex-col items-start leading-tight">
                 <span className="text-3xl tabular-nums">{sequencia}</span>
                 <span className="text-base font-bold opacity-70">{exibir(sequencia === 1 ? "dia seguido" : "dias seguidos", minusculas)}</span>
@@ -133,7 +134,7 @@ export function PainelEu() {
             <BotaoGrande
               rotulo={`${crianca?.xp ?? 0} pontos`}
               falaAoTocar={`Você tem ${crianca?.xp ?? 0} pontos.`}
-              cor="branco"
+              cor="neutra"
               redondo={false}
               tamanho={80}
               className="w-full justify-start gap-4 px-5 text-2xl"
@@ -148,7 +149,7 @@ export function PainelEu() {
           <li className="flex">
             <BotaoGrande
               rotulo={rotuloRevisao(devidos)}
-              cor={devidos > 0 ? "grama" : "branco"}
+              cor={devidos > 0 ? "sucesso" : "neutra"}
               redondo={false}
               tamanho={80}
               destaque={devidos > 0}
@@ -167,7 +168,7 @@ export function PainelEu() {
         {erro ? (
           <BotaoGrande
             rotulo="Tentar de novo"
-            cor="ceu"
+            cor="primaria"
             tamanho={96}
             destaque
             onClick={() => {

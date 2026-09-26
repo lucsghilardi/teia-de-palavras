@@ -16,6 +16,8 @@ class OpcaoVisualResource extends JsonResource
             'chave' => $this->chave,
             'rotulo' => $this->rotulo,
             'emoji' => $this->emoji,
+            'icone' => $this->icone,
+            'cor' => $this->cor,
             'imagem_url' => Midia::url($this->imagem_path),
         ];
     }

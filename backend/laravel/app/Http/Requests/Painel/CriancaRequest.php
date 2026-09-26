@@ -39,6 +39,7 @@ class CriancaRequest extends FormRequest
             ],
             'avatar_chave' => ['required', 'string', Rule::exists('opcoes_visuais', 'chave')->where('tipo', OpcaoVisual::TIPO_AVATAR)->where('ativa', true)],
             'usa_minusculas' => ['sometimes', 'boolean'],
+            'narracao_automatica' => ['sometimes', 'boolean'],
             'figura_secreta_chave' => $criando
                 ? ['required', 'string', Rule::exists('opcoes_visuais', 'chave')->where('tipo', OpcaoVisual::TIPO_FIGURA)->where('ativa', true)]
                 : ['prohibited'],

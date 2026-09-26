@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Crianca\AtividadeController;
 use App\Http\Controllers\Api\Crianca\AudioController;
 use App\Http\Controllers\Api\Crianca\AulaController;
 use App\Http\Controllers\Api\Crianca\EntradaController;
+use App\Http\Controllers\Api\Crianca\GalaxiaController;
 use App\Http\Controllers\Api\Crianca\MapaController;
 use App\Http\Controllers\Api\Crianca\MedalhaController;
 use App\Http\Controllers\Api\Crianca\PerfilController;
@@ -24,6 +25,7 @@ Route::prefix('crianca')->group(function () {
         Route::post('/sair', [EntradaController::class, 'sair']);
         Route::post('/sessao/pulso', [PerfilController::class, 'pulso']);
 
+        Route::get('/galaxia', GalaxiaController::class);
         Route::get('/mapa', MapaController::class);
         Route::get('/teia', TeiaController::class);
         Route::get('/medalhas', MedalhaController::class);

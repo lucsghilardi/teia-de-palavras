@@ -1,7 +1,8 @@
 "use client";
 
+import { ArrowLeft, CloudOff, Lock, Orbit, RefreshCw, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { createElement, useCallback, useEffect, useReducer, useRef, useState } from "react";
 
 import { AtividadeAtual } from "@/components/crianca/atividades/registro";
 import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
@@ -13,6 +14,7 @@ import { useWakeLock } from "@/components/crianca/aula/use-wake-lock";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { BotaoOuvir } from "@/components/crianca/ui/botao-ouvir";
 import { useCrianca } from "@/context/CriancaContext";
+import { COPY } from "@/lib/copy";
 import { atividadeVisivel, ehConquista, estadoInicial, motorAula, totalEtapas } from "@/lib/aula/motor";
 import { criarSincronizador, type Sincronizador } from "@/lib/aula/sincronia";
 import { parar } from "@/lib/fala";
@@ -25,18 +27,18 @@ import {
 } from "@/services/crianca";
 import type { Conquista, ResultadoConclusao } from "@/types/CriancaApp";
 
-const FALA_TRANCADA = "Essa missão ainda está trancada";
-const FALA_FALHA = "Não consegui abrir a missão. Vamos tentar de novo?";
+const FALA_TRANCADA = COPY.missao.trancada;
+const FALA_FALHA = COPY.missao.falha;
 
-/** Tela simples de espera/aviso, sempre com saída para o mapa. */
+/** Tela simples de espera/aviso, sempre com saída para a Galáxia. */
 function TelaAviso({
-  emoji,
+  icone,
   fala,
   falarNaChegada = true,
   pulsar = false,
   aoTentarDeNovo,
 }: {
-  emoji: string;
+  icone: LucideIcon;
   /** O que o alto-falante repete (null = sem alto-falante, ex.: carregando). */
   fala: string | null;
   /** false quando quem abriu a tela já está falando (ex.: missão trancada). */
@@ -53,10 +55,8 @@ function TelaAviso({
   return (
     <div className="flex h-dvh flex-col">
       <header className="flex items-center justify-between gap-3 px-3 pt-3 sm:px-5">
-        <BotaoGrande rotulo="Voltar ao mapa" cor="branco" tamanho={64} onClick={() => router.push("/app")}>
-          <span aria-hidden className="text-3xl leading-none">
-            🗺️
-          </span>
+        <BotaoGrande rotulo={COPY.planeta.voltar} cor="neutra" tamanho={64} onClick={() => router.push("/app")}>
+          <ArrowLeft className="size-9" aria-hidden />
         </BotaoGrande>
         {fala && (
           <div onClickCapture={cancelarNarracao}>
@@ -69,14 +69,14 @@ function TelaAviso({
         aria-label={fala ? undefined : "Carregando"}
         className="flex flex-1 flex-col items-center justify-center gap-8 px-4"
       >
-        <span aria-hidden className={pulsar ? "animate-crianca-pulso text-8xl" : "text-8xl"}>
-          {emoji}
-        </span>
+        {createElement(icone, {
+          "aria-hidden": true,
+          strokeWidth: 1.75,
+          className: pulsar ? "size-24 animate-crianca-pulso text-[var(--c-primaria)]" : "size-24 text-[var(--c-borda)]",
+        })}
         {aoTentarDeNovo && (
-          <BotaoGrande rotulo="Tentar de novo" cor="ceu" tamanho={96} destaque onClick={aoTentarDeNovo}>
-            <span aria-hidden className="text-5xl leading-none">
-              🔄
-            </span>
+          <BotaoGrande rotulo={COPY.comum.tentarDeNovo} cor="primaria" tamanho={96} destaque onClick={aoTentarDeNovo}>
+            <RefreshCw className="size-12" aria-hidden />
           </BotaoGrande>
         )}
       </main>
@@ -221,13 +221,13 @@ export function PlayerAula({ id }: { id: number }) {
   }, [id, total, atualizar, recarregar, router]);
 
   if (falha === "trancada") {
-    return <TelaAviso emoji="🔒" fala={FALA_TRANCADA} falarNaChegada={false} />;
+    return <TelaAviso icone={Lock} fala={FALA_TRANCADA} falarNaChegada={false} />;
   }
 
   if (falha === "rede") {
     return (
       <TelaAviso
-        emoji="🌧️"
+        icone={CloudOff}
         fala={FALA_FALHA}
         aoTentarDeNovo={() => {
           setFalha(null);
@@ -238,11 +238,11 @@ export function PlayerAula({ id }: { id: number }) {
   }
 
   if (!estado.aula) {
-    return <TelaAviso emoji="🕸️" fala={null} pulsar />;
+    return <TelaAviso icone={Orbit} fala={null} pulsar />;
   }
 
   const aula = estado.aula;
-  const minusculas = crianca?.usa_minusculas ?? false;
+  const minusculas = crianca?.usa_minusculas ?? true;
   const atividade = atividadeVisivel(estado);
   const conquista = ehConquista(estado);
   const props: Omit<PropsAtividade, "atividade"> = {
@@ -257,6 +257,7 @@ export function PlayerAula({ id }: { id: number }) {
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
       <BarraAula
+        disciplina={aula.disciplina}
         atividades={aula.atividades}
         etapaAtual={estado.etapaAtual}
         etapaVisivel={etapaVisivel}

@@ -25,8 +25,12 @@ subir o projeto e o plano de fases.
 - Reverb: canais em `routes/channels.php` SEMPRE com `['guards' => ['api', 'crianca']]`; rota de auth em `/api/broadcasting/auth`.
 - Next 16 em `frontend`: o navegador nunca vê o JWT; ele fica em cookie httpOnly (`teia_sessao`) e o proxy
   `app/api/proxy/[...path]` injeta o Bearer e renova no 401. `apiFetch` em `services/api.ts`.
-- Painel do educador em `app/(painel)/painel/*` (shadcn). App da criança em `app/(crianca)/app/*`
-  (botões ≥ 64px, caixa alta na Fase 1, áudio em todo toque, prefers-reduced-motion).
+- Painel do educador em `app/(painel)/painel/*` (shadcn). App da criança em `app/(crianca)/app/*`:
+  tema Espaço (tokens em `globals.css` `.tema-crianca`, fonte Lexend, ícones lucide via `lib/icones.ts`,
+  NUNCA emoji na tela), Galáxia (`GET /crianca/galaxia`) → planeta (`/app/planeta/{disciplina}`) → missão.
+  Botões ≥ 64px, áudio em todo toque, prefers-reduced-motion. `usa_minusculas` = "texto como escrito"
+  (padrão true; `lib/exibir.ts`: `exibir` para frases, `exibirPalavra` para peças/palavras);
+  `narracao_automatica` por criança (`useFalarAoChegar`/`useNarracaoDeChegada` respeitam).
 
 ## Comandos
 - Testes backend: `docker compose exec backend php artisan test` (Pest, PostgreSQL `teia_test`).

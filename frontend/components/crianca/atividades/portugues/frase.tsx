@@ -1,6 +1,6 @@
 "use client";
 
-import { Eraser, Send, Volume2 } from "lucide-react";
+import { Eraser, Network, Pencil, Send, Star, Volume2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
@@ -13,7 +13,7 @@ import { useCrianca } from "@/context/CriancaContext";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
 import { adicionar, BANDEJA_VAZIA, cheia, limpar, remover, texto, vazia, type Bandeja } from "@/lib/aula/bandeja";
 import { palavrasDaProducao } from "@/lib/aula/conteudo";
-import { exibir } from "@/lib/exibir";
+import { exibirPalavra } from "@/lib/exibir";
 import { sons } from "@/lib/sons";
 import { cn } from "@/lib/utils";
 import { ApiError } from "@/services/apiError";
@@ -23,7 +23,7 @@ import type { AtividadeFrase } from "@/types/CriancaApp";
 const MAX_FRASE = 8;
 
 const INSTRUCAO = {
-  texto: "Toque nas palavras para montar uma frase sobre a missão. Depois, toque no aviãozinho para enviar.",
+  texto: "Toque nas palavras para montar uma frase sobre a missão. Depois, toque no botão de enviar.",
 };
 
 const CHIP =
@@ -130,12 +130,12 @@ export function Frase({ aula, atividade, minusculas, aoConcluir, definirInstruca
         className={cn(
           CHIP,
           p.palavrinha
-            ? "bg-white text-2xl shadow-[0_4px_0_var(--c-borda)]"
-            : "bg-[var(--c-teia)] text-3xl text-white shadow-[0_5px_0_var(--c-teia-sombra)]",
+            ? "bg-[var(--c-superficie)] text-2xl shadow-[0_4px_0_var(--c-borda)]"
+            : "bg-[var(--c-portugues)] text-3xl text-[var(--c-fundo)] shadow-[0_5px_0_var(--c-teia-sombra)]",
         )}
       >
-        {!p.palavrinha && <span aria-hidden>🕸️</span>}
-        {exibir(p.palavra, minusculas)}
+        {!p.palavrinha && <Network aria-hidden className="size-6" strokeWidth={2.5} />}
+        {exibirPalavra(p.palavra, minusculas)}
       </button>
     </li>
   );
@@ -146,12 +146,10 @@ export function Frase({ aula, atividade, minusculas, aoConcluir, definirInstruca
       <div
         role="group"
         aria-label="Minha frase"
-        className="flex min-h-24 flex-wrap items-center justify-center gap-2 rounded-[2rem] border-4 border-dashed border-[var(--c-borda)] bg-white/85 p-3"
+        className="flex min-h-24 flex-wrap items-center justify-center gap-2 rounded-[2rem] border-4 border-dashed border-[var(--c-borda)] bg-[var(--c-superficie)] p-3"
       >
         {frase.length === 0 ? (
-          <span aria-hidden className="text-5xl opacity-40">
-            ✏️
-          </span>
+          <Pencil aria-hidden className="size-12 opacity-40" />
         ) : (
           frase.map((palavra, i) => (
             <button
@@ -159,24 +157,24 @@ export function Frase({ aula, atividade, minusculas, aoConcluir, definirInstruca
               type="button"
               aria-label={`Tirar ${palavra}`}
               onClick={() => tirar(i)}
-              className={cn(CHIP, "animate-crianca-entrar bg-[var(--c-sol)] text-3xl shadow-[0_5px_0_var(--c-sol-sombra)]")}
+              className={cn(CHIP, "animate-crianca-entrar bg-[var(--c-alerta)] text-3xl text-[var(--c-fundo)] shadow-[0_5px_0_var(--c-alerta-sombra)]")}
             >
-              {exibir(palavra, minusculas)}
+              {exibirPalavra(palavra, minusculas)}
             </button>
           ))
         )}
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-        <BotaoGrande rotulo="Apagar" cor="branco" tamanho={80} onClick={apagar}>
+        <BotaoGrande rotulo="Apagar" cor="neutra" tamanho={80} onClick={apagar}>
           <Eraser className="size-9" strokeWidth={2.5} aria-hidden />
         </BotaoGrande>
-        <BotaoGrande rotulo="Ouvir minha frase" cor="ceu" tamanho={80} onClick={ouvirFrase}>
+        <BotaoGrande rotulo="Ouvir minha frase" cor="primaria" tamanho={80} onClick={ouvirFrase}>
           <Volume2 className="size-9" strokeWidth={2.5} aria-hidden />
         </BotaoGrande>
         <BotaoGrande
           rotulo="Enviar frase"
-          cor="grama"
+          cor="sucesso"
           tamanho={96}
           disabled={frase.length < MIN_FRASE}
           destaque={frase.length >= MIN_FRASE && !enviada && !enviando}
@@ -188,9 +186,9 @@ export function Frase({ aula, atividade, minusculas, aoConcluir, definirInstruca
       </div>
 
       {enviada && (
-        <p className="animate-crianca-entrar mx-auto flex max-w-full items-center gap-3 rounded-[2rem] bg-white px-5 py-3 text-center text-3xl font-black shadow-[0_6px_0_var(--c-grama-sombra)] ring-4 ring-[var(--c-grama)]">
-          <span aria-hidden>⭐</span>
-          <span className="break-words">{exibir(enviada, minusculas)}</span>
+        <p className="animate-crianca-entrar mx-auto flex max-w-full items-center gap-3 rounded-[2rem] bg-[var(--c-superficie)] px-5 py-3 text-center text-3xl font-black shadow-[0_6px_0_var(--c-sucesso-sombra)] ring-4 ring-[var(--c-sucesso)]">
+          <Star aria-hidden className="size-8 shrink-0 fill-[var(--c-alerta)] text-[var(--c-alerta)]" />
+          <span className="break-words">{exibirPalavra(enviada, minusculas)}</span>
         </p>
       )}
 

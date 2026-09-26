@@ -24,7 +24,7 @@ function Icones({ item }: { item: ItemFato }) {
 
   return (
     <div role="img" aria-label={falarFato(item)} className="flex flex-wrap items-center justify-center gap-3">
-      <div className="flex max-w-xs flex-wrap justify-center gap-1 rounded-2xl bg-white/80 p-2 shadow-[0_4px_0_var(--c-borda)]">
+      <div className="flex max-w-xs flex-wrap justify-center gap-1 rounded-2xl bg-[var(--c-superficie)]/80 p-2 shadow-[0_4px_0_var(--c-borda)]">
         {Array.from({ length: item.a }, (_, i) => (
           <Icone
             key={i}
@@ -39,7 +39,7 @@ function Icones({ item }: { item: ItemFato }) {
           <span aria-hidden className="text-4xl font-black">
             +
           </span>
-          <div className="flex max-w-xs flex-wrap justify-center gap-1 rounded-2xl bg-white/80 p-2 shadow-[0_4px_0_var(--c-borda)]">
+          <div className="flex max-w-xs flex-wrap justify-center gap-1 rounded-2xl bg-[var(--c-superficie)]/80 p-2 shadow-[0_4px_0_var(--c-borda)]">
             {Array.from({ length: item.b }, (_, i) => (
               <Icone key={i} nome="moon" aria-hidden className="size-7 text-[var(--c-sol-sombra)] sm:size-8" />
             ))}
@@ -56,7 +56,7 @@ function Reta({ item }: { item: ItemFato }) {
   const numeros = Array.from({ length: maximo + 1 }, (_, i) => i);
 
   return (
-    <div role="img" aria-label={`reta numérica de 0 a ${maximo}, começando no ${item.a}`} className="w-full max-w-3xl overflow-x-auto rounded-2xl bg-white/80 p-3 shadow-[0_4px_0_var(--c-borda)]">
+    <div role="img" aria-label={`reta numérica de 0 a ${maximo}, começando no ${item.a}`} className="w-full max-w-3xl overflow-x-auto rounded-2xl bg-[var(--c-superficie)]/80 p-3 shadow-[0_4px_0_var(--c-borda)]">
       <ol className="flex min-w-max items-end gap-1">
         {numeros.map((n) => (
           <li
@@ -67,7 +67,7 @@ function Reta({ item }: { item: ItemFato }) {
               n % 10 === 0 && "font-black",
             )}
           >
-            <span aria-hidden className={cn("h-3 w-1 rounded-full bg-black/20", n % 5 === 0 && "h-5", n === item.a && "bg-[var(--c-teia)]")} />
+            <span aria-hidden className={cn("h-3 w-1 rounded-full bg-white/20", n % 5 === 0 && "h-5", n === item.a && "bg-[var(--c-teia)]")} />
             <span>{n}</span>
           </li>
         ))}
@@ -129,7 +129,7 @@ export function SomarSubtrair({ aula, atividade, aoConcluir, definirInstrucao, m
             sons.toque();
             void narrar(`quanto é ${falarFato(item)}?`);
           }}
-          className="rounded-[2rem] bg-white px-8 py-4 text-[clamp(3rem,10vw,5rem)] font-black tabular-nums tracking-wider shadow-[0_6px_0_var(--c-borda)] touch-manipulation focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]"
+          className="rounded-[2rem] bg-[var(--c-superficie)] px-8 py-4 text-[clamp(3rem,10vw,5rem)] font-black tabular-nums tracking-wider shadow-[0_6px_0_var(--c-borda)] touch-manipulation focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]"
         >
           {item.a} {item.operacao === "+" ? "+" : "−"} {item.b} = {resolvido && certo !== null && certo !== undefined ? certo : "?"}
         </button>
@@ -142,7 +142,7 @@ export function SomarSubtrair({ aula, atividade, aoConcluir, definirInstrucao, m
             <li key={valor}>
               <BotaoGrande
                 rotulo={String(valor)}
-                cor="branco"
+                cor="neutra"
                 tamanho={88}
                 disabled={resolvido || enviando}
                 data-opcao={valor}

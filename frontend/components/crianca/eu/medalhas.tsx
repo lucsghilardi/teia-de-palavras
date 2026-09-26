@@ -43,13 +43,13 @@ export function Medalhas({ dados, minusculas }: { dados: DadosMedalhas | null; m
                   void narrar(`${m.titulo}. ${m.descricao}${ganha ? "" : " Ainda por ganhar."}`);
                 }}
                 className={cn(
-                  "flex min-h-28 w-full flex-col items-center justify-center gap-2 rounded-3xl bg-white px-3 py-3 shadow-[0_5px_0_var(--c-borda)] touch-manipulation",
+                  "flex min-h-28 w-full flex-col items-center justify-center gap-2 rounded-3xl bg-[var(--c-superficie)] px-3 py-3 shadow-[0_5px_0_var(--c-borda)] touch-manipulation",
                   "transition-transform duration-100 active:translate-y-1 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]",
-                  ganha ? "ring-4 ring-[var(--c-sol)]" : "opacity-55",
+                  ganha ? "ring-4 ring-[var(--c-alerta)]" : "opacity-55",
                 )}
               >
                 <span className="relative">
-                  <Icone nome={m.icone} aria-hidden className={cn("size-12", ganha ? "text-[var(--c-teia)]" : "text-[var(--c-tinta)]/60")} strokeWidth={2.25} />
+                  <Icone nome={m.icone} aria-hidden className={cn("size-12", ganha ? "text-[var(--c-alerta)]" : "text-[var(--c-tinta)]/60")} strokeWidth={2.25} />
                   {!ganha ? <Lock className="absolute -right-3 -bottom-2 size-6 text-[var(--c-tinta)]/70" aria-hidden /> : null}
                 </span>
                 <span className="text-center text-lg leading-tight font-black">{exibir(m.titulo, minusculas)}</span>

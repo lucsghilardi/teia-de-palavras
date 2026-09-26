@@ -8,7 +8,7 @@ use Database\Seeders\OpcoesVisuaisSeeder;
 beforeEach(function () {
     $this->seed(OpcoesVisuaisSeeder::class);
     $this->turma = Turma::factory()->create(['codigo' => 'ABC234']);
-    $this->crianca = Crianca::factory()->for($this->turma)->create(['apelido' => 'Gugu', 'avatar_chave' => 'tigre']);
+    $this->crianca = Crianca::factory()->for($this->turma)->create(['apelido' => 'Gugu', 'avatar_chave' => 'robo']);
 });
 
 function entrarComo(Crianca $crianca, string $figura, string $codigo = 'ABC234')
@@ -27,7 +27,7 @@ it('mostra as crianças e as 9 figuras da turma pelo código', function () {
         ->assertOk()
         ->assertJsonPath('turma.codigo', 'ABC234')
         ->assertJsonPath('criancas.0.apelido', 'Ana')
-        ->assertJsonPath('criancas.1.avatar.emoji', '🐯')
+        ->assertJsonPath('criancas.1.avatar.icone', 'bot')
         ->assertJsonCount(9, 'figuras')
         ->assertJsonMissingPath('criancas.0.figura_secreta_hash');
 });
@@ -49,7 +49,7 @@ it('entra com a figura secreta certa e recebe token de 8 horas', function () {
         ->getJson('/api/crianca/eu')
         ->assertOk()
         ->assertJsonPath('apelido', 'Gugu')
-        ->assertJsonPath('avatar.chave', 'tigre')
+        ->assertJsonPath('avatar.chave', 'robo')
         ->assertJsonPath('estrelas', 0)
         ->assertJsonPath('config.minutos_pausa', 20);
 });

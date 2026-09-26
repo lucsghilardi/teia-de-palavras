@@ -21,7 +21,7 @@ class PrepararE2e extends Command
 
     public const APELIDO = 'Teste';
 
-    public const AVATAR = 'coruja';
+    public const AVATAR = 'nave';
 
     public const FIGURA = 'estrela';
 
@@ -63,7 +63,7 @@ class PrepararE2e extends Command
                 'responsavel_user_id' => $educador->id,
                 'apelido' => self::APELIDO,
                 'avatar_chave' => self::AVATAR,
-                'usa_minusculas' => false,
+                'usa_minusculas' => true,
             ]);
             $crianca->definirFiguraSecreta(self::FIGURA);
             $crianca->save();

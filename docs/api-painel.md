@@ -10,7 +10,7 @@ edita. `/painel/users` continua só admin.
 
 ## Opções visuais (avatares e figuras secretas)
 - `GET /painel/opcoes-visuais` → `{ avatares: OpcaoVisual[], figuras: OpcaoVisual[] }`
-  - `OpcaoVisual = { chave, rotulo, emoji, imagem_url|null }` (só ativas, na ordem)
+  - `OpcaoVisual = { chave, rotulo, emoji, icone|null, cor|null, imagem_url|null }` (só ativas, na ordem; avatares são a tripulação espacial, os bichinhos antigos ficam inativos)
 
 ## Turmas
 - `GET /painel/turmas` → `Turma[]`
@@ -20,23 +20,23 @@ edita. `/painel/users` continua só admin.
 - `POST /painel/turmas/{id}/novo-codigo` → `Turma` (gera outro código de 6 caracteres)
 - `DELETE /painel/turmas/{id}` → 204 (só sem crianças; senão 422)
 - `Turma = { id, nome, codigo, ativa, educador: {id, name}, total_criancas, created_at }`
-- `CriancaResumo = { id, apelido, avatar: OpcaoVisual, usa_minusculas }`
+- `CriancaResumo = { id, apelido, avatar: OpcaoVisual, usa_minusculas, narracao_automatica }`
 
 ## Crianças
 - `GET /painel/criancas?turma_id=` → `Crianca[]`
 - `POST /painel/criancas` → 201 `Crianca`
   ```
-  { turma_id, apelido, avatar_chave, figura_secreta_chave, usa_minusculas?,
+  { turma_id, apelido, avatar_chave, figura_secreta_chave, usa_minusculas?, narracao_automatica?,
     consentimento: { aceito: true, versao_texto: "v1" } }
   ```
   - `consentimento.aceito` obrigatório e `true`; grava `consentimentos` com o user logado e o IP.
   - `apelido` único na turma (2–40 chars). Nenhum outro dado pessoal é aceito.
 - `GET /painel/criancas/{id}` → `Crianca`
-- `PUT /painel/criancas/{id}` `{apelido, avatar_chave, usa_minusculas, turma_id}` → `Crianca`
+- `PUT /painel/criancas/{id}` `{apelido, avatar_chave, usa_minusculas, narracao_automatica, turma_id}` → `Crianca`
 - `POST /painel/criancas/{id}/figura-secreta` `{figura_secreta_chave}` → `Crianca` (redefine e desbloqueia)
 - `POST /painel/criancas/{id}/solicitar-exclusao` → `Crianca` (marca `exclusao_solicitada_em`)
 - `DELETE /painel/criancas/{id}` → 204 (soft delete; áudios são apagados por job — Fase 4)
-- `Crianca = { id, apelido, avatar: OpcaoVisual, usa_minusculas, turma: {id, nome, codigo},
+- `Crianca = { id, apelido, avatar: OpcaoVisual, usa_minusculas, narracao_automatica, turma: {id, nome, codigo},
     responsavel: {id, name}, bloqueada_ate|null, exclusao_solicitada_em|null,
     consentimento: {versao_texto, aceito_em}|null, created_at }`
 

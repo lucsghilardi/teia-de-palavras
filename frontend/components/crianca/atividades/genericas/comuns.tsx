@@ -13,7 +13,7 @@ export function Enunciado({ texto, icone, className }: { texto: string; icone?: 
   return (
     <div
       className={cn(
-        "flex w-full max-w-3xl items-center gap-4 rounded-[2rem] bg-white px-5 py-4 shadow-[0_6px_0_var(--c-borda)]",
+        "flex w-full max-w-3xl items-center gap-4 rounded-[2rem] bg-[var(--c-superficie)] px-5 py-4 shadow-[0_6px_0_var(--c-borda)]",
         className,
       )}
     >
@@ -51,7 +51,7 @@ export function RodapeItens({
         ultimo ? (
           <BotaoContinuar destaque onClick={aoConcluir} className="animate-crianca-entrar" />
         ) : (
-          <BotaoGrande rotulo="Próximo" cor="ceu" tamanho={88} destaque className="animate-crianca-entrar px-8" onClick={aoProximo}>
+          <BotaoGrande rotulo="Próximo" cor="primaria" tamanho={88} destaque className="animate-crianca-entrar px-8" onClick={aoProximo}>
             <ArrowRight className="size-11" strokeWidth={3} aria-hidden />
           </BotaoGrande>
         )
@@ -66,7 +66,7 @@ export function RodapeItens({
 export function classeDaOpcao(estado: "certa" | "nao" | "neutra" | "apagada"): string {
   switch (estado) {
     case "certa":
-      return "ring-4 ring-[var(--c-grama)] bg-white";
+      return "ring-4 ring-[var(--c-grama)] bg-[var(--c-superficie)]";
     case "nao":
       return "opacity-45";
     case "apagada":

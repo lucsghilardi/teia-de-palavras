@@ -98,6 +98,7 @@ type FormCadastro = {
   avatar_chave: string | null;
   figura_secreta_chave: string | null;
   usa_minusculas: boolean;
+  narracao_automatica: boolean;
   consentimento: boolean;
 };
 
@@ -106,6 +107,7 @@ type FormEdicao = {
   apelido: string;
   avatar_chave: string | null;
   usa_minusculas: boolean;
+  narracao_automatica: boolean;
 };
 
 const formCadastroVazio: FormCadastro = {
@@ -113,7 +115,8 @@ const formCadastroVazio: FormCadastro = {
   apelido: "",
   avatar_chave: null,
   figura_secreta_chave: null,
-  usa_minusculas: false,
+  usa_minusculas: true,
+  narracao_automatica: true,
   consentimento: false,
 };
 
@@ -328,6 +331,7 @@ function CriancasConteudo() {
         avatar_chave: formCadastro.avatar_chave,
         figura_secreta_chave: formCadastro.figura_secreta_chave,
         usa_minusculas: formCadastro.usa_minusculas,
+        narracao_automatica: formCadastro.narracao_automatica,
         consentimento: {
           aceito: true,
           versao_texto: configuracoes.consentimento_versao,
@@ -360,6 +364,7 @@ function CriancasConteudo() {
       apelido: crianca.apelido,
       avatar_chave: crianca.avatar?.chave ?? null,
       usa_minusculas: crianca.usa_minusculas,
+      narracao_automatica: crianca.narracao_automatica,
     });
     setErroEdicao(null);
   }
@@ -391,6 +396,7 @@ function CriancasConteudo() {
         apelido: formEdicao.apelido.trim(),
         avatar_chave: formEdicao.avatar_chave,
         usa_minusculas: formEdicao.usa_minusculas,
+        narracao_automatica: formEdicao.narracao_automatica,
         turma_id: Number(formEdicao.turma_id),
       });
 
@@ -603,9 +609,8 @@ function CriancasConteudo() {
                                 <div className="min-w-0">
                                   <p className="font-semibold break-words">{crianca.apelido}</p>
                                   <p className="text-xs text-muted-foreground">
-                                    {crianca.usa_minusculas
-                                      ? "Letras maiúsculas e minúsculas"
-                                      : "Só letras maiúsculas"}
+                                    {crianca.usa_minusculas ? "Texto como escrito" : "Só letras maiúsculas"}
+                                    {crianca.narracao_automatica ? "" : " · narração só no alto-falante"}
                                   </p>
                                 </div>
                               </div>
@@ -821,9 +826,26 @@ function CriancasConteudo() {
                     disabled={cadastrando}
                   />
                   <FieldContent>
-                    <FieldLabel htmlFor="cadastro-minusculas">Usar letras minúsculas</FieldLabel>
+                    <FieldLabel htmlFor="cadastro-minusculas">Texto como escrito</FieldLabel>
                     <FieldDescription>
-                      Desligado, o app mostra só letras maiúsculas (Fase 1).
+                      Frases em caso natural e peças em minúsculas. Desligado, o app mostra tudo em letras maiúsculas (leitores iniciantes).
+                    </FieldDescription>
+                  </FieldContent>
+                </Field>
+
+                <Field orientation="horizontal">
+                  <Switch
+                    id="cadastro-narracao"
+                    checked={formCadastro.narracao_automatica}
+                    onCheckedChange={(checked) =>
+                      setFormCadastro((atual) => ({ ...atual, narracao_automatica: checked }))
+                    }
+                    disabled={cadastrando}
+                  />
+                  <FieldContent>
+                    <FieldLabel htmlFor="cadastro-narracao">Narração automática</FieldLabel>
+                    <FieldDescription>
+                      Lê a história e a instrução ao chegar em cada tela. Desligada, a criança toca no alto-falante quando quiser ouvir.
                     </FieldDescription>
                   </FieldContent>
                 </Field>
@@ -990,9 +1012,28 @@ function CriancasConteudo() {
                       disabled={salvandoEdicao}
                     />
                     <FieldContent>
-                      <FieldLabel htmlFor="edicao-minusculas">Usar letras minúsculas</FieldLabel>
+                      <FieldLabel htmlFor="edicao-minusculas">Texto como escrito</FieldLabel>
                       <FieldDescription>
-                        Desligado, o app mostra só letras maiúsculas.
+                        Frases em caso natural e peças em minúsculas. Desligado, tudo em letras maiúsculas.
+                      </FieldDescription>
+                    </FieldContent>
+                  </Field>
+
+                  <Field orientation="horizontal">
+                    <Switch
+                      id="edicao-narracao"
+                      checked={formEdicao.narracao_automatica}
+                      onCheckedChange={(checked) =>
+                        setFormEdicao((atual) =>
+                          atual ? { ...atual, narracao_automatica: checked } : atual,
+                        )
+                      }
+                      disabled={salvandoEdicao}
+                    />
+                    <FieldContent>
+                      <FieldLabel htmlFor="edicao-narracao">Narração automática</FieldLabel>
+                      <FieldDescription>
+                        Lê a história e a instrução ao chegar em cada tela.
                       </FieldDescription>
                     </FieldContent>
                   </Field>

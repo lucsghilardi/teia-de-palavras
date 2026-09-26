@@ -2,7 +2,7 @@
 
 import { forwardRef } from "react";
 
-import { exibir } from "@/lib/exibir";
+import { exibirPalavra } from "@/lib/exibir";
 import { cn } from "@/lib/utils";
 
 /** Paleta das peças: a mesma sílaba sempre com a mesma cor no app inteiro. */
@@ -42,7 +42,7 @@ const TAMANHOS = {
 
 /** Peça de sílaba (ficha de descoberta, bandeja da criação, palmas). */
 export const Peca = forwardRef<HTMLButtonElement, Props>(function Peca(
-  { texto, minusculas = false, rotulo, tamanho = "lg", ativa = false, className, ...resto },
+  { texto, minusculas = true, rotulo, tamanho = "lg", ativa = false, className, ...resto },
   ref,
 ) {
   return (
@@ -57,12 +57,12 @@ export const Peca = forwardRef<HTMLButtonElement, Props>(function Peca(
         "disabled:opacity-40 [-webkit-touch-callout:none] touch-manipulation",
         TAMANHOS[tamanho],
         corDaPeca(texto),
-        ativa && "ring-4 ring-[var(--c-teia)] ring-offset-2",
+        ativa && "ring-4 ring-[var(--c-primaria)] ring-offset-2 ring-offset-[var(--c-fundo)]",
         className,
       )}
       {...resto}
     >
-      {exibir(texto, minusculas)}
+      {exibirPalavra(texto, minusculas)}
     </button>
   );
 });

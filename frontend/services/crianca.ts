@@ -4,6 +4,7 @@ import { ApiError, UnauthorizedError, type ApiErrorBody } from "./apiError";
 import type {
   AulaCrianca,
   Eu,
+  Galaxia,
   Medalhas,
   Missao,
   Pulso,
@@ -89,6 +90,7 @@ export async function sair() {
 
 export const buscarEu = () => criancaFetch<Eu>("/eu");
 export const pulso = () => post<Pulso>("/sessao/pulso");
+export const buscarGalaxia = () => criancaFetch<Galaxia>("/galaxia");
 export const buscarMapa = (disciplina?: string) =>
   criancaFetch<{ missoes: Missao[] }>(disciplina ? `/mapa?disciplina=${encodeURIComponent(disciplina)}` : "/mapa");
 export const buscarTeia = () => criancaFetch<Teia>("/teia");

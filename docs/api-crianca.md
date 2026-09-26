@@ -13,7 +13,7 @@ Regras gerais:
 - `*_audio_url` pode ser `null`: o front fala o texto com a Web Speech API pt-BR.
   Prioridade já resolvida no backend: gravação aprovada > áudio da aula > null.
 - Textos de história/perguntas já chegam com `{{heroi}}`/`{{fabrica}}` trocados.
-- `OpcaoVisual = { chave, rotulo, emoji, imagem_url|null }`.
+- `OpcaoVisual = { chave, rotulo, emoji, icone|null, cor|null, imagem_url|null }` (o app desenha `icone` do lucide sobre `cor`; `emoji` é só reserva textual).
 - `Conquista = { chave, titulo, descricao, emoji, icone }` (`icone` é um nome do lucide; o front não usa o emoji).
 
 ## Entrada (públicas, sem token)
@@ -39,7 +39,9 @@ Regras gerais:
 
 `GET /crianca/eu` → 200
 ```
-{ id, apelido, avatar: OpcaoVisual, usa_minusculas,
+{ id, apelido, avatar: OpcaoVisual,
+  usa_minusculas,                             // "texto como escrito": caso natural e peças em minúsculas (padrão true)
+  narracao_automatica,                        // fala história/instrução ao chegar na tela (padrão true)
   turma: { id, nome },
   estrelas,                                   // = xp (nome antigo, some na Fase 9)
   xp, nivel, xp_no_nivel, xp_para_proximo,    // nível pela tabela config('teia.niveis'); último nível → xp_para_proximo null
@@ -55,7 +57,20 @@ Regras gerais:
 - `sugerir_pausa` vem `true` **uma única vez** por sessão, quando `minutos >= minutos_pausa`.
 - Mais de 10 min sem pulso encerra a sessão; o próximo pulso abre outra.
 
-## Mapa
+## Galáxia
+
+`GET /crianca/galaxia` → 200
+```
+{ planetas: [ { chave, nome, cor, icone, ordem, tem_palavra_geradora, descricao,   // sempre os 4, na ordem
+                publicadas, concluidas, em_andamento,
+                proxima: Missao|null } ],                 // a em andamento, senão a primeira disponível
+  escolhas_do_dia: Missao[],                              // até 3, uma por planeta; o planeta parado há mais tempo primeiro
+  revisao: { devidos },
+  amigos: { novas } }                                     // Fase 7; por ora 0
+```
+`Missao` é o mesmo item de `GET /crianca/mapa`.
+
+## Mapa (trilha de um planeta)
 
 `GET /crianca/mapa?disciplina=` → 200
 ```

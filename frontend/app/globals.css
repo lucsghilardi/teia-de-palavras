@@ -154,22 +154,52 @@
 }
 
 /* ===================== App da criança ===================== */
+/*
+| Tema Espaço: fundo escuro, superfícies azul-noite e cores neon por função.
+| Os nomes antigos (sol, céu, grama, teia) apontam para os novos tokens até a
+| Fase 9, para nenhuma tela ficar sem cor no meio do caminho.
+*/
 .tema-crianca {
-  --c-fundo: #fff7e6;
-  --c-tinta: #2b2240;
-  --c-borda: #e9dcc3;
-  --c-sol: #ffc93c;
-  --c-sol-sombra: #d9a21b;
-  --c-ceu: #3aa6ff;
-  --c-ceu-sombra: #1f7fd1;
-  --c-grama: #2fbf71;
-  --c-grama-sombra: #1f9255;
-  --c-teia: #7c5cff;
-  --c-teia-sombra: #5a3fd6;
-  --c-foco: #ff7a59;
+  --c-fundo: #0b1020;
+  --c-superficie: #1a2140;
+  --c-superficie-2: #232b52;
+  --c-tinta: #f3f6ff;
+  --c-tinta-suave: rgb(243 246 255 / 0.72);
+  --c-borda: #2c3566;
+  --c-primaria: #22d3ee;
+  --c-primaria-sombra: #0e7490;
+  --c-sucesso: #a3e635;
+  --c-sucesso-sombra: #4d7c0f;
+  --c-alerta: #facc15;
+  --c-alerta-sombra: #a16207;
+  --c-destaque: #f472b6;
+  --c-destaque-sombra: #9d174d;
+  --c-foco: #ffffff;
+  --c-portugues: #a78bfa;
+  --c-matematica: #22d3ee;
+  --c-geografia: #34d399;
+  --c-historia: #fbbf24;
+  --c-sol: var(--c-alerta);
+  --c-sol-sombra: var(--c-alerta-sombra);
+  --c-ceu: var(--c-primaria);
+  --c-ceu-sombra: var(--c-primaria-sombra);
+  --c-grama: var(--c-sucesso);
+  --c-grama-sombra: var(--c-sucesso-sombra);
+  --c-teia: var(--c-portugues);
+  --c-teia-sombra: #6d28d9;
   background: var(--c-fundo);
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgb(255 255 255 / 0.55) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 38% 62%, rgb(255 255 255 / 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 71% 27%, rgb(255 255 255 / 0.5) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 86% 78%, rgb(255 255 255 / 0.4) 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 88%, rgb(255 255 255 / 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 24% 84%, rgb(255 255 255 / 0.35) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 92% 8%, rgb(255 255 255 / 0.45) 50%, transparent 51%);
+  background-attachment: fixed;
   color: var(--c-tinta);
-  font-family: var(--font-sans);
+  color-scheme: dark;
+  font-family: var(--font-lexend), var(--font-sans);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }

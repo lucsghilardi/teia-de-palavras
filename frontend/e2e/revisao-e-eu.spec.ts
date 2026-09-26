@@ -18,7 +18,7 @@ test.beforeEach(() => {
 test("criança faz a Revisão do dia e vê o próprio painel", async ({ page }) => {
   await entrarNoApp(page, crianca);
 
-  // No mapa, a Revisão avisa que há 1 item para hoje.
+  // Na Galáxia, a Revisão avisa que há 1 item para hoje.
   const revisao = page.getByRole("button", { name: "Revisão: 1 item para hoje", exact: true });
   await expect(revisao).toBeVisible();
   await botoesGrandes(page.locator("body"));
@@ -46,7 +46,7 @@ test("criança faz a Revisão do dia e vê o próprio painel", async ({ page }) 
   await cabeNaTela(page);
   await capturar(page, "revisao-fim");
 
-  await tocar(page, "Voltar ao mapa");
+  await tocar(page, "Voltar à Galáxia");
   await expect(page).toHaveURL(/\/app$/);
 
   // O item errado volta para amanhã: hoje a Revisão fica em dia.
@@ -64,6 +64,6 @@ test("criança faz a Revisão do dia e vê o próprio painel", async ({ page }) 
   await cabeNaTela(page);
   await capturar(page, "eu");
 
-  await tocar(page, "Voltar ao mapa");
+  await tocar(page, "Voltar à Galáxia");
   await expect(page).toHaveURL(/\/app$/);
 });

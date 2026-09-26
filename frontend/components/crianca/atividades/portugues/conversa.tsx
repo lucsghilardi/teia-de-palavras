@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MessageCircle, Users } from "lucide-react";
 import { useState } from "react";
 
 import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
@@ -32,10 +32,8 @@ export function Conversa({ atividade, minusculas, aoConcluir, definirInstrucao }
   return (
     <section aria-label="Hora de conversar" className="flex flex-1 flex-col gap-4 px-3 pb-4 sm:px-6">
       <div key={indice} className="animate-crianca-entrar flex flex-1 flex-col items-center justify-center gap-5 landscape:flex-row">
-        <div className="relative flex w-full max-w-2xl flex-1 flex-col items-center justify-center rounded-[2.5rem] bg-white px-6 py-8 shadow-[0_8px_0_var(--c-borda)] landscape:self-stretch">
-          <span aria-hidden className="text-[clamp(4rem,14vmin,8rem)] leading-none">
-            💬
-          </span>
+        <div className="relative flex w-full max-w-2xl flex-1 flex-col items-center justify-center rounded-[2.5rem] bg-[var(--c-superficie)] px-6 py-8 shadow-[0_8px_0_var(--c-borda)] landscape:self-stretch">
+          <MessageCircle aria-hidden className="size-[clamp(4rem,14vmin,8rem)] text-[var(--c-primaria)]" strokeWidth={1.75} />
           <p className="mt-4 text-center text-[clamp(1.25rem,3.2vw,2.1rem)] font-extrabold leading-snug">
             {exibir(pergunta.texto, minusculas)}
           </p>
@@ -43,14 +41,12 @@ export function Conversa({ atividade, minusculas, aoConcluir, definirInstrucao }
 
         <BotaoGrande
           rotulo="Conversar com quem está perto"
-          cor="sol"
+          cor="alerta"
           tamanho={128}
           onClick={() => void narrar(CONVIDAR)}
           className="shrink-0"
         >
-          <span aria-hidden className="text-6xl leading-none">
-            👨‍👩‍👧
-          </span>
+          <Users className="size-16" strokeWidth={2} aria-hidden />
         </BotaoGrande>
       </div>
 
@@ -62,7 +58,7 @@ export function Conversa({ atividade, minusculas, aoConcluir, definirInstrucao }
         ) : (
           <BotaoGrande
             rotulo="Próxima pergunta"
-            cor="ceu"
+            cor="primaria"
             tamanho={88}
             destaque={narrou}
             className="px-8"

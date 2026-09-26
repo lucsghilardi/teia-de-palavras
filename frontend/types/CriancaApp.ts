@@ -25,7 +25,10 @@ export type Eu = {
   id: number;
   apelido: string;
   avatar: OpcaoVisual;
+  /** "Texto como escrito": caso natural e peças em minúsculas (lib/exibir.ts). */
   usa_minusculas: boolean;
+  /** Fala a história e a instrução ao chegar na tela; desligada, só o alto-falante fala. */
+  narracao_automatica: boolean;
   turma: { id: number; nome: string };
   /** Mesmo valor de `xp` (nome antigo). */
   estrelas: number;
@@ -68,6 +71,31 @@ export type Missao = {
 };
 
 export type ItemFalado = { texto: string; audio_url: string | null };
+
+// ---------- Galáxia ----------
+
+export type Planeta = {
+  chave: Disciplina;
+  nome: string;
+  cor: string;
+  icone: string;
+  ordem: number;
+  tem_palavra_geradora: boolean;
+  descricao: string;
+  publicadas: number;
+  concluidas: number;
+  em_andamento: number;
+  /** A missão em andamento ou a primeira disponível; null sem missão aberta. */
+  proxima: Missao | null;
+};
+
+export type Galaxia = {
+  planetas: Planeta[];
+  /** Até 3 missões, uma por planeta, o planeta parado há mais tempo primeiro. */
+  escolhas_do_dia: Missao[];
+  revisao: { devidos: number };
+  amigos: { novas: number };
+};
 
 // ---------- Atividades ----------
 

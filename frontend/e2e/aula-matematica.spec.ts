@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { type CriancaE2E, prepararCriancaE2E } from "./fixture";
-import { botao, entrarNoApp, etapaAtual, semPalavrasProibidas, tocar, tocarEnquantoHouver } from "./util";
+import { botao, entrarNoApp, etapaAtual, irParaPlaneta, semPalavrasProibidas, tocar, tocarEnquantoHouver } from "./util";
 
 /*
 | A missão de Matemática "Somar para decolar" (5 atividades + conquista) só
@@ -53,7 +53,8 @@ async function proximoOuContinuar(page: Page): Promise<"proximo" | "continuar"> 
 test("criança completa a missão de Matemática só com toques, com dica no erro", async ({ page }) => {
   await entrarNoApp(page, crianca);
 
-  // No mapa, a missão de Matemática aparece disponível (a trilha de Português começa pela TEIA).
+  // Galáxia → planeta Matemática: a missão aparece disponível.
+  await irParaPlaneta(page, "Matemática", "matematica");
   await tocar(page, "Missão 7 + 5, disponível");
   await expect(page).toHaveURL(/\/app\/missao\/\d+$/);
 
@@ -97,11 +98,16 @@ test("criança completa a missão de Matemática só com toques, com dica no err
   await tocar(page, "10");
   await tocar(page, "Continuar");
 
-  // 6. Conquista: missão concluída, estrelas e volta ao mapa.
+  // 6. Conquista: missão concluída, pontos e volta ao planeta.
   await etapaAtual(page, 6, TOTAL);
   await expect(page.getByRole("heading", { name: /missão concluída/i })).toBeVisible();
   await semPalavrasProibidas(page);
-  await tocar(page, "Voltar ao mapa");
-  await expect(page).toHaveURL(/\/app$/);
+  await tocar(page, "Voltar ao planeta");
+  await expect(page).toHaveURL(/\/app\/planeta\/matematica$/);
   await expect(page.getByRole("button", { name: "Missão 7 + 5, concluída", exact: true })).toBeVisible();
+
+  // Na Galáxia, o planeta mostra o progresso e a Matemática sai das missões do dia.
+  await tocar(page, "Voltar à Galáxia");
+  await expect(page).toHaveURL(/\/app$/);
+  await expect(page.getByRole("button", { name: "Planeta Matemática", exact: true })).toContainText("1 de 1");
 });

@@ -1,18 +1,21 @@
 "use client";
 
+import { ArrowLeft, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { cancelarNarracao, type Trecho } from "@/components/crianca/aula/narrador";
 import { TrilhaEtapas } from "@/components/crianca/aula/trilha-etapas";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { BotaoOuvir } from "@/components/crianca/ui/botao-ouvir";
-import type { Atividade } from "@/types/CriancaApp";
+import { COPY } from "@/lib/copy";
+import type { Atividade, Disciplina } from "@/types/CriancaApp";
 
 /**
- * Topo do player: voltar ao mapa (esquerda), trilha das etapas (centro;
- * numa segunda linha em telas estreitas), estrelas e o alto-falante (direita).
+ * Topo do player: voltar ao planeta (esquerda), trilha das etapas (centro;
+ * numa segunda linha em telas estreitas), pontos e o alto-falante (direita).
  */
 export function BarraAula({
+  disciplina,
   atividades,
   etapaAtual,
   etapaVisivel,
@@ -22,6 +25,7 @@ export function BarraAula({
   estrelas,
   mostrarVoltar = true,
 }: {
+  disciplina: Disciplina;
   atividades: Atividade[];
   etapaAtual: number;
   etapaVisivel: number;
@@ -38,10 +42,8 @@ export function BarraAula({
     <header className="flex shrink-0 flex-wrap items-center gap-x-2 gap-y-2 px-3 pb-2 pt-3 sm:px-5 lg:flex-nowrap lg:gap-3">
       <div className="order-1 shrink-0">
         {mostrarVoltar ? (
-          <BotaoGrande rotulo="Voltar ao mapa" cor="branco" tamanho={64} onClick={() => router.push("/app")}>
-            <span aria-hidden className="text-3xl leading-none">
-              🗺️
-            </span>
+          <BotaoGrande rotulo={COPY.missao.voltar} cor="neutra" tamanho={64} onClick={() => router.push(`/app/planeta/${disciplina}`)}>
+            <ArrowLeft className="size-9" aria-hidden />
           </BotaoGrande>
         ) : (
           <div aria-hidden className="size-16" />
@@ -56,10 +58,10 @@ export function BarraAula({
         {estrelas !== null && (
           <div
             role="img"
-            aria-label={`${estrelas} estrelas`}
-            className="flex h-12 items-center gap-1 rounded-full bg-white/80 px-3 text-xl font-black shadow-[0_3px_0_var(--c-borda)]"
+            aria-label={COPY.comum.pontos(estrelas)}
+            className="flex h-12 items-center gap-1.5 rounded-full bg-[var(--c-superficie)] px-3 text-xl font-black shadow-[0_3px_0_var(--c-borda)]"
           >
-            <span aria-hidden>⭐</span>
+            <Star aria-hidden className="size-6 fill-[var(--c-alerta)] text-[var(--c-alerta)]" />
             <span aria-hidden>{estrelas}</span>
           </div>
         )}

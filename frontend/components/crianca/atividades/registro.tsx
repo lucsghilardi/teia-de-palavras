@@ -1,5 +1,25 @@
 "use client";
 
+import {
+  Blocks,
+  BookOpen,
+  Calculator,
+  CheckCheck,
+  Hand,
+  Hash,
+  Hourglass,
+  Link,
+  ListChecks,
+  ListOrdered,
+  MessageCircle,
+  Pencil,
+  Puzzle,
+  SpellCheck,
+  Trophy,
+  Type,
+  type LucideIcon,
+} from "lucide-react";
+
 import { Contar } from "@/components/crianca/atividades/genericas/contar";
 import { Escolha } from "@/components/crianca/atividades/genericas/escolha";
 import { EscolherSilaba } from "@/components/crianca/atividades/genericas/escolher-silaba";
@@ -56,23 +76,24 @@ export function AtividadeAtual(props: PropsAtividade) {
   }
 }
 
-export const ICONE_TIPO: Record<TipoAtividade | "conquista", string> = {
-  historia: "📖",
-  conversa: "💬",
-  palavra: "🕸️",
-  palmas: "👏",
-  ficha: "🧩",
-  montar_palavras: "🛠️",
-  frase: "✏️",
-  escolha: "✅",
-  verdadeiro_falso: "✅",
-  ordenar: "🔢",
-  linha_do_tempo: "⏳",
-  parear: "🔗",
-  contar: "🔟",
-  somar_subtrair: "➕",
-  escolher_silaba: "🔤",
-  conquista: "🏆",
+/** Ícone (lucide) de cada tipo na trilha da missão. */
+export const ICONE_TIPO: Record<TipoAtividade | "conquista", LucideIcon> = {
+  historia: BookOpen,
+  conversa: MessageCircle,
+  palavra: Type,
+  palmas: Hand,
+  ficha: Puzzle,
+  montar_palavras: Blocks,
+  frase: Pencil,
+  escolha: ListChecks,
+  verdadeiro_falso: CheckCheck,
+  ordenar: ListOrdered,
+  linha_do_tempo: Hourglass,
+  parear: Link,
+  contar: Hash,
+  somar_subtrair: Calculator,
+  escolher_silaba: SpellCheck,
+  conquista: Trophy,
 };
 
 /** Nome falado ao tocar no ícone da etapa que já está na tela. */

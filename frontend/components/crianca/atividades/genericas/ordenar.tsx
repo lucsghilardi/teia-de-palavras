@@ -23,7 +23,7 @@ function Cartao({ item, numero, className, ...resto }: { item: ItemOrdenar; nume
       type="button"
       aria-label={item.texto}
       className={cn(
-        "flex min-h-16 items-center gap-3 rounded-2xl bg-white px-4 py-2 text-left text-xl font-extrabold shadow-[0_5px_0_var(--c-borda)] touch-manipulation",
+        "flex min-h-16 items-center gap-3 rounded-2xl bg-[var(--c-superficie)] px-4 py-2 text-left text-xl font-extrabold shadow-[0_5px_0_var(--c-borda)] touch-manipulation",
         "transition-transform active:translate-y-1 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)] disabled:opacity-60",
         className,
       )}
@@ -92,7 +92,7 @@ export function Ordenar({ aula, atividade, aoConcluir, definirInstrucao, mostrar
 
         <ol
           aria-label="Minha ordem"
-          className="flex w-full max-w-3xl min-h-24 flex-col gap-2 rounded-[2rem] border-4 border-dashed border-[var(--c-borda)] bg-white/70 p-3"
+          className="flex w-full max-w-3xl min-h-24 flex-col gap-2 rounded-[2rem] border-4 border-dashed border-[var(--c-borda)] bg-[var(--c-superficie)]/70 p-3"
         >
           {(mostrada ?? sequencia).map((id, i) => {
             const item = porId.get(id);
@@ -135,12 +135,12 @@ export function Ordenar({ aula, atividade, aoConcluir, definirInstrucao, mostrar
       <div className="flex min-h-[96px] shrink-0 items-center justify-center gap-4">
         {!resolvido ? (
           <>
-            <BotaoGrande rotulo="Apagar" cor="branco" tamanho={80} disabled={sequencia.length === 0 || enviando} onClick={() => setSequencia([])}>
+            <BotaoGrande rotulo="Apagar" cor="neutra" tamanho={80} disabled={sequencia.length === 0 || enviando} onClick={() => setSequencia([])}>
               <Eraser className="size-9" strokeWidth={2.5} aria-hidden />
             </BotaoGrande>
             <BotaoGrande
               rotulo="Confirmar"
-              cor="grama"
+              cor="sucesso"
               tamanho={96}
               disabled={!completa(sequencia, ids.length) || enviando}
               destaque={completa(sequencia, ids.length) && !enviando}

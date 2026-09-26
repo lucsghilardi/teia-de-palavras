@@ -1,16 +1,17 @@
 "use client";
 
+import { ArrowRight, Puzzle } from "lucide-react";
 import { useState } from "react";
 
 import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
 import { narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
 import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { Peca } from "@/components/crianca/ui/peca";
-import { exibir } from "@/lib/exibir";
+import { exibirPalavra } from "@/lib/exibir";
 import { sons } from "@/lib/sons";
 import type { AtividadeFicha } from "@/types/CriancaApp";
 
-const INSTRUCAO = { texto: "Toque nas pecinhas para ouvir." };
+const INSTRUCAO = { texto: "Toque nas peças para ouvir." };
 
 /**
  * FICHA DE DESCOBERTA: uma linha por sílaba da palavra geradora, com a
@@ -37,20 +38,18 @@ export function Ficha({ atividade, minusculas, aoConcluir, definirInstrucao }: P
             key={`${linha.silaba}-${l}`}
             role="group"
             aria-label={`Família da sílaba ${linha.silaba}`}
-            className="animate-crianca-entrar flex flex-wrap items-center gap-2 rounded-[2rem] bg-white/75 p-3 shadow-[0_5px_0_var(--c-borda)] sm:gap-3 sm:p-4"
+            className="animate-crianca-entrar flex flex-wrap items-center gap-2 rounded-[2rem] bg-[var(--c-superficie)] p-3 shadow-[0_5px_0_var(--c-borda)] sm:gap-3 sm:p-4"
             style={{ animationDelay: `${l * 80}ms` }}
           >
             <button
               type="button"
               aria-label={`Família ${linha.silaba}`}
               onClick={() => ouvir(`h-${l}`, linha.silaba, null)}
-              className="flex min-h-20 min-w-20 items-center justify-center rounded-3xl bg-[var(--c-teia)] px-4 text-4xl font-black text-white shadow-[0_5px_0_var(--c-teia-sombra)] transition-transform active:translate-y-1 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)] touch-manipulation"
+              className="flex min-h-20 min-w-20 items-center justify-center rounded-3xl bg-[var(--c-portugues)] px-4 text-4xl font-black text-[var(--c-fundo)] shadow-[0_5px_0_var(--c-teia-sombra)] transition-transform active:translate-y-1 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)] touch-manipulation"
             >
-              {exibir(linha.silaba, minusculas)}
+              {exibirPalavra(linha.silaba, minusculas)}
             </button>
-            <span aria-hidden className="px-1 text-3xl text-black/30">
-              ➜
-            </span>
+            <ArrowRight aria-hidden className="size-8 text-white/30" />
             <div className="flex flex-1 flex-wrap gap-2 sm:gap-3">
               {linha.membros.map((m, i) => {
                 const chave = `${l}-${i}`;
@@ -72,9 +71,7 @@ export function Ficha({ atividade, minusculas, aoConcluir, definirInstrucao }: P
         ))}
 
         {atividade.linhas.length === 0 && (
-          <p aria-hidden className="text-center text-8xl">
-            🧩
-          </p>
+          <Puzzle aria-hidden className="mx-auto size-24 text-[var(--c-borda)]" />
         )}
       </div>
 

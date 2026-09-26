@@ -1,27 +1,27 @@
 "use client";
 
-import { RefreshCw, Repeat, RotateCcw } from "lucide-react";
+import { ArrowLeft, Flag, Network, RefreshCw, Telescope } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { VisualOpcao } from "@/components/crianca/comum/visual-opcao";
+import { TelaCarregando } from "@/components/crianca/comum/tela-carregando";
 import { NoMissao } from "@/components/crianca/mapa/no-missao";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { BotaoOuvir } from "@/components/crianca/ui/botao-ouvir";
+import { Icone } from "@/components/crianca/ui/icone";
 import { useCrianca } from "@/context/CriancaContext";
 import { useFalarAoChegar } from "@/hooks/use-falar-ao-chegar";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
-import { rotuloRevisao } from "@/lib/crianca/revisao";
+import { COPY } from "@/lib/copy";
+import { infoDisciplina } from "@/lib/disciplinas";
 import { exibir } from "@/lib/exibir";
 import { falar } from "@/lib/fala";
 import { sons } from "@/lib/sons";
 import { UnauthorizedError } from "@/services/apiError";
 import { buscarMapa } from "@/services/crianca";
-import type { Missao } from "@/types/CriancaApp";
+import type { Disciplina, Missao } from "@/types/CriancaApp";
 
 type Estado = { tipo: "carregando" } | { tipo: "erro" } | { tipo: "pronto"; missoes: Missao[] };
-
-const FALA_TRANCADA = "Essa missão ainda está trancada. Termine a anterior!";
 
 /** Altura de cada "degrau" da trilha, em px. */
 const DEGRAU = 184;
@@ -76,11 +76,11 @@ function Trilha({
         viewBox={`0 0 100 ${altura}`}
         preserveAspectRatio="none"
       >
-        <path d={caminho} fill="none" stroke="#F3DDB0" strokeWidth={34} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+        <path d={caminho} fill="none" stroke="var(--c-superficie-2)" strokeWidth={34} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
         <path
           d={caminho}
           fill="none"
-          stroke="white"
+          stroke="var(--c-planeta)"
           strokeWidth={6}
           strokeLinecap="round"
           strokeDasharray="2 18"
@@ -107,35 +107,36 @@ function Trilha({
 
       <span
         aria-hidden
-        className="absolute -translate-x-1/2 -translate-y-1/2 text-6xl"
+        className="absolute flex size-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--c-superficie)] ring-4 ring-[var(--c-planeta)]"
         style={{ left: `${posicaoX(pontos - 1)}%`, top: posicaoY(pontos - 1) }}
       >
-        🏆
+        <Flag className="size-10 text-[var(--c-planeta)]" strokeWidth={2.5} />
       </span>
     </div>
   );
 }
 
 /**
- * O mapa de missões: cabeçalho com a criança, estrelas e a Teia; embaixo, a
- * trilha sinuosa com as missões na ordem.
+ * Um planeta: cabeçalho com a volta à Galáxia, o nome do planeta e (em
+ * Português) a Teia; embaixo, a trilha sinuosa com as missões na ordem.
  */
-export function MapaMissoes() {
+export function MapaMissoes({ disciplina }: { disciplina: Disciplina }) {
   const router = useRouter();
-  const { crianca, recarregar, sair } = useCrianca();
+  const { crianca, recarregar } = useCrianca();
   const movimentoReduzido = useMovimentoReduzido();
+  const info = infoDisciplina(disciplina);
   const [estado, setEstado] = useState<Estado>({ tipo: "carregando" });
   const [tentativa, setTentativa] = useState(0);
 
   useEffect(() => {
     let ativo = true;
 
-    buscarMapa()
+    buscarMapa(disciplina)
       .then(({ missoes }) => {
         if (!ativo) return;
 
-        setEstado({ tipo: "pronto", missoes: [...missoes].sort((a, b) => a.ordem - b.ordem) });
-        // Voltando de uma missão: estrelas e Teia podem ter mudado.
+        setEstado({ tipo: "pronto", missoes: [...missoes].sort((a, b) => a.fase - b.fase || a.ordem - b.ordem || a.id - b.id) });
+        // Voltando de uma missão: XP e Teia podem ter mudado.
         void recarregar();
       })
       .catch((erro: unknown) => {
@@ -153,25 +154,19 @@ export function MapaMissoes() {
     return () => {
       ativo = false;
     };
-  }, [tentativa, router, recarregar]);
+  }, [disciplina, tentativa, router, recarregar]);
 
-  const minusculas = crianca?.usa_minusculas ?? false;
+  const minusculas = crianca?.usa_minusculas ?? true;
   const missoes = estado.tipo === "pronto" ? estado.missoes : [];
   const atual =
     missoes.find((m) => m.status === "em_andamento") ?? missoes.find((m) => m.status === "disponivel") ?? null;
 
   let instrucao: string | null = null;
 
-  if (crianca && estado.tipo !== "carregando") {
-    const oi = `Oi, ${crianca.apelido}!`;
-
-    if (estado.tipo === "erro") {
-      instrucao = `${oi} Não consegui abrir o mapa. Toque no botão para tentar de novo.`;
-    } else if (missoes.length === 0) {
-      instrucao = `${oi} Ainda não tem missão por aqui. Volte logo!`;
-    } else {
-      instrucao = `${oi} Escolha a sua missão.`;
-    }
+  if (estado.tipo === "erro") {
+    instrucao = COPY.planeta.erro;
+  } else if (estado.tipo === "pronto") {
+    instrucao = missoes.length === 0 ? COPY.planeta.vazio : COPY.planeta.instrucao(info.nome);
   }
 
   useFalarAoChegar(instrucao);
@@ -191,7 +186,7 @@ export function MapaMissoes() {
     sons.toque();
 
     if (missao.status === "bloqueada") {
-      void falar(FALA_TRANCADA);
+      void falar(COPY.planeta.trancada);
 
       return;
     }
@@ -199,96 +194,54 @@ export function MapaMissoes() {
     router.push(`/app/missao/${missao.id}`);
   }
 
-  const estrelas = crianca?.estrelas ?? 0;
-  const nivel = crianca?.nivel ?? 1;
-  const devidos = crianca?.revisao_devidos ?? 0;
-  const rotuloEstrelas = estrelas === 1 ? "1 estrela" : `${estrelas} estrelas`;
-
   return (
-    <main className="flex min-h-dvh flex-col bg-[linear-gradient(180deg,#E8F6FF_0%,var(--c-fundo)_45%,#EAF8E6_100%)]">
-      <header className="sticky top-0 z-10 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[color-mix(in_srgb,#E8F6FF_88%,transparent)] px-4 pt-4 pb-3 backdrop-blur sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:px-6">
-        <h1 className="sr-only">Mapa de missões</h1>
-        <div className="col-start-1 row-start-1 flex min-w-0 items-center gap-3">
-          <BotaoGrande
-            rotulo="Meu perfil"
-            cor="branco"
-            redondo={false}
-            tamanho={64}
-            className="max-w-full justify-start gap-3 py-1 pr-5 pl-1"
-            onClick={() => router.push("/app/eu")}
+    <main className="flex min-h-dvh flex-col" style={{ "--c-planeta": info.cor } as React.CSSProperties}>
+      <header className="sticky top-0 z-10 flex items-center gap-3 bg-[color-mix(in_srgb,var(--c-fundo)_85%,transparent)] px-4 pt-4 pb-3 backdrop-blur sm:px-6">
+        <BotaoGrande rotulo={COPY.planeta.voltar} cor="neutra" tamanho={64} onClick={() => router.push("/app")}>
+          <ArrowLeft className="size-9" aria-hidden />
+        </BotaoGrande>
+
+        <div className="flex min-w-0 items-center gap-3">
+          <span
+            aria-hidden
+            className="flex size-14 shrink-0 items-center justify-center rounded-full text-[var(--c-fundo)]"
+            style={{ backgroundColor: info.cor }}
           >
-            <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-[var(--c-fundo)]">
-              <VisualOpcao opcao={crianca?.avatar} className="size-11 text-4xl" />
-            </span>
-            <span aria-hidden className="flex min-w-0 flex-col items-start leading-tight">
-              <span className="truncate text-2xl font-black tracking-wide sm:text-3xl">{crianca ? exibir(crianca.apelido, minusculas) : " "}</span>
-              <span className="text-sm font-bold text-[var(--c-teia)]">{exibir(`Nível ${nivel}`, minusculas)}</span>
-            </span>
-          </BotaoGrande>
+            <Icone nome={info.icone} className="size-8" strokeWidth={2.25} />
+          </span>
+          <h1 className="truncate text-2xl font-black sm:text-3xl">{exibir(info.nome, minusculas)}</h1>
         </div>
 
-        <div className="col-span-2 row-start-2 flex flex-wrap items-center gap-3 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:flex-nowrap">
-          <BotaoGrande
-            rotulo={rotuloEstrelas}
-            falaAoTocar={`Você tem ${rotuloEstrelas}!`}
-            cor="branco"
-            redondo={false}
-            tamanho={64}
-            className="px-4 text-3xl tabular-nums"
-          >
-            <span aria-hidden>⭐</span>
-            {estrelas}
-          </BotaoGrande>
+        <div className="ml-auto flex shrink-0 items-center gap-3">
+          {info.temPalavraGeradora ? (
+            <BotaoGrande
+              rotulo={COPY.planeta.teia}
+              cor="destaque"
+              redondo={false}
+              tamanho={64}
+              className="px-4 text-3xl tabular-nums"
+              onClick={() => router.push("/app/teia")}
+            >
+              <Network className="size-8" aria-hidden strokeWidth={2.5} />
+              {crianca ? <span aria-hidden>{crianca.teia_total}</span> : null}
+            </BotaoGrande>
+          ) : null}
 
-          <BotaoGrande
-            rotulo={rotuloRevisao(devidos)}
-            cor={devidos > 0 ? "grama" : "branco"}
-            redondo={false}
-            tamanho={64}
-            className="px-4 text-3xl tabular-nums"
-            onClick={() => router.push("/app/revisao")}
-          >
-            <RotateCcw className="size-8" aria-hidden strokeWidth={2.75} />
-            {devidos > 0 ? <span aria-hidden>{devidos}</span> : null}
-          </BotaoGrande>
-
-          <BotaoGrande
-            rotulo="Minha Teia de Palavras"
-            cor="teia"
-            redondo={false}
-            tamanho={64}
-            className="px-4 text-3xl tabular-nums"
-            onClick={() => router.push("/app/teia")}
-          >
-            <span aria-hidden>🕸️</span>
-            {crianca ? <span aria-hidden>{crianca.teia_total}</span> : null}
-          </BotaoGrande>
+          <BotaoOuvir texto={instrucao ?? COPY.planeta.instrucao(info.nome)} />
         </div>
-
-        <BotaoOuvir
-          texto={instrucao ?? "Escolha a sua missão."}
-          className="col-start-2 row-start-1 sm:col-start-3"
-        />
       </header>
 
       <div className="flex-1 px-4 pt-4 pb-6 sm:px-6">
-        {estado.tipo === "carregando" ? (
-          <div role="status" aria-label="Carregando o mapa" className="flex min-h-[50dvh] items-center justify-center">
-            <span aria-hidden className="animate-crianca-pulso text-7xl">
-              🗺️
-            </span>
-          </div>
-        ) : null}
+        {estado.tipo === "carregando" ? <TelaCarregando className="min-h-[50dvh]" /> : null}
 
         {estado.tipo === "erro" ? (
           <div className="flex min-h-[50dvh] flex-col items-center justify-center gap-6 text-center">
-            <span aria-hidden className="text-8xl">
-              🗺️
-            </span>
+            <Telescope aria-hidden className="size-24 text-[var(--c-borda)]" />
             <BotaoGrande
-              rotulo="Tentar de novo"
-              cor="ceu"
+              rotulo={COPY.comum.tentarDeNovo}
+              cor="primaria"
               tamanho={96}
+              destaque
               onClick={() => {
                 setEstado({ tipo: "carregando" });
                 setTentativa((n) => n + 1);
@@ -301,9 +254,7 @@ export function MapaMissoes() {
 
         {estado.tipo === "pronto" && missoes.length === 0 ? (
           <div className="flex min-h-[50dvh] flex-col items-center justify-center gap-4 text-center">
-            <span aria-hidden className="text-8xl">
-              🚧
-            </span>
+            <Telescope aria-hidden className="size-24 text-[var(--c-planeta)]" />
             <p className="text-2xl font-black">{exibir("Volte logo!", minusculas)}</p>
           </div>
         ) : null}
@@ -312,19 +263,6 @@ export function MapaMissoes() {
           <Trilha missoes={missoes} minusculas={minusculas} idAtual={idAtual} onTocar={tocarMissao} />
         ) : null}
       </div>
-
-      {/* Para adultos: discreto, no rodapé. */}
-      <footer className="flex justify-center px-4 pb-4">
-        <button
-          type="button"
-          aria-label="Trocar de criança"
-          onClick={() => void sair()}
-          className="inline-flex min-h-16 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-[color-mix(in_srgb,var(--c-tinta)_55%,transparent)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]"
-        >
-          <Repeat className="size-4" aria-hidden />
-          trocar de criança
-        </button>
-      </footer>
     </main>
   );
 }

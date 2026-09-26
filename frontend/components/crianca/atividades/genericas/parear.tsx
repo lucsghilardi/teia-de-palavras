@@ -20,7 +20,7 @@ function Item({ item, className, ...resto }: { item: ItemParear; className?: str
       type="button"
       aria-label={item.texto}
       className={cn(
-        "flex min-h-16 w-full items-center gap-3 rounded-2xl bg-white px-4 py-2 text-left text-xl font-extrabold shadow-[0_5px_0_var(--c-borda)] touch-manipulation",
+        "flex min-h-16 w-full items-center gap-3 rounded-2xl bg-[var(--c-superficie)] px-4 py-2 text-left text-xl font-extrabold shadow-[0_5px_0_var(--c-borda)] touch-manipulation",
         "transition-transform active:translate-y-1 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]",
         className,
       )}

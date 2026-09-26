@@ -36,11 +36,11 @@ export function Historia({ aula, atividade, minusculas, aoConcluir, definirInstr
         className="animate-crianca-entrar flex min-h-0 flex-1 flex-col gap-3 sm:gap-4 landscape:flex-row landscape:items-stretch"
       >
         <div className="relative min-h-[36vh] flex-1 landscape:min-h-[40vh]">
-          <Ilustracao key={atual.imagem_url ?? "sem-imagem"} src={atual.imagem_url} emoji="🕸️🦸" className="absolute inset-0" />
+          <Ilustracao key={atual.imagem_url ?? "sem-imagem"} src={atual.imagem_url} icone={atual.icone ?? "rocket"} className="absolute inset-0" />
         </div>
         <p
           className={cn(
-            "rounded-[2rem] bg-white/85 px-5 py-4 text-center font-extrabold leading-snug shadow-[0_6px_0_var(--c-borda)]",
+            "rounded-[2rem] bg-[var(--c-superficie)] px-5 py-4 text-center font-extrabold leading-snug shadow-[0_6px_0_var(--c-borda)]",
             "text-[clamp(1.25rem,3.4vw,2.25rem)] landscape:flex landscape:flex-1 landscape:items-center landscape:justify-center",
           )}
         >
@@ -51,7 +51,7 @@ export function Historia({ aula, atividade, minusculas, aoConcluir, definirInstr
       <div className="flex shrink-0 items-center justify-between gap-3">
         <BotaoGrande
           rotulo="Anterior"
-          cor="branco"
+          cor="neutra"
           tamanho={80}
           className={cn(primeira && "invisible")}
           disabled={primeira}
@@ -67,7 +67,7 @@ export function Historia({ aula, atividade, minusculas, aoConcluir, definirInstr
         ) : (
           <BotaoGrande
             rotulo="Próximo"
-            cor="ceu"
+            cor="primaria"
             tamanho={88}
             destaque={narrou}
             className="px-8"

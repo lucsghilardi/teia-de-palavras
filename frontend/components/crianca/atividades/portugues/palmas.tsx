@@ -1,5 +1,6 @@
 "use client";
 
+import { Hand } from "lucide-react";
 import { useAnimate } from "motion/react";
 import { useState } from "react";
 
@@ -10,7 +11,7 @@ import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { corDaPeca } from "@/components/crianca/ui/peca";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
-import { exibir } from "@/lib/exibir";
+import { exibir, exibirPalavra } from "@/lib/exibir";
 import { sons } from "@/lib/sons";
 import { cn } from "@/lib/utils";
 import type { AtividadePalmas } from "@/types/CriancaApp";
@@ -34,7 +35,7 @@ export function Palmas({ aula, atividade, minusculas, aoConcluir, definirInstruc
   const completo = batidas >= total;
 
   const instrucao = {
-    texto: `Vamos bater palmas! Uma palma para cada pedacinho da palavra ${palavra}. Toque no botão de palmas.`,
+    texto: `Vamos bater palmas! Uma palma para cada pedaço da palavra ${palavra}. Toque no botão de palmas.`,
   };
   const narrou = useNarracaoDeChegada("palmas", [instrucao], instrucao, definirInstrucao);
 
@@ -82,7 +83,7 @@ export function Palmas({ aula, atividade, minusculas, aoConcluir, definirInstruc
   return (
     <section aria-label="Palmas" className="flex flex-1 flex-col gap-4 px-3 pb-4 sm:px-6">
       <div className="flex flex-1 flex-col items-center justify-center gap-6 landscape:flex-row landscape:gap-10">
-        <ol aria-label="Pedacinhos da palavra" className="flex flex-wrap items-center justify-center gap-3">
+        <ol aria-label="Pedaços da palavra" className="flex flex-wrap items-center justify-center gap-3">
           {silabas.map((s, i) => {
             const revelada = i < batidas;
 
@@ -102,15 +103,15 @@ export function Palmas({ aula, atividade, minusculas, aoConcluir, definirInstruc
                       "text-[clamp(2.5rem,8vw,4.5rem)] transition-transform duration-150 touch-manipulation",
                       "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]",
                       corDaPeca(s.texto),
-                      destacada === i && "scale-110 ring-4 ring-[var(--c-teia)] ring-offset-2",
+                      destacada === i && "scale-110 ring-4 ring-[var(--c-primaria)] ring-offset-2 ring-offset-[var(--c-fundo)]",
                     )}
                   >
-                    {exibir(s.texto, minusculas)}
+                    {exibirPalavra(s.texto, minusculas)}
                   </button>
                 ) : (
                   <div
                     aria-hidden
-                    className="flex min-h-24 min-w-24 items-center justify-center rounded-[1.75rem] border-4 border-dashed border-[var(--c-borda)] bg-white/60 text-5xl font-black text-black/20"
+                    className="flex min-h-24 min-w-24 items-center justify-center rounded-[1.75rem] border-4 border-dashed border-[var(--c-borda)] bg-[var(--c-superficie)] text-5xl font-black text-white/20"
                   >
                     ?
                   </div>
@@ -122,15 +123,13 @@ export function Palmas({ aula, atividade, minusculas, aoConcluir, definirInstruc
 
         <div className="flex flex-col items-center gap-3">
           <div ref={escopo}>
-            <BotaoGrande rotulo="Palma" cor="sol" tamanho={152} destaque={narrou && !completo} onClick={palma}>
-              <span aria-hidden className="text-7xl leading-none">
-                👏
-              </span>
+            <BotaoGrande rotulo="Palma" cor="alerta" tamanho={152} destaque={narrou && !completo} onClick={palma}>
+              <Hand className="size-20" strokeWidth={2} aria-hidden />
             </BotaoGrande>
           </div>
 
           {completo && (
-            <p className="animate-crianca-entrar rounded-full bg-white px-5 py-2 text-3xl font-black text-[var(--c-grama-sombra)] shadow-[0_4px_0_var(--c-borda)]">
+            <p className="animate-crianca-entrar rounded-full bg-[var(--c-superficie)] px-5 py-2 text-3xl font-black text-[var(--c-sucesso)] shadow-[0_4px_0_var(--c-borda)]">
               {exibir(`${total} ${total === 1 ? "palma" : "palmas"}!`, minusculas)}
             </p>
           )}

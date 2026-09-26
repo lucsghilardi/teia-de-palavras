@@ -16,6 +16,7 @@ class CriancaResumoResource extends JsonResource
             'apelido' => $this->apelido,
             'avatar' => $this->avatar ? new OpcaoVisualResource($this->avatar) : null,
             'usa_minusculas' => (bool) $this->usa_minusculas,
+            'narracao_automatica' => (bool) $this->narracao_automatica,
         ];
     }
 }

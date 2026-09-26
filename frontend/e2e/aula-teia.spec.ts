@@ -95,11 +95,20 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await capturar(page, "figura-secreta");
   await tocar(page, "Estrela");
 
-  // ---------- Mapa ----------
+  // ---------- Galáxia ----------
   await expect(page).toHaveURL(/\/app$/);
   await botoesGrandes(page.locator("body"));
   await cabeNaTela(page);
-  await capturar(page, "mapa");
+  await capturar(page, "galaxia");
+  await expect(page.getByRole("button", { name: "Planeta Português", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Planeta Geografia", exact: true })).toContainText(/em breve/i);
+
+  // ---------- Planeta Português: a trilha de missões ----------
+  await tocar(page, "Planeta Português");
+  await expect(page).toHaveURL(/\/app\/planeta\/portugues$/);
+  await botoesGrandes(page.locator("body"));
+  await cabeNaTela(page);
+  await capturar(page, "planeta");
   await expect(page.getByRole("button", { name: "Missão BONECA, bloqueada" }).or(page.getByRole("link", { name: "Missão BONECA, bloqueada" }))).toBeVisible();
   await tocar(page, "Missão TEIA, disponível");
   await expect(page).toHaveURL(/\/app\/missao\/\d+$/);
@@ -178,10 +187,10 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await capturar(page, "etapa-8");
   await expect(botao(page, "Palavra TATU")).toBeVisible();
   await expect(botao(page, "Palavra TETO")).toBeVisible();
-  await tocar(page, "Voltar ao mapa");
+  await tocar(page, "Voltar ao planeta");
 
-  // ---------- De volta ao mapa e à Teia ----------
-  await expect(page).toHaveURL(/\/app$/);
+  // ---------- De volta ao planeta e à Teia ----------
+  await expect(page).toHaveURL(/\/app\/planeta\/portugues$/);
   await expect(page.getByRole("button", { name: "Missão TEIA, concluída" }).or(page.getByRole("link", { name: "Missão TEIA, concluída" }))).toBeVisible();
   await expect(page.getByRole("button", { name: "Missão BONECA, disponível" }).or(page.getByRole("link", { name: "Missão BONECA, disponível" }))).toBeVisible();
 
@@ -192,6 +201,11 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await capturar(page, "teia");
   await expect(botao(page, "Palavra TETO")).toBeVisible();
   await expect(page.locator("body")).not.toContainText(/errad|incorret|ranking|nota/i);
+
+  // ---------- A Galáxia direto para a próxima missão do dia ----------
+  await tocar(page, "Voltar à Galáxia");
+  await expect(page).toHaveURL(/\/app$/);
+  await expect(page.getByRole("button", { name: "Missão BONECA, disponível", exact: true })).toBeVisible();
 });
 
 test("figura secreta diferente não entra e não diz 'errado'", async ({ page }) => {

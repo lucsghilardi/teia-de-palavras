@@ -65,7 +65,7 @@ export function Escolha({ aula, atividade, aoConcluir, definirInstrucao, mostrar
             <li key={opcao.id} className="flex">
               <BotaoGrande
                 rotulo={opcao.texto}
-                cor="branco"
+                cor="neutra"
                 redondo={false}
                 tamanho={72}
                 disabled={resolvido || enviando}

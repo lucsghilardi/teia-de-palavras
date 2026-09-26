@@ -29,12 +29,18 @@ export async function tocarEnquantoHouver(page: Page, nome: string, maximo = 20)
   throw new Error(`"${nome}" continuou aparecendo depois de ${maximo} toques`);
 }
 
-/** Entrada da criança: QR/código da turma → avatar (apelido) → figura secreta → mapa. */
+/** Entrada da criança: QR/código da turma → avatar (apelido) → figura secreta → Galáxia. */
 export async function entrarNoApp(page: Page, crianca: CriancaE2E) {
   await page.goto(`/app/entrar?codigo=${crianca.codigo}`);
   await tocar(page, crianca.apelido);
   await tocar(page, "Estrela");
   await expect(page).toHaveURL(/\/app$/);
+}
+
+/** Da Galáxia para a trilha de um planeta ("Português", "Matemática"...). */
+export async function irParaPlaneta(page: Page, nome: string, chave: string) {
+  await tocar(page, `Planeta ${nome}`);
+  await expect(page).toHaveURL(new RegExp(`/app/planeta/${chave}$`));
 }
 
 /** Sem rolagem horizontal da página e o alto-falante sempre visível. */

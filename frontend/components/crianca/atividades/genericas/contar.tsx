@@ -35,7 +35,7 @@ export function Objetos({ item, className }: { item: ItemContar; className?: str
               sons.toque();
               void narrar(n === 10 ? `uma fileira de 10. até aqui, ${inicio + n}.` : `${n} ${n === 1 ? "objeto" : "objetos"}. total até aqui, ${inicio + n}.`);
             }}
-            className="flex min-h-16 flex-wrap items-center justify-center gap-1 rounded-2xl bg-white/80 px-2 py-1 shadow-[0_4px_0_var(--c-borda)] touch-manipulation focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]"
+            className="flex min-h-16 flex-wrap items-center justify-center gap-1 rounded-2xl bg-[var(--c-superficie)]/80 px-2 py-1 shadow-[0_4px_0_var(--c-borda)] touch-manipulation focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)]"
           >
             {Array.from({ length: n }, (_, i) => (
               <Icone
@@ -106,7 +106,7 @@ export function Contar({ aula, atividade, aoConcluir, definirInstrucao, mostrarC
             <li key={valor}>
               <BotaoGrande
                 rotulo={String(valor)}
-                cor="branco"
+                cor="neutra"
                 tamanho={88}
                 disabled={resolvido || enviando}
                 data-opcao={valor}

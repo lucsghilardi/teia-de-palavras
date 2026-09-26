@@ -26,7 +26,7 @@ export function BotaoOuvir({
   return (
     <BotaoGrande
       rotulo={rotulo}
-      cor="ceu"
+      cor="primaria"
       tamanho={72}
       className={cn(falando && "animate-crianca-falando", className)}
       onClick={() => void falar(texto, audioUrl)}

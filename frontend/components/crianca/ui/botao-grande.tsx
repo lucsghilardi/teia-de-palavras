@@ -6,14 +6,19 @@ import { falar } from "@/lib/fala";
 import { sons } from "@/lib/sons";
 import { cn } from "@/lib/utils";
 
-type Cor = "sol" | "ceu" | "grama" | "teia" | "branco";
+/**
+ * Cores por função (tema Espaço): primária = ação principal/ouvir; sucesso =
+ * seguir/confirmar; alerta = atenção/dica; destaque = Português/Teia;
+ * neutra = superfície escura para o resto.
+ */
+export type CorBotao = "primaria" | "sucesso" | "alerta" | "destaque" | "neutra";
 
-const CORES: Record<Cor, string> = {
-  sol: "bg-[var(--c-sol)] text-[var(--c-tinta)] shadow-[0_6px_0_var(--c-sol-sombra)]",
-  ceu: "bg-[var(--c-ceu)] text-white shadow-[0_6px_0_var(--c-ceu-sombra)]",
-  grama: "bg-[var(--c-grama)] text-white shadow-[0_6px_0_var(--c-grama-sombra)]",
-  teia: "bg-[var(--c-teia)] text-white shadow-[0_6px_0_var(--c-teia-sombra)]",
-  branco: "bg-white text-[var(--c-tinta)] shadow-[0_6px_0_var(--c-borda)]",
+const CORES: Record<CorBotao, string> = {
+  primaria: "bg-[var(--c-primaria)] text-[var(--c-fundo)] shadow-[0_6px_0_var(--c-primaria-sombra)]",
+  sucesso: "bg-[var(--c-sucesso)] text-[var(--c-fundo)] shadow-[0_6px_0_var(--c-sucesso-sombra)]",
+  alerta: "bg-[var(--c-alerta)] text-[var(--c-fundo)] shadow-[0_6px_0_var(--c-alerta-sombra)]",
+  destaque: "bg-[var(--c-destaque)] text-[var(--c-fundo)] shadow-[0_6px_0_var(--c-destaque-sombra)]",
+  neutra: "bg-[var(--c-superficie)] text-[var(--c-tinta)] shadow-[0_6px_0_var(--c-borda)] ring-2 ring-inset ring-[var(--c-borda)]",
 };
 
 type Props = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "aria-label"> & {
@@ -21,7 +26,7 @@ type Props = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "aria-label"> &
   rotulo: string;
   /** Se definido, é falado em voz alta ao tocar (para quem ainda não lê). */
   falaAoTocar?: string;
-  cor?: Cor;
+  cor?: CorBotao;
   /** Tamanho mínimo em px (nunca menos que 64). */
   tamanho?: number;
   /** Chama atenção (pulsa) quando é o próximo passo esperado. */
@@ -34,7 +39,7 @@ type Props = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "aria-label"> &
  * faz um som de toque e pode falar o próprio nome.
  */
 export const BotaoGrande = forwardRef<HTMLButtonElement, Props>(function BotaoGrande(
-  { rotulo, falaAoTocar, cor = "sol", tamanho = 80, destaque = false, redondo = true, className, onClick, children, style, ...resto },
+  { rotulo, falaAoTocar, cor = "primaria", tamanho = 80, destaque = false, redondo = true, className, onClick, children, style, ...resto },
   ref,
 ) {
   const lado = Math.max(64, tamanho);

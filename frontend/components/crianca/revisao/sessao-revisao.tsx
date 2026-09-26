@@ -15,6 +15,7 @@ import { TelaCarregando } from "@/components/crianca/comum/tela-carregando";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { useCrianca } from "@/context/CriancaContext";
 import { useMovimentoReduzido } from "@/hooks/use-movimento-reduzido";
+import { COPY } from "@/lib/copy";
 import { aulaDaRevisao, resumoDaRevisao } from "@/lib/crianca/revisao";
 import { exibir } from "@/lib/exibir";
 import { parar } from "@/lib/fala";
@@ -89,7 +90,7 @@ export function SessaoRevisao() {
   const fim = estado.tipo === "pronto" && itens.length > 0 && indice >= itens.length;
   const restantes = Math.max(0, devidos - itens.length);
   const resumo = resumoDaRevisao(itens.length, xp, restantes);
-  const minusculas = crianca?.usa_minusculas ?? false;
+  const minusculas = crianca?.usa_minusculas ?? true;
 
   const enviar = useCallback<EnviarResposta>(
     async (_ordem, resposta) => {
@@ -137,9 +138,9 @@ export function SessaoRevisao() {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col bg-[radial-gradient(circle_at_50%_0%,#EAF8E6_0%,var(--c-fundo)_60%)]">
+    <main className="flex min-h-dvh flex-col">
       <BarraTopo instrucao={falaDoTopo.texto} audioUrl={falaDoTopo.audio_url ?? null}>
-        <BotaoGrande rotulo="Voltar ao mapa" cor="branco" tamanho={64} onClick={() => router.push("/app")}>
+        <BotaoGrande rotulo={COPY.planeta.voltar} cor="neutra" tamanho={64} onClick={() => router.push("/app")}>
           <ArrowLeft className="size-9" aria-hidden />
         </BotaoGrande>
         <h1 className="flex items-center gap-2 text-2xl font-black sm:text-3xl">
@@ -159,7 +160,7 @@ export function SessaoRevisao() {
           <RotateCcw className="size-24 text-[var(--c-borda)]" aria-hidden />
           <BotaoGrande
             rotulo="Tentar de novo"
-            cor="ceu"
+            cor="primaria"
             tamanho={96}
             destaque
             onClick={() => {
@@ -177,7 +178,7 @@ export function SessaoRevisao() {
           <CalendarCheck className="size-28 text-[var(--c-grama)]" aria-hidden strokeWidth={2} />
           <h2 className="text-[clamp(1.75rem,5vw,3rem)] font-black leading-tight">{exibir("Revisão em dia!", minusculas)}</h2>
           <p className="max-w-md text-2xl font-bold opacity-80">{exibir("Amanhã tem mais.", minusculas)}</p>
-          <BotaoGrande rotulo="Voltar ao mapa" cor="grama" tamanho={96} destaque className="px-8" onClick={() => router.push("/app")}>
+          <BotaoGrande rotulo={COPY.planeta.voltar} cor="sucesso" tamanho={96} destaque className="px-8" onClick={() => router.push("/app")}>
             <ArrowLeft className="size-12" aria-hidden />
           </BotaoGrande>
         </section>
@@ -210,20 +211,20 @@ export function SessaoRevisao() {
             <div
               role="img"
               aria-label={xp === 1 ? "Você ganhou 1 ponto" : `Você ganhou ${xp} pontos`}
-              className="flex items-center gap-3 rounded-full bg-white px-6 py-3 text-4xl font-black shadow-[0_6px_0_var(--c-sol-sombra)] ring-4 ring-[var(--c-sol)]"
+              className="flex items-center gap-3 rounded-full bg-[var(--c-superficie)] px-6 py-3 text-4xl font-black shadow-[0_6px_0_var(--c-sol-sombra)] ring-4 ring-[var(--c-sol)]"
             >
               <Star className="size-10 fill-[var(--c-sol)] text-[var(--c-sol-sombra)]" aria-hidden />
               <span aria-hidden>+{xp}</span>
             </div>
           ) : null}
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <BotaoGrande rotulo="Voltar ao mapa" cor="branco" tamanho={96} className="px-8" onClick={() => router.push("/app")}>
+            <BotaoGrande rotulo={COPY.planeta.voltar} cor="neutra" tamanho={96} className="px-8" onClick={() => router.push("/app")}>
               <ArrowLeft className="size-12" aria-hidden />
             </BotaoGrande>
             {restantes > 0 ? (
               <BotaoGrande
                 rotulo="Revisar mais"
-                cor="grama"
+                cor="sucesso"
                 tamanho={96}
                 destaque
                 className="px-8"
