@@ -20,9 +20,9 @@ use Illuminate\Support\Collection;
 /**
  * Monta a missão como o app da criança precisa (docs/api-crianca.md,
  * AulaCrianca): a sequência `atividades[]` montada pelo avaliador de cada
- * tipo (sem respostas), mais os recursos de Português (história, peças
- * acumuladas, metas marcadas como encontradas, Teia) que as atividades
- * legadas usam e que, por compatibilidade, também seguem no topo do payload.
+ * tipo (sem respostas). Os recursos de Português (história, peças
+ * acumuladas, metas marcadas como encontradas, Teia) vão para as atividades
+ * legadas pelo contexto; nada deles fica solto no topo do payload.
  */
 class MontadorAulaCrianca
 {
@@ -109,17 +109,7 @@ class MontadorAulaCrianca
             'status' => $status,
             'etapa_atual' => $etapa,
             'total_atividades' => $total,
-            // Nomes na ordem, com a conquista no fim (compatibilidade com o app atual).
-            'etapas' => [...$aula->atividades->pluck('tipo')->all(), 'conquista'],
             'atividades' => $atividades,
-            'historia' => $recursos['historia'],
-            'perguntas' => $recursos['perguntas'],
-            'palmas' => $recursos['palmas'],
-            'ficha' => $recursos['ficha'],
-            'pecas' => $recursos['pecas'],
-            'metas' => $recursos['metas'],
-            'teia' => $recursos['teia'],
-            'palavrinhas' => $recursos['palavrinhas'],
         ];
     }
 

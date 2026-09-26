@@ -24,5 +24,5 @@ export type PropsConquista = {
   definirInstrucao: (instrucao: Trecho) => void;
   mostrarConquistas: (conquistas: Conquista[]) => void;
   concluirMissao: () => Promise<ResultadoConclusao | null>;
-  estrelasNoInicio: number | null;
+  xpNoInicio: number | null;
 };

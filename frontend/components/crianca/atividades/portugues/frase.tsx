@@ -98,7 +98,7 @@ export function Frase({ aula, atividade, minusculas, aoConcluir, definirInstruca
       const r = enviarPersonalizado ? await enviarPersonalizado([...frase]) : await enviarProducao(aula.id, [...frase]);
 
       celebrar(reduzido);
-      atualizar({ estrelas: r.estrelas });
+      atualizar({ xp: r.xp_total });
       setEnviada(r.texto || texto(frase, " "));
 
       if (r.conquistas.length > 0) mostrarConquistas(r.conquistas);

@@ -24,6 +24,7 @@ import type {
   UpdateCriancaPayload,
 } from "@/types/Crianca";
 import type { OpcoesVisuais } from "@/types/OpcaoVisual";
+import type { Progresso } from "@/types/Progresso";
 import type {
   CreatePalavraPayload,
   ImportarDicionarioResponse,
@@ -325,4 +326,10 @@ export function aceitarAmizade(data: AceitarAmizadePayload) {
 
 export function encerrarAmizade(id: number) {
   return apiFetch<Amizade>(`/painel/amizades/${id}`, { method: "DELETE" });
+}
+
+// ===== Progresso de uma criança =====
+
+export function getProgresso(criancaId: number) {
+  return apiFetch<Progresso>(`/painel/progresso/${criancaId}`);
 }

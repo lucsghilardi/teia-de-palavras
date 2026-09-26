@@ -36,7 +36,7 @@ class TentativaService
             : $this->validador->validarCom($disponiveis, $aula, $silabas, $crianca);
 
         $nova = $this->teia->registrar($crianca, $resultado, $aula, $silabas, $origem);
-        $stats = $this->gamificacao->darEstrelas($crianca, $nova ? (int) config('teia.estrelas.palavra') : 0);
+        $stats = $this->gamificacao->darXp($crianca, $nova ? (int) config('teia.xp.palavra') : 0);
         $conquistas = $nova ? $this->gamificacao->avaliarConquistas($crianca) : [];
 
         $this->sessoes->registrar(
@@ -54,14 +54,14 @@ class TentativaService
      * @param  list<array<string, string>>  $conquistas
      * @return array<string, mixed>
      */
-    public function resposta(Crianca $crianca, ResultadoValidacao $resultado, bool $nova, int $estrelas, array $conquistas): array
+    public function resposta(Crianca $crianca, ResultadoValidacao $resultado, bool $nova, int $xpTotal, array $conquistas): array
     {
         return [
             ...$resultado->toArray(),
             'nova_na_teia' => $nova,
             'audio_url' => $resultado->valida ? ResolverAudio::para($crianca)->palavra($resultado->palavraExibida) : null,
             'teia_total' => TeiaPalavra::where('crianca_id', $crianca->id)->count(),
-            'estrelas' => $estrelas,
+            'xp_total' => $xpTotal,
             'conquistas' => $conquistas,
         ];
     }

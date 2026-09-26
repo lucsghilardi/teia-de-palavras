@@ -71,7 +71,7 @@ export function useResposta({
           },
         }));
 
-        atualizar({ estrelas: r.xp_total, xp: r.xp_total, nivel: r.nivel });
+        atualizar({ xp: r.xp_total, nivel: r.nivel });
 
         if (r.correta) {
           celebrar(reduzido);

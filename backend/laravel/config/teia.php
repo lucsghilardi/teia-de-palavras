@@ -21,23 +21,20 @@ return [
     'palavrinhas' => ['O', 'A', 'E', 'É', 'UM', 'UMA', 'NO', 'NA', 'DO', 'DA', 'TEM', 'COM'],
 
     // Estrelas (XP) são só da criança: nunca há ranking ou comparação.
-    'estrelas' => [
+    // XP (pontos) por conquista. Atividades genéricas: só no primeiro acerto de cada item.
+    'xp' => [
         'palavra' => 1,
         'producao' => 1,
         'missao' => 3,
-    ],
-
-    // XP das atividades genéricas: só no primeiro acerto de cada item.
-    'xp' => [
         'atividade_item' => 1,
         'revisao_item' => 1,
     ],
 
     // Mini-aulas gravadas pelas crianças (ensino entre pares).
     'mini_aulas' => [
-        'por_dia' => 10,
-        'duracao_max_s' => 60,
-        'tamanho_max_kb' => 2048,
+        'por_dia' => (int) env('TEIA_MINI_AULAS_POR_DIA', 10),
+        'duracao_max_s' => (int) env('TEIA_MINI_AULAS_DURACAO_MAX_S', 60),
+        'tamanho_max_kb' => (int) env('TEIA_MINI_AULAS_TAMANHO_MAX_KB', 2048),
         'mimes' => ['webm', 'weba', 'mp4', 'm4a', 'ogg', 'oga', 'opus', 'mp3', 'wav'],
         'xp_dada' => 3,            // autora, quando um adulto aprova
         'xp_respondida' => 1,      // quem responde certo

@@ -30,8 +30,6 @@ export type Eu = {
   /** Fala a história e a instrução ao chegar na tela; desligada, só o alto-falante fala. */
   narracao_automatica: boolean;
   turma: { id: number; nome: string };
-  /** Mesmo valor de `xp` (nome antigo). */
-  estrelas: number;
   xp: number;
   nivel: number;
   xp_no_nivel: number;
@@ -320,15 +318,15 @@ export type ResultadoTentativa = {
   dica: string | null;
   audio_url: string | null;
   teia_total: number;
-  estrelas: number;
+  xp_total: number;
   conquistas: Conquista[];
 };
 
-export type ResultadoProducao = { texto: string; estrelas: number; conquistas: Conquista[] };
+export type ResultadoProducao = { texto: string; xp_total: number; conquistas: Conquista[] };
 
 export type ResultadoConclusao = {
   desbloqueadas: { id: number; titulo: string; palavra_geradora: string | null }[];
-  estrelas: number;
+  xp_total: number;
   conquistas: Conquista[];
   palavras_da_missao: { palavra: string; audio_url: string | null }[];
 };

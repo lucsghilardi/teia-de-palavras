@@ -34,7 +34,7 @@ na mesma luta. Se ajudar mais uma criança, já valeu.
 
 **A Galáxia** é o início: até três *missões do dia* (uma por planeta, o planeta
 parado há mais tempo primeiro), a *Revisão* com os itens que venceram, os quatro
-planetas com o progresso e a *base dos amigos* (em breve).
+planetas com o progresso, a *base dos amigos* e, quando um adulto abre uma, a *Roda*.
 
 **Cada planeta** é uma trilha de missões. **Cada missão** tem de 3 a 7 atividades
 curtas, com instrução visível e alto-falante em toda tela, e termina numa
@@ -64,7 +64,18 @@ Três combinados que o sistema nunca quebra:
     <td align="center"><img src="docs/imagens/revisao.png" width="200" alt="Revisão do dia"><br><sub>Revisão espaçada</sub></td>
     <td align="center"><img src="docs/imagens/eu.png" width="200" alt="Nível, sequência e medalhas"><br><sub>Nível e medalhas</sub></td>
   </tr>
+  <tr>
+    <td align="center"><img src="docs/imagens/amigos.png" width="200" alt="Base dos amigos: aulas recebidas e dar uma aula"><br><sub>Base dos amigos</sub></td>
+    <td align="center"><img src="docs/imagens/amigos-gravar.png" width="200" alt="Gravar uma mini-aula"><br><sub>Dar uma aula</sub></td>
+    <td align="center"><img src="docs/imagens/roda-dupla.png" width="200" alt="A dupla na Roda: concordo ou vamos mudar"><br><sub>Roda em dupla</sub></td>
+  </tr>
 </table>
+
+**Aprender ensinando.** Na *base dos amigos* a criança grava uma **mini-aula** (a voz dela
+explicando um desafio gerado da missão; ela nunca digita) que um adulto ouve e aprova antes
+de chegar aos amigos da turma e das *turmas amigas* (a casa de um primo, ligada por um código
+que os dois responsáveis aceitam). Quem recebe ouve, responde e reage com um toque. Na **Roda**,
+o adulto conduz uma missão ao vivo e as crianças, em duplas, propõem e confirmam as respostas.
 
 Os métodos por trás de cada decisão (palavras geradoras, prática de recuperação e
 espaçamento, feedback formativo, maestria, concreto → pictórico → abstrato,
@@ -97,13 +108,15 @@ tipos mais comuns). Tipos hoje: `historia`, `escolha`, `verdadeiro_falso`, `orde
 **App da criança** (tablet ou celular, tema Espaço)
 - Entrada sem senha: o adulto digita o código da turma (ou lê o QR), a criança toca no próprio avatar e na sua "figura secreta"
 - Galáxia, planetas, missões com atividades genéricas, Teia de Palavras, Revisão espaçada, pontos, nível, sequência de dias e medalhas
+- Base dos amigos: mini-aulas gravadas (dar e receber), reações com um toque; Roda ao vivo com duplas
 - Voz em tudo, botões grandes (≥ 64 px), fonte Lexend, texto como escrito (ou caixa alta, por criança), respeita "reduzir movimento"
 - Sugere uma pausa depois de alguns minutos de tela
 
 **Painel do educador** (pai, mãe ou professora)
 - Turmas com código e QR code, cadastro de crianças (avatar, texto como escrito, narração automática)
-- Editor de missões por disciplina: atividades com modelos de JSON, e em Português história, perguntas, sílabas, famílias e palavras-meta
-- Dicionário de palavras válidas, avatares, figuras e configurações
+- Editor de missões por disciplina: formulários para os tipos mais comuns e JSON validado para os demais; em Português história, perguntas, sílabas, famílias e palavras-meta
+- Mini-aulas para ouvir e aprovar, amizades entre turmas (código + termo), rodas ao vivo (QR, comandos, duplas)
+- Progresso de cada criança (só o caminho dela, sem comparação), dicionário, avatares, figuras e configurações
 
 ## Como rodar
 
@@ -183,7 +196,8 @@ Contratos e referências: [`docs/api-painel.md`](docs/api-painel.md),
 ```bash
 docker compose exec backend php artisan test   # backend (Pest), banco teia_test
 cd frontend && npm test                        # lógica pura do app da criança (Vitest)
-cd frontend && npm run test:e2e                # missões TEIA e 7 + 5, Revisão e "eu", só com toques, em tablet e celular
+cd frontend && npm run test:e2e                # missões TEIA e 7 + 5, Revisão e "eu", base dos amigos (com microfone falso)
+                                               # e a Roda com dois navegadores, só com toques, em tablet e celular
 ```
 
 - Os testes do backend usam o PostgreSQL do compose (banco `teia_test`, criado na
@@ -200,15 +214,18 @@ cd frontend && npm run test:e2e                # missões TEIA e 7 + 5, Revisão
 - A criança tem **só apelido, avatar e turma**. Nada de nome completo, foto ou data de nascimento.
 - Quem cadastra é o responsável, com consentimento registrado.
 - A criança entra com uma figura secreta, não com senha. Depois de 5 tentativas, a entrada pausa por 15 minutos e o app pede ajuda a um adulto.
-- Áudios ficam em disco privado, nunca em pasta pública.
+- Áudios ficam em disco privado, nunca em pasta pública. A voz de uma criança (mini-aula) só é servida à própria turma e às turmas amigas, e só depois que um adulto aprova; recusar apaga o arquivo e `php artisan teia:limpar-gravacoes` purga o resto.
+- Amizade entre turmas exige o código de um responsável e o aceite, com termo versionado, do outro. Crianças nunca trocam texto livre: só reações fixas.
 
 ## Próximos passos
 
 - [x] Motor de atividades por tipo, quatro planetas, revisão espaçada, nível e medalhas, tema Espaço
 - [x] Atividades de dinheiro, mapa e ditado; formulários amigáveis no painel
-- [ ] Amizades entre turmas e mini-aulas gravadas pelas crianças (aprovadas por um adulto)
-- [ ] Duplas ao vivo (a *Roda*, contrato em `docs/api-roda.md`)
-- [ ] Progresso da criança no painel
+- [x] Amizades entre turmas e mini-aulas gravadas pelas crianças (aprovadas por um adulto)
+- [x] Duplas ao vivo (a *Roda*, contrato em `docs/api-roda.md`)
+- [x] Progresso da criança no painel
+- [ ] Reverb em produção (hoje o compose sobe o servidor; sem ele a Roda usa polling)
+- [ ] Mais missões por planeta e imagens próprias nas atividades
 
 ## Quer ajudar?
 

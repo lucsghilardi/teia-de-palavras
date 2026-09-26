@@ -33,7 +33,7 @@ it('completa a missão TEIA do início ao fim', function () {
     }
 
     // Etapa 5: criação — monta as palavras da missão com as peças.
-    foreach ($aula['metas'] as $meta) {
+    foreach (collect($aula['atividades'])->firstWhere('tipo', 'montar_palavras')['metas'] as $meta) {
         $comToken()->postJson("/api/crianca/aulas/{$teiaId}/tentativas", ['silabas' => $meta['silabas']])
             ->assertOk()->assertJsonPath('valida', true);
     }
@@ -59,11 +59,11 @@ it('completa a missão TEIA do início ao fim', function () {
 
     expect($fim['desbloqueadas'][0]['palavra_geradora'])->toBe('BONECA')
         ->and(array_column($fim['palavras_da_missao'], 'palavra'))->toBe(['TEIA', 'TATU', 'TIA', 'TIO', 'TETO'])
-        ->and($fim['estrelas'])->toBe(5 + 1 + 1 + 1 + 3); // palavras + sílaba + ditado + frase + missão
+        ->and($fim['xp_total'])->toBe(5 + 1 + 1 + 1 + 3); // palavras + sílaba + ditado + frase + missão
 
     $mapa = $comToken()->getJson('/api/crianca/mapa')->json('missoes');
     expect($mapa[0]['status'])->toBe('concluida')->and($mapa[1]['status'])->toBe('disponivel');
 
     $comToken()->getJson('/api/crianca/teia')->assertJsonPath('total', 5);
-    $comToken()->getJson('/api/crianca/eu')->assertJsonPath('teia_total', 5)->assertJsonPath('estrelas', 11);
+    $comToken()->getJson('/api/crianca/eu')->assertJsonPath('teia_total', 5)->assertJsonPath('xp', 11);
 });

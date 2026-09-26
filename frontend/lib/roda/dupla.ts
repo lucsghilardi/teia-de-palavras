@@ -85,7 +85,7 @@ export function respostaDeMudar(apelido: string, item: string, totais: { xp_tota
   };
 }
 
-export function tentativaDeMudar(apelido: string, silabas: string[], totais: { estrelas: number; teia_total: number }): ResultadoTentativa {
+export function tentativaDeMudar(apelido: string, silabas: string[], totais: { xp_total: number; teia_total: number }): ResultadoTentativa {
   return {
     valida: false,
     tipo: "quase",
@@ -95,7 +95,7 @@ export function tentativaDeMudar(apelido: string, silabas: string[], totais: { e
     dica: `${apelido} quer tentar de outro jeito. Conversem e montem outra palavra.`,
     audio_url: null,
     teia_total: totais.teia_total,
-    estrelas: totais.estrelas,
+    xp_total: totais.xp_total,
     conquistas: [],
   };
 }

@@ -113,7 +113,7 @@ class RevisaoService
         $item->save();
 
         $xp = $resultado->correta ? (int) config('teia.xp.revisao_item', 1) : 0;
-        $stats = $this->gamificacao->darEstrelas($crianca, $xp);
+        $stats = $this->gamificacao->darXp($crianca, $xp);
         $conquistas = $resultado->correta ? $this->gamificacao->avaliarConquistas($crianca) : [];
 
         $this->sessoes->registrar($crianca, $resultado->correta ? 'revisao_certa' : 'revisao_errada', null, null, [

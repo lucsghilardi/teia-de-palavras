@@ -235,7 +235,7 @@ export function MontarPalavras({
 
         celebrar(reduzido);
         aoDescobrir(palavra, r.audio_url);
-        atualizar({ estrelas: r.estrelas, teia_total: r.teia_total });
+        atualizar({ xp: r.xp_total, teia_total: r.teia_total });
         setAchadas((lista) =>
           lista.some((a) => mesmaPalavra(a.palavra, palavra)) ? lista : [...lista, { palavra, audio_url: r.audio_url }],
         );

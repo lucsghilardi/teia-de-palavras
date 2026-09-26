@@ -117,7 +117,7 @@ it('a missão de Matemática inteira pode ser concluída pelas rotas genéricas'
 
     $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$this->aula->id}/concluir")
         ->assertOk()
-        ->assertJsonPath('estrelas', 3)
+        ->assertJsonPath('xp_total', 3)
         ->assertJsonPath('palavras_da_missao', []);
 });
 

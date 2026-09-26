@@ -22,7 +22,7 @@ export function BarraAula({
   concluidas,
   aoIr,
   instrucao,
-  estrelas,
+  xp,
   mostrarVoltar = true,
 }: {
   disciplina: Disciplina;
@@ -32,7 +32,7 @@ export function BarraAula({
   concluidas: number[];
   aoIr: (etapa: number) => void;
   instrucao: Trecho;
-  estrelas: number | null;
+  xp: number | null;
   /** Na conquista o botão grande "Voltar ao mapa" fica no conteúdo. */
   mostrarVoltar?: boolean;
 }) {
@@ -55,14 +55,14 @@ export function BarraAula({
       </nav>
 
       <div className="order-2 ml-auto flex shrink-0 items-center gap-2 lg:order-3 lg:ml-0">
-        {estrelas !== null && (
+        {xp !== null && (
           <div
             role="img"
-            aria-label={COPY.comum.pontos(estrelas)}
+            aria-label={COPY.comum.pontos(xp)}
             className="flex h-12 items-center gap-1.5 rounded-full bg-[var(--c-superficie)] px-3 text-xl font-black shadow-[0_3px_0_var(--c-borda)]"
           >
             <Star aria-hidden className="size-6 fill-[var(--c-alerta)] text-[var(--c-alerta)]" />
-            <span aria-hidden>{estrelas}</span>
+            <span aria-hidden>{xp}</span>
           </div>
         )}
         {/* Tocar no alto-falante cancela sequências de fala em andamento. */}

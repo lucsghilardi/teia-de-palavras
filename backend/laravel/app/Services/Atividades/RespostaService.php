@@ -74,7 +74,7 @@ class RespostaService
         }
 
         $xp = ($primeiroAcerto && ! $resultado->xpCreditado) ? $resultado->xp : 0;
-        $stats = $this->gamificacao->darEstrelas($crianca, $xp);
+        $stats = $this->gamificacao->darXp($crianca, $xp);
         $conquistas = $primeiroAcerto ? $this->gamificacao->avaliarConquistas($crianca) : [];
 
         $this->sessoes->registrar($crianca, $resultado->correta ? 'resposta_certa' : 'resposta_errada', $aula, $atividade->ordem, [

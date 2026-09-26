@@ -28,7 +28,11 @@ subir o projeto e o plano de fases.
   A claim `prv` do tymon impede usar um token no guard do outro.
 - Rotas em `routes/api/*.php` por área; controllers em `App\Http\Controllers\Api\{Painel,Crianca,Turma}`; regras em `App\Services`.
 - Código novo usa FormRequest e API Resource. Nomes de domínio em português; tabelas de framework em inglês.
-- Reverb: canais em `routes/channels.php` SEMPRE com `['guards' => ['api', 'crianca']]`; rota de auth em `/api/broadcasting/auth`.
+- Reverb: canais em `routes/channels.php` SEMPRE com `['guards' => ['api', 'crianca']]`; rota de auth em `/api/broadcasting/auth`
+  (adulto) e `/api/crianca/broadcasting/auth` (criança). A Roda (`routes/api/turma.php`, `App\Services\Roda\RodaService`,
+  contrato em `docs/api-roda.md`) transmite snapshots `RodaAtualizada`/`DuplaAtualizada`; sem websocket o front faz polling.
+- XP é o único nome (`xp`, `xp_total`, `darXp`, `config('teia.xp.*')`): não reintroduza "estrelas" na API.
+- Progresso no painel (`GET /painel/progresso/{crianca}`) mostra só o caminho da própria criança: nunca comparação nem ranking.
 - Next 16 em `frontend`: o navegador nunca vê o JWT; ele fica em cookie httpOnly (`teia_sessao`) e o proxy
   `app/api/proxy/[...path]` injeta o Bearer e renova no 401. `apiFetch` em `services/api.ts`.
 - Painel do educador em `app/(painel)/painel/*` (shadcn). App da criança em `app/(crianca)/app/*`:

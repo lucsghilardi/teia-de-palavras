@@ -21,7 +21,7 @@ const FALA_FINAL = { texto: COPY.missao.concluida };
 
 /**
  * CONQUISTA (etapa N+1): conclui a missão no servidor (uma vez), comemora e
- * mostra estrelas, palavras descobertas nesta missão e medalhas. A missão
+ * mostra os pontos, as palavras descobertas nesta missão e as medalhas. A missão
  * pode ser revista depois — nada aqui trava.
  */
 export function TelaConquista({
@@ -30,12 +30,12 @@ export function TelaConquista({
   definirInstrucao,
   mostrarConquistas,
   concluirMissao,
-  estrelasNoInicio,
+  xpNoInicio,
 }: PropsConquista) {
   const router = useRouter();
   const reduzido = useMovimentoReduzido();
   const { crianca } = useCrianca();
-  const [estrelasAntes] = useState(() => estrelasNoInicio ?? crianca?.estrelas ?? null);
+  const [xpAntes] = useState(() => xpNoInicio ?? crianca?.xp ?? null);
   const [resultado, setResultado] = useState<ResultadoConclusao | null>(null);
   const [pronto, setPronto] = useState(false);
   const chamou = useRef(false);
@@ -81,8 +81,8 @@ export function TelaConquista({
         : [],
     );
   const proxima = resultado?.desbloqueadas[0] ?? null;
-  const ganhas = resultado && estrelasAntes !== null ? Math.max(0, resultado.estrelas - estrelasAntes) : null;
-  const estrelasTotal = resultado?.estrelas ?? crianca?.estrelas ?? null;
+  const ganhas = resultado && xpAntes !== null ? Math.max(0, resultado.xp_total - xpAntes) : null;
+  const xpTotal = resultado?.xp_total ?? crianca?.xp ?? null;
 
   return (
     <section aria-label="Conquista" className="flex flex-1 flex-col items-center gap-5 px-3 pb-6 sm:px-6">
@@ -98,14 +98,14 @@ export function TelaConquista({
         aria-label={
           ganhas !== null && ganhas > 0
             ? `Você ganhou ${COPY.comum.pontos(ganhas)}`
-            : estrelasTotal !== null
-              ? COPY.comum.pontos(estrelasTotal)
+            : xpTotal !== null
+              ? COPY.comum.pontos(xpTotal)
               : "Pontos"
         }
         className="flex items-center gap-3 rounded-full bg-[var(--c-superficie)] px-6 py-3 text-4xl font-black shadow-[0_6px_0_var(--c-alerta-sombra)] ring-4 ring-[var(--c-alerta)]"
       >
         <Star aria-hidden className={cn("size-10 fill-[var(--c-alerta)] text-[var(--c-alerta)]", pronto && !reduzido && "animate-crianca-pulso")} />
-        <span aria-hidden>{ganhas !== null && ganhas > 0 ? `+${ganhas}` : (estrelasTotal ?? "…")}</span>
+        <span aria-hidden>{ganhas !== null && ganhas > 0 ? `+${ganhas}` : (xpTotal ?? "…")}</span>
       </div>
 
       {palavras.length > 0 && (

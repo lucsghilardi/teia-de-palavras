@@ -10,9 +10,9 @@ import type { Eu } from "@/types/CriancaApp";
 type Valor = {
   crianca: Eu | null;
   carregando: boolean;
-  /** Recarrega /eu (estrelas, Teia) depois de uma conquista. */
+  /** Recarrega /eu (XP, nível, Teia) depois de uma conquista. */
   recarregar: () => Promise<void>;
-  /** Atualiza campos localmente sem ir ao servidor (ex.: estrelas da resposta). */
+  /** Atualiza campos localmente sem ir ao servidor (ex.: XP da resposta). */
   atualizar: (parcial: Partial<Eu>) => void;
   sair: () => Promise<void>;
 };

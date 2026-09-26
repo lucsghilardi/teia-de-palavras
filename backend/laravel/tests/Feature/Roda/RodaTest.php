@@ -62,7 +62,7 @@ it('o educador abre uma roda (uma por turma, só missão publicada, só nas suas
 
     $painel = $this->comoAdulto($this->educador)->getJson("/api/painel/rodas/{$roda['id']}")->assertOk()->json();
     expect($painel['conteudo']['atividades'])->toHaveCount(8)
-        ->and($painel['conteudo']['pecas'])->not->toBeEmpty()
+        ->and(collect($painel['conteudo']['atividades'])->firstWhere('tipo', 'montar_palavras')['pecas'])->not->toBeEmpty()
         ->and($painel['criancas_da_turma'])->toHaveCount(3)
         ->and($painel['duplas'])->toBe([]);
 });
@@ -78,7 +78,7 @@ it('as crianças da turma entram (sem código ou pelo código), recebem o pacote
         ->and(collect($pacote['roda']['participantes'])->pluck('apelido')->all())->toBe(['Ana'])
         ->and($pacote['roda']['participantes'][0]['presente'])->toBeTrue()
         ->and($pacote['conteudo']['atividades'])->toHaveCount(8)
-        ->and($pacote['conteudo']['pecas'])->not->toBeEmpty();
+        ->and(collect($pacote['conteudo']['atividades'])->firstWhere('tipo', 'montar_palavras')['pecas'])->not->toBeEmpty();
 
     $this->comoCrianca($this->beto)->postJson('/api/crianca/rodas/entrar', ['codigo' => strtolower($roda['codigo'])])->assertOk()->assertJsonCount(2, 'roda.participantes');
     $this->comoCrianca($this->caio)->getJson("/api/crianca/rodas/{$roda['id']}")->assertForbidden();

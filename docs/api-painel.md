@@ -138,6 +138,23 @@ próprias turmas; admin todas.
 Limpeza (LGPD): `php artisan teia:limpar-gravacoes --dias=7` (agendado todo dia às 03:10) apaga do
 disco os áudios recusados/removidos há mais de N dias e os de crianças excluídas.
 
+## Progresso de uma criança
+- `GET /painel/progresso/{crianca}` → só o caminho dela (educador da turma ou admin; 403 senão). Nunca compara crianças.
+  ```
+  { crianca: { id, apelido, avatar, turma: {id, nome} },
+    xp: { xp, nivel, xp_no_nivel, xp_para_proximo },
+    sequencia: { atual, maior, ultimo_dia_ativo },
+    missoes: { por_disciplina: [ { chave, nome, cor, icone, publicadas, concluidas, em_andamento } ],
+               ultimas: [ { id, rotulo, titulo, disciplina, status, etapa_atual, total_atividades, iniciada_em, concluida_em } ] },
+    teia: { total, ultimas: [ { palavra, origem, descoberta_em } ] },
+    revisao: { itens, dominados, devidos, acertos, erros },
+    respostas: { itens, acertou, acertou_na_primeira },
+    mini_aulas: { dadas, aprovadas, recebidas, respondidas },
+    rodas: { participou },
+    medalhas: { total, desbloqueadas, ultimas: [ Conquista & { desbloqueada_em } ] },
+    uso: { dias_ativos_30d, minutos_30d } }
+  ```
+
 ## Configurações
 - `GET /painel/configuracoes` → `{ heroi_nome, fabrica_nome, minutos_pausa, consentimento_versao, consentimento_texto,
   amizade_termo_versao, amizade_termo_texto }`

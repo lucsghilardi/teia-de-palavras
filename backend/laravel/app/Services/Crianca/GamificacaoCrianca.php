@@ -27,7 +27,7 @@ class GamificacaoCrianca
         );
     }
 
-    public function darEstrelas(Crianca $crianca, int $quantidade): CriancaEstatistica
+    public function darXp(Crianca $crianca, int $quantidade): CriancaEstatistica
     {
         $stats = $this->registrarDiaAtivo($crianca);
 

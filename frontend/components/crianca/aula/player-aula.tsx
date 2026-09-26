@@ -98,7 +98,7 @@ export function PlayerAula({ id }: { id: number }) {
   const [carga, setCarga] = useState(0);
   const [instrucao, setInstrucao] = useState<Trecho>({ texto: "Vamos começar a missão!" });
   const [lote, setLote] = useState<LoteConquistas | null>(null);
-  const [estrelasNoInicio] = useState(() => crianca?.estrelas ?? null);
+  const [xpNoInicio] = useState(() => crianca?.xp ?? null);
   const sincronizador = useRef<Sincronizador | null>(null);
   const refConteudo = useRef<HTMLElement | null>(null);
 
@@ -203,7 +203,7 @@ export function PlayerAula({ id }: { id: number }) {
         const r = await concluirAulaApi(id);
 
         despachar({ tipo: "concluirAula" });
-        atualizar({ estrelas: r.estrelas });
+        atualizar({ xp: r.xp_total });
         void recarregar();
 
         return r;
@@ -264,7 +264,7 @@ export function PlayerAula({ id }: { id: number }) {
         concluidas={estado.concluidas}
         aoIr={irPara}
         instrucao={instrucao}
-        estrelas={crianca?.estrelas ?? null}
+        xp={crianca?.xp ?? null}
         mostrarVoltar={!conquista}
       />
 
@@ -280,7 +280,7 @@ export function PlayerAula({ id }: { id: number }) {
             definirInstrucao={setInstrucao}
             mostrarConquistas={mostrarConquistas}
             concluirMissao={concluirMissao}
-            estrelasNoInicio={estrelasNoInicio}
+            xpNoInicio={xpNoInicio}
           />
         ) : null}
       </main>

@@ -141,7 +141,7 @@ class RodaService
             foreach ($roda->participantes as $crianca) {
                 $jaConcluida = CriancaAula::where('crianca_id', $crianca->id)->where('aula_id', $aula->id)->where('status', CriancaAula::CONCLUIDA)->exists();
                 $this->desbloqueio->concluir($crianca, $aula);
-                $this->gamificacao->darEstrelas($crianca, $jaConcluida ? 0 : (int) config('teia.estrelas.missao'));
+                $this->gamificacao->darXp($crianca, $jaConcluida ? 0 : (int) config('teia.xp.missao'));
 
                 if (! $jaConcluida) {
                     $this->gamificacao->avaliarConquistas($crianca);

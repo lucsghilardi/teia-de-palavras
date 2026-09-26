@@ -40,7 +40,7 @@ it('/eu expõe nível, XP até o próximo, sequências, medalhas e revisões dev
 
     $this->comoCrianca($this->crianca)->getJson('/api/crianca/eu')
         ->assertOk()
-        ->assertJsonPath('estrelas', 12)
+        ->assertJsonPath('xp', 12)
         ->assertJsonPath('xp', 12)
         ->assertJsonPath('nivel', 2)
         ->assertJsonPath('xp_no_nivel', 2)
@@ -65,9 +65,9 @@ it('o nível vem da tabela de XP e o último nível não tem próximo', function
 it('ganhar XP atualiza o nível guardado nas estatísticas', function () {
     $gamificacao = app(GamificacaoCrianca::class);
 
-    expect($gamificacao->darEstrelas($this->crianca, 9)->nivel)->toBe(1)
-        ->and($gamificacao->darEstrelas($this->crianca, 1)->nivel)->toBe(2)
-        ->and($gamificacao->darEstrelas($this->crianca, 15)->nivel)->toBe(3);
+    expect($gamificacao->darXp($this->crianca, 9)->nivel)->toBe(1)
+        ->and($gamificacao->darXp($this->crianca, 1)->nivel)->toBe(2)
+        ->and($gamificacao->darXp($this->crianca, 15)->nivel)->toBe(3);
 });
 
 it('concluir a primeira missão de Matemática dá a medalha do planeta', function () {

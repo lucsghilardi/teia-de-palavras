@@ -29,7 +29,7 @@ export function metasPendentes(metas: Meta[], achadasAgora: string[] = []): Meta
   return metas.filter((m) => !m.encontrada && !achadasAgora.some((p) => mesmaPalavra(p, m.palavra)));
 }
 
-/** Frase falada pelo botão 💡 da Criação. */
+/** Frase falada pelo botão de dica (lâmpada) da Criação. */
 export function dicaDaCriacao(metas: Meta[], achadasAgora: string[] = []): string {
   if (metas.length === 0) {
     return "Junte duas pecinhas e toque no botão verde.";

@@ -50,7 +50,7 @@ it('entra com a figura secreta certa e recebe token de 8 horas', function () {
         ->assertOk()
         ->assertJsonPath('apelido', 'Gugu')
         ->assertJsonPath('avatar.chave', 'robo')
-        ->assertJsonPath('estrelas', 0)
+        ->assertJsonPath('xp', 0)
         ->assertJsonPath('config.minutos_pausa', 20);
 });
 

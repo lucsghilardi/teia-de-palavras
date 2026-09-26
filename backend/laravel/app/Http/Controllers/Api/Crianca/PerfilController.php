@@ -35,7 +35,6 @@ class PerfilController extends Controller
             'usa_minusculas' => (bool) $crianca->usa_minusculas,
             'narracao_automatica' => (bool) $crianca->narracao_automatica,
             'turma' => ['id' => $crianca->turma->id, 'nome' => $crianca->turma->nome],
-            'estrelas' => (int) $stats->xp_total,
             ...GamificacaoCrianca::resumoNivel((int) $stats->xp_total),
             'sequencia_dias' => (int) $stats->sequencia_atual,
             'maior_sequencia' => (int) $stats->maior_sequencia,

@@ -37,22 +37,23 @@ it('entrega a aula pronta para a criança', function () {
     Configuracao::definir('heroi_nome', 'Fio');
 
     $aula = $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$this->teia->id}/iniciar")->assertOk()->json();
+    $porTipo = collect($aula['atividades'])->keyBy('tipo');
 
     expect($aula['status'])->toBe('em_andamento')
         ->and($aula['etapa_atual'])->toBe(1)
-        ->and($aula['etapas'])->toHaveCount(count(ConteudoInicialSeeder::SEQUENCIA) + 1)
-        ->and($aula['historia'][0]['texto'])->toContain('Fio')->not->toContain('{{heroi}}')
-        ->and(array_column($aula['palmas'], 'texto'))->toBe(['TEI', 'A'])
-        ->and(array_column($aula['ficha'][0]['membros'], 'texto'))->toBe(['TA', 'TE', 'TI', 'TO', 'TU'])
-        ->and(array_column($aula['metas'], 'palavra'))->toContain('TATU', 'TETO')
-        ->and($aula['metas'][0]['encontrada'])->toBeFalse()
-        ->and($aula['palavrinhas'])->toContain('O', 'TEM');
+        ->and($aula)->not->toHaveKeys(['etapas', 'historia', 'palmas', 'ficha', 'pecas', 'metas', 'teia', 'palavrinhas'])
+        ->and($aula['atividades'])->toHaveCount(count(ConteudoInicialSeeder::SEQUENCIA))
+        ->and($porTipo['historia']['paginas'][0]['texto'])->toContain('Fio')->not->toContain('{{heroi}}')
+        ->and(array_column($porTipo['ficha']['linhas'][0]['membros'], 'texto'))->toBe(['TA', 'TE', 'TI', 'TO', 'TU'])
+        ->and(array_column($porTipo['montar_palavras']['metas'], 'palavra'))->toContain('TATU', 'TETO')
+        ->and($porTipo['montar_palavras']['metas'][0]['encontrada'])->toBeFalse()
+        ->and($porTipo['frase']['palavrinhas'])->toContain('O', 'TEM');
 
     // Peças: famílias da aula primeiro, sem repetir som; palma TEI também vira peça.
-    $pecas = array_column($aula['pecas'], 'texto');
+    $pecas = array_column($porTipo['montar_palavras']['pecas'], 'texto');
     expect($pecas)->toContain('TA', 'A', 'TEI')
         ->and(count($pecas))->toBe(count(array_unique($pecas)))
-        ->and(collect($aula['pecas'])->every(fn ($p) => $p['da_aula']))->toBeTrue();
+        ->and(collect($porTipo['montar_palavras']['pecas'])->every(fn ($p) => $p['da_aula']))->toBeTrue();
 
     expect(CriancaAula::where('crianca_id', $this->crianca->id)->value('status'))->toBe('em_andamento');
 });
@@ -60,7 +61,7 @@ it('entrega a aula pronta para a criança', function () {
 it('peças acumuladas de aulas anteriores aparecem depois das da aula', function () {
     progresso($this->crianca, $this->teia, CriancaAula::CONCLUIDA);
 
-    $pecas = $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$this->boneca->id}/iniciar")->json('pecas');
+    $pecas = $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$this->boneca->id}/iniciar")->json('atividades.4.pecas');
     $textos = array_column($pecas, 'texto');
 
     expect($textos)->toContain('BA', 'CA', 'TA', 'A')
@@ -91,7 +92,7 @@ it('palavra válida entra na Teia, dá estrela e a primeira conquista', function
         ->assertJsonPath('palavra', 'TATU')
         ->assertJsonPath('nova_na_teia', true)
         ->assertJsonPath('teia_total', 1)
-        ->assertJsonPath('estrelas', 1)
+        ->assertJsonPath('xp_total', 1)
         ->assertJsonPath('conquistas.0.chave', 'primeira_palavra');
 
     expect($resposta->json('dica'))->toBeNull();
@@ -101,7 +102,7 @@ it('palavra válida entra na Teia, dá estrela e a primeira conquista', function
         ->postJson("/api/crianca/aulas/{$this->teia->id}/tentativas", ['silabas' => ['TA', 'TU']])
         ->assertJsonPath('valida', true)
         ->assertJsonPath('nova_na_teia', false)
-        ->assertJsonPath('estrelas', 1)
+        ->assertJsonPath('xp_total', 1)
         ->assertJsonPath('conquistas', []);
 
     expect(TeiaPalavra::where('crianca_id', $this->crianca->id)->count())->toBe(1);
@@ -112,7 +113,7 @@ it('tentativa inválida vem com dica gentil e fica registrada', function () {
         ->postJson("/api/crianca/aulas/{$this->teia->id}/tentativas", ['silabas' => ['TU', 'TO', 'TA']])
         ->assertOk()
         ->assertJsonPath('valida', false)
-        ->assertJsonPath('estrelas', 0);
+        ->assertJsonPath('xp_total', 0);
 
     expect($resposta->json('dica'))->not->toBeEmpty()
         ->and(mb_strtolower($resposta->json('dica')))->not->toContain('errad')
@@ -141,7 +142,7 @@ it('produção aceita palavras da Teia e palavrinhas', function () {
         ->postJson("/api/crianca/aulas/{$this->teia->id}/producao", ['palavras' => ['O', 'TATU']])
         ->assertOk()
         ->assertJsonPath('texto', 'O TATU')
-        ->assertJsonPath('estrelas', 2)
+        ->assertJsonPath('xp_total', 2)
         ->assertJsonPath('conquistas.0.chave', 'primeira_frase');
 
     $this->comoCrianca($this->crianca)
@@ -161,20 +162,20 @@ it('só conclui a missão depois da última etapa, e concluir de novo não dá e
     $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$this->teia->id}/concluir")
         ->assertOk()
         ->assertJsonPath('desbloqueadas.0.palavra_geradora', 'BONECA')
-        ->assertJsonPath('estrelas', 3)
+        ->assertJsonPath('xp_total', 3)
         ->assertJsonPath('conquistas.0.chave', 'missao_1');
 
     $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$this->teia->id}/concluir")
         ->assertOk()
         ->assertJsonPath('desbloqueadas', [])
-        ->assertJsonPath('estrelas', 3);
+        ->assertJsonPath('xp_total', 3);
 });
 
 it('usa o áudio da aula e, se houver, a gravação aprovada da mesma turma', function () {
     $tatu = $this->teia->palavras()->where('palavra', 'TATU')->first();
     $tatu->update(['audio_path' => 'aulas/1/tatu.mp3']);
 
-    $meta = fn () => collect($this->comoCrianca($this->crianca)->getJson("/api/crianca/aulas/{$this->teia->id}")->json('metas'))
+    $meta = fn () => collect($this->comoCrianca($this->crianca)->getJson("/api/crianca/aulas/{$this->teia->id}")->json('atividades.4.metas'))
         ->firstWhere('palavra', 'TATU');
 
     // Sem gravação, ainda trancada? Não: TEIA está disponível.

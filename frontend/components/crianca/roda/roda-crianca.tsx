@@ -252,7 +252,7 @@ export function RodaCrianca({ codigo }: { codigo: string | null }) {
         const t = d.tentativa;
 
         if (!t || t.status === "recusada" || !t.resultado) {
-          return tentativaDeMudar(parceiro.apelido, silabas, { estrelas: crianca?.estrelas ?? 0, teia_total: crianca?.teia_total ?? 0 });
+          return tentativaDeMudar(parceiro.apelido, silabas, { xp_total: crianca?.xp ?? 0, teia_total: crianca?.teia_total ?? 0 });
         }
 
         return t.resultado as ResultadoTentativa;
@@ -260,7 +260,7 @@ export function RodaCrianca({ codigo }: { codigo: string | null }) {
 
       return tentarNaRoda(rodaId, silabas);
     },
-    [rodaId, parceiro, dupla, eu, proporEEsperar, crianca?.estrelas, crianca?.teia_total],
+    [rodaId, parceiro, dupla, eu, proporEEsperar, crianca?.xp, crianca?.teia_total],
   );
 
   const producao = useCallback<EnviarProducao>((palavras) => (rodaId === null ? Promise.reject(new Error("Sem roda.")) : producaoNaRoda(rodaId, palavras)), [rodaId]);

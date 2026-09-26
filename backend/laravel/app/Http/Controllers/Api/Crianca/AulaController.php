@@ -150,7 +150,7 @@ class AulaController extends Controller
         }
 
         $desbloqueadas = $this->desbloqueio->concluir($crianca, $aula);
-        $stats = $this->gamificacao->darEstrelas($crianca, $jaConcluida ? 0 : (int) config('teia.estrelas.missao'));
+        $stats = $this->gamificacao->darXp($crianca, $jaConcluida ? 0 : (int) config('teia.xp.missao'));
 
         if (! $jaConcluida) {
             $this->sessoes->registrar($crianca, 'aula_concluida', $aula, $conquista);
@@ -164,7 +164,7 @@ class AulaController extends Controller
                 'titulo' => $a->titulo,
                 'palavra_geradora' => $a->palavra_geradora,
             ])->values(),
-            'estrelas' => (int) $stats->xp_total,
+            'xp_total' => (int) $stats->xp_total,
             'conquistas' => $this->gamificacao->avaliarConquistas($crianca),
             'palavras_da_missao' => TeiaPalavra::where('crianca_id', $crianca->id)
                 ->where('aula_id', $aula->id)

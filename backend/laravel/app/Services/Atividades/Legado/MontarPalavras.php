@@ -59,7 +59,7 @@ final class MontarPalavras extends Base
         if ($tentativa['valida']) {
             return ResultadoAtividade::acerto(
                 $tentativa['nova_na_teia'] ? 'você descobriu uma palavra! ela foi para a sua teia.' : 'essa já está na sua teia!',
-                $tentativa['nova_na_teia'] ? (int) config('teia.estrelas.palavra') : 0,
+                $tentativa['nova_na_teia'] ? (int) config('teia.xp.palavra') : 0,
                 'palavra:'.$tentativa['palavra'],
                 [],
                 $tentativa,

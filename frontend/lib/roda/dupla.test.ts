@@ -46,12 +46,12 @@ describe("dupla", () => {
 
   it("'vamos mudar' vira um resultado sem avaliação e sem palavra proibida", () => {
     const r = respostaDeMudar("Beto", "q1", { xp_total: 7, nivel: 2 });
-    const t = tentativaDeMudar("Beto", ["TA", "TU"], { estrelas: 7, teia_total: 3 });
+    const t = tentativaDeMudar("Beto", ["TA", "TU"], { xp_total: 7, teia_total: 3 });
 
     expect(r.resolvido).toBe(false);
     expect(r.xp_ganho).toBe(0);
     expect(r.xp_total).toBe(7);
-    expect(t.estrelas).toBe(7);
+    expect(t.xp_total).toBe(7);
     expect(t.valida).toBe(false);
     expect(`${r.mensagem} ${r.dica} ${t.dica}`).not.toMatch(/errad|incorret/);
   });

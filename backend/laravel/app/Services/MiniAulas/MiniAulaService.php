@@ -116,7 +116,7 @@ class MiniAulaService
                 ->pluck('id')
                 ->each(fn ($id) => MiniAulaEntrega::firstOrCreate(['mini_aula_id' => $miniAula->id, 'crianca_id' => $id], ['status' => MiniAulaEntrega::RECEBIDA]));
 
-            $this->gamificacao->darEstrelas($autora, (int) config('teia.mini_aulas.xp_dada', 3));
+            $this->gamificacao->darXp($autora, (int) config('teia.mini_aulas.xp_dada', 3));
             $this->gamificacao->avaliarConquistas($autora);
 
             return $miniAula->fresh(['gravacao', 'autor']);
@@ -247,7 +247,7 @@ class MiniAulaService
             $entrega->save();
 
             $xp = $primeiroAcerto ? (int) config('teia.mini_aulas.xp_respondida', 1) : 0;
-            $stats = $this->gamificacao->darEstrelas($crianca, $xp);
+            $stats = $this->gamificacao->darXp($crianca, $xp);
             $conquistas = $entrega->status === MiniAulaEntrega::RESPONDIDA ? $this->gamificacao->avaliarConquistas($crianca) : [];
 
             if ($primeiroAcerto) {
@@ -290,7 +290,7 @@ class MiniAulaService
         }
 
         $mini->increment('xp_autora', $porAcerto);
-        $this->gamificacao->darEstrelas($mini->autor, $porAcerto);
+        $this->gamificacao->darXp($mini->autor, $porAcerto);
         $this->gamificacao->avaliarConquistas($mini->autor);
     }
 

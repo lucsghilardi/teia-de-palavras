@@ -17,7 +17,6 @@ it('entrega a sequência de atividades montada por tipo, sem respostas', functio
     expect($aula['disciplina'])->toBe('portugues')
         ->and($aula['rotulo'])->toBe('TEIA')
         ->and($aula['total_atividades'])->toBe(8)
-        ->and($aula['etapas'])->toBe([...ConteudoInicialSeeder::SEQUENCIA, 'conquista'])
         ->and(array_column($aula['atividades'], 'tipo'))->toBe(ConteudoInicialSeeder::SEQUENCIA)
         ->and(array_column($aula['atividades'], 'ordem'))->toBe(range(1, 8))
         ->and(array_column($aula['atividades'], 'avaliada'))->toBe([false, true, false, false, true, true, true, true]);
@@ -35,7 +34,7 @@ it('entrega a sequência de atividades montada por tipo, sem respostas', functio
         ->and($ditado['itens'][0])->toMatchArray(['id' => 'd1', 'fala' => 'tatu', 'tamanho' => 2])
         ->and($ditado['itens'][0])->not->toHaveKey('silabas')
         ->and(array_column($ficha['linhas'][0]['membros'], 'texto'))->toBe(['TA', 'TE', 'TI', 'TO', 'TU'])
-        ->and(array_column($criacao['pecas'], 'texto'))->toBe(array_column($aula['pecas'], 'texto'))
+        ->and(array_column($criacao['pecas'], 'texto'))->toContain('TA', 'TE', 'TI', 'TO', 'TU')
         ->and(array_column($criacao['metas'], 'palavra'))->toContain('TATU')
         ->and($criacao['teia_total'])->toBe(0)
         ->and($frase['palavrinhas'])->toContain('O', 'TEM')
@@ -50,7 +49,7 @@ it('a última etapa concluível é a última atividade; a conquista vem depois d
     }
 
     $this->comoCrianca($this->crianca)->postJson("{$url}/etapas/9/concluir")->assertStatus(422);
-    $this->comoCrianca($this->crianca)->postJson("{$url}/concluir")->assertOk()->assertJsonPath('estrelas', 3);
+    $this->comoCrianca($this->crianca)->postJson("{$url}/concluir")->assertOk()->assertJsonPath('xp_total', 3);
 
     expect(CriancaAula::where('crianca_id', $this->crianca->id)->value('etapa_atual'))->toBe(9);
 });
