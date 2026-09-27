@@ -15,13 +15,16 @@ use App\Services\MiniAulas\MiniAulaService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * Prepara o banco de desenvolvimento para o teste de ponta a ponta
- * (frontend/e2e): turma "E2E" com código fixo e a criança "Teste" recriada
- * (com um item vencido na Revisão e uma mini-aula aprovada da colega "Bia"
- * para jogar). Mexe só nessa turma. Recusa rodar em produção.
+ * (frontend/e2e): turma "E2E" com código fixo, dona de um educador só de
+ * teste, e a criança "Teste" recriada (com um item vencido na Revisão e uma
+ * mini-aula aprovada da colega "Bia" para jogar). Mexe só nessa turma.
+ * Recusa rodar em produção.
  */
 class PrepararE2e extends Command
 {
@@ -34,6 +37,9 @@ class PrepararE2e extends Command
     public const FIGURA = 'estrela';
 
     public const COLEGA = 'Bia';
+
+    /** Educador (não admin) dono da turma E2E: só enxerga os dados de teste. */
+    public const EDUCADOR_EMAIL = 'e2e-educador@teia.local';
 
     protected $signature = 'teia:preparar-e2e {--json : Imprime só o JSON com os dados da criança}';
 
@@ -49,14 +55,20 @@ class PrepararE2e extends Command
 
         $this->callSilently('db:seed', ['--class' => DatabaseSeeder::class, '--force' => true]);
 
-        $educador = User::where('role', User::PAPEL_ADMIN)->orderBy('id')->first()
-            ?? User::factory()->admin()->create(['email' => 'e2e-admin@teia.local']);
+        // Conta própria do E2E, e não o primeiro admin do banco: o login do
+        // teste da Roda funciona em qualquer banco. A senha muda a cada rodada
+        // e só sai no JSON que o Playwright lê.
+        $senha = Str::random(32);
+        $educador = User::updateOrCreate(
+            ['email' => self::EDUCADOR_EMAIL],
+            ['name' => 'Educador E2E', 'password' => Hash::make($senha), 'role' => User::PAPEL_EDUCADOR, 'is_active' => true],
+        );
 
         $turma = Turma::firstOrCreate(
             ['codigo' => self::CODIGO],
             ['educador_user_id' => $educador->id, 'nome' => 'E2E', 'ativa' => true],
         );
-        $turma->update(['ativa' => true]);
+        $turma->update(['ativa' => true, 'educador_user_id' => $educador->id]);
         // Nenhuma roda sobra de uma rodada anterior.
         TurmaSessao::where('turma_id', $turma->id)->delete();
 
@@ -104,6 +116,7 @@ class PrepararE2e extends Command
             'crianca_id' => $crianca->id,
             'apelido' => self::APELIDO,
             'figura' => self::FIGURA,
+            'educador' => ['email' => self::EDUCADOR_EMAIL, 'senha' => $senha],
         ];
 
         if ($this->option('json')) {

@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\Voz\GoogleSintetizador;
+use App\Services\Voz\Sintetizador;
+use App\Services\Voz\SintetizadorNulo;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +16,21 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Provedor da voz neural escolhido pela config. `bind` (não singleton):
+        // lê a config na hora de resolver, então os testes trocam de provedor
+        // com config([...]) antes de bater na rota.
+        $this->app->bind(Sintetizador::class, function () {
+            $voz = (array) config('teia.voz');
+
+            return match ($voz['provedor'] ?? 'nulo') {
+                'google' => new GoogleSintetizador(
+                    (string) ($voz['chave'] ?? ''),
+                    (string) ($voz['nome'] ?? ''),
+                    (float) ($voz['velocidade'] ?? 1.0),
+                ),
+                default => new SintetizadorNulo,
+            };
+        });
     }
 
     public function boot(): void
@@ -56,6 +73,17 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('crianca-turma', fn (Request $request) => Limit::perMinute(30)
             ->by($request->ip())
             ->response(fn () => self::esperarUmPouquinho()));
+
+        // Voz neural: por criança quando o Bearer vem (o proxy injeta mesmo em
+        // rota pública), senão por IP (telas de entrada). Um 429 aqui só faz
+        // o app falar com a voz do navegador.
+        RateLimiter::for('voz', fn (Request $request) => Limit::perMinute(120)
+            ->by('voz:'.($request->user('crianca')?->getAuthIdentifier() ?? $request->ip())));
+
+        // Arquivos .mp3 da voz: sem Bearer e com cache de um ano no navegador.
+        // A escola inteira sai por um IP só, por isso é folgado e substitui o
+        // throttle geral da API nessa rota.
+        RateLimiter::for('vozes', fn (Request $request) => Limit::perMinute(600)->by('vozes:'.$request->ip()));
     }
 
     /** 429 do app da criança em pt-BR e gentil (o padrão do Laravel é "Too Many Attempts."). */

@@ -55,4 +55,19 @@ return [
         'itens_por_sessao' => 6,
         'caixa_dominada' => 4,
     ],
+
+    // Voz neural (TTS) do app da criança: gerada sob demanda, guardada para
+    // sempre pelo hash do texto e servida em /api/vozes/{hash}.mp3. Sem
+    // provedor/chave, o app usa a voz do navegador (Web Speech).
+    'voz' => [
+        'provedor' => env('TEIA_VOZ_PROVEDOR', 'nulo'),          // nulo | google
+        'chave' => (string) env('TEIA_VOZ_CHAVE', ''),
+        'nome' => env('TEIA_VOZ_NOME', 'pt-BR-Chirp3-HD-Leda'),
+        'velocidade' => (float) env('TEIA_VOZ_VELOCIDADE', 0.92),
+        'max_chars' => (int) env('TEIA_VOZ_MAX_CHARS', 300),
+        // Abaixo do 1 milhão grátis por mês do Google; estourou, cai na voz do navegador.
+        'limite_mensal_chars' => (int) env('TEIA_VOZ_LIMITE_MENSAL_CHARS', 900000),
+        // Frases NOVAS por criança (ou IP antes do login) por dia; repetir é de graça.
+        'novas_por_dia' => (int) env('TEIA_VOZ_NOVAS_POR_DIA', 500),
+    ],
 ];

@@ -17,9 +17,11 @@ test.beforeEach(() => {
   crianca = prepararCriancaE2E();
 });
 
-/** Sessão do educador (admin do E2E) pelo proxy do painel. */
+/** Sessão do educador do E2E (dono da turma) pelo proxy do painel. */
 async function educador(request: APIRequestContext) {
-  const login = await request.post("/api/auth/login", { data: { email: "e2e-admin@teia.local", password: "password" } });
+  const login = await request.post("/api/auth/login", {
+    data: { email: crianca.educador.email, password: crianca.educador.senha },
+  });
   expect(login.ok()).toBeTruthy();
 
   const turmas = (await (await request.get("/api/proxy/painel/turmas")).json()) as { id: number; codigo: string }[];

@@ -10,8 +10,9 @@ Regras gerais:
 - Respostas JSON sem envelope `data`. Erros: `{ message }` (+ `errors` em 422).
 - **Nenhuma mensagem para a criança diz "errado"**; `message` e `dica` já vêm
   em linguagem gentil e podem ser faladas em voz alta.
-- `*_audio_url` pode ser `null`: o front fala o texto com a Web Speech API pt-BR.
-  Prioridade já resolvida no backend: gravação aprovada > áudio da aula > null.
+- `*_audio_url` pode ser `null`: o front então pede a **voz neural** (`GET /crianca/voz`, abaixo)
+  e, se ela também não existir, fala o texto com a Web Speech API pt-BR.
+  Prioridade: gravação aprovada > áudio da aula (as duas resolvidas no backend) > voz neural em cache > Web Speech.
 - Textos de história/perguntas já chegam com `{{heroi}}`/`{{fabrica}}` trocados.
 - `OpcaoVisual = { chave, rotulo, emoji, icone|null, cor|null, imagem_url|null }` (o app desenha `icone` do lucide sobre `cor`; `emoji` é só reserva textual).
 - `Conquista = { chave, titulo, descricao, emoji, icone }` (`icone` é um nome do lucide; o front não usa o emoji).
@@ -34,6 +35,23 @@ Regras gerais:
 - 429 teto de tentativas por minuto.
 
 `POST /crianca/refresh` (Bearer vencido) → mesmo formato do login (uso interno do proxy).
+
+## Voz neural (pública, sem token)
+
+Cada frase é sintetizada **uma vez** (Google Cloud TTS, `TEIA_VOZ_*` no `.env` do backend), guardada
+no disco privado pelo hash do texto normalizado (trim, espaços colapsados, minúsculas) e servida com
+cache de um ano. Pública porque as telas de entrada falam antes do login; o proxy repassa sem Bearer.
+
+`GET /crianca/voz?texto=…` (até 300 caracteres)
+- 200 `{ url }` — JSON plano, sem Resource (um único campo). `url` é absoluta (`APP_URL/api/vozes/{hash}.mp3`).
+- 204 — sem voz para esta frase: provedor desligado (`TEIA_VOZ_PROVEDOR=nulo`), orçamento mensal
+  esgotado, teto diário de frases novas por criança/IP, ou falha do provedor. O app usa a Web Speech.
+- 422 — `texto` ausente ou longo demais. 429 — `throttle:voz` (120/min por criança ou IP).
+- Frases já em cache nunca contam no teto diário nem no orçamento.
+
+`GET /vozes/{hash}.mp3` (fora do prefixo `crianca`, **fora do proxy**: o `<audio>` carrega direto do `APP_URL`)
+- 200 `audio/mpeg`, `Cache-Control: public, max-age=31536000, immutable`, aceita `Range` (206; Safari/iPad exige).
+- 404 para hash desconhecido. Limitador próprio `throttle:vozes` (600/min por IP) no lugar do geral da API.
 
 ## Sessão e perfil (Bearer da criança)
 

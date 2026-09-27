@@ -50,7 +50,7 @@ conquista com pontos, itens novos e medalhas.
 Três combinados que o sistema nunca quebra:
 
 - **Nada de "errado", nota ou ranking.** Na primeira tentativa que não dá certo a criança ganha uma dica; na segunda, vê a resposta e o item vai para a Revisão. Pontos, nível e medalhas são só dela.
-- **Tudo fala.** Cada toque tem áudio: gravação aprovada, áudio da aula ou a voz do navegador em português. A narração automática é opcional por criança.
+- **Tudo fala.** Cada toque tem áudio: gravação aprovada, áudio da aula, a voz neural (Google TTS, quando configurada; cada frase gerada uma vez e guardada) ou a voz do navegador em português. A narração automática é opcional por criança.
 - **Privacidade da criança em primeiro lugar.** Ela tem só apelido, avatar e turma (mais em [Privacidade](#privacidade-e-lgpd)).
 
 <table>
@@ -149,6 +149,7 @@ existe (para não apagar edições do painel). Para trazer o conteúdo novo:
 ```bash
 docker compose exec backend php artisan teia:reaplicar-conteudo --todas           # lista o que existe e o que falta
 docker compose exec backend php artisan teia:reaplicar-conteudo --todas --forcar  # sobrescreve as missões semeadas
+docker compose exec backend php artisan teia:gerar-vozes                          # aquece a voz neural do conteúdo (precisa de TEIA_VOZ_*)
 ```
 
 | Serviço | Endereço |
@@ -204,7 +205,8 @@ cd frontend && npm run test:e2e                # missões TEIA e 7 + 5, Revisão
   primeira subida do volume). Fora do Docker: `DB_HOST=127.0.0.1 DB_PORT=5437 php artisan test`.
 - O E2E precisa do ambiente de desenvolvimento no ar. Antes de cada teste ele
   recria a turma `E2ETST` com a criança "Teste" (`php artisan teia:preparar-e2e`),
-  sem mexer nas outras turmas. Sem Docker: `E2E_PREPARAR_CMD="php artisan teia:preparar-e2e --json"`.
+  sem mexer nas outras turmas. A turma pertence a um educador só de teste
+  (`e2e-educador@teia.local`, senha nova a cada rodada), que a Roda usa para conduzir. Sem Docker: `E2E_PREPARAR_CMD="php artisan teia:preparar-e2e --json"`.
   Na primeira vez, rode `npx playwright install chromium` (ou aponte `E2E_CHROMIUM` para um Chromium).
 - Com `E2E_CAPTURAS=1 npm run test:e2e`, uma imagem de cada tela vai para
   `frontend/test-results/capturas`. As imagens deste README saíram daí.
@@ -215,6 +217,7 @@ cd frontend && npm run test:e2e                # missões TEIA e 7 + 5, Revisão
 - Quem cadastra é o responsável, com consentimento registrado.
 - A criança entra com uma figura secreta, não com senha. Depois de 5 tentativas, a entrada pausa por 15 minutos e o app pede ajuda a um adulto.
 - Áudios ficam em disco privado, nunca em pasta pública. A voz de uma criança (mini-aula) só é servida à própria turma e às turmas amigas, e só depois que um adulto aprova; recusar apaga o arquivo e `php artisan teia:limpar-gravacoes` purga o resto.
+- A voz neural só sintetiza textos do conteúdo (instruções, histórias, palavras, mensagens) e o apelido nas saudações; os MP3 gerados não têm nada de criança e ficam em `storage/app/private/vozes`.
 - Amizade entre turmas exige o código de um responsável e o aceite, com termo versionado, do outro. Crianças nunca trocam texto livre: só reações fixas.
 
 ## Próximos passos

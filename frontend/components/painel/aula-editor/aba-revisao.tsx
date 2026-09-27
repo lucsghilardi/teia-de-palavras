@@ -84,7 +84,7 @@ function recomendacoes(aula: Aula): ItemChecklist[] {
     {
       rotulo: "Áudio da palavra geradora",
       ok: Boolean(aula.palavra_audio_url),
-      detalhe: aula.palavra_audio_url ? "Enviado" : "Sem áudio, o app usa a voz do navegador",
+      detalhe: aula.palavra_audio_url ? "Enviado" : "Sem áudio, o app usa a voz neural (ou a do navegador)",
     },
     {
       rotulo: "Imagens em todas as páginas",

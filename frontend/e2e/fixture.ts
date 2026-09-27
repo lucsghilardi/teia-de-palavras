@@ -1,7 +1,14 @@
 import { execSync } from "node:child_process";
 import path from "node:path";
 
-export type CriancaE2E = { codigo: string; crianca_id: number; apelido: string; figura: string };
+export type CriancaE2E = {
+  codigo: string;
+  crianca_id: number;
+  apelido: string;
+  figura: string;
+  /** Educador só de teste, dono da turma E2E; a senha muda a cada preparação. */
+  educador: { email: string; senha: string };
+};
 
 const COMANDO_PADRAO = "docker compose exec -T backend php artisan teia:preparar-e2e --json";
 

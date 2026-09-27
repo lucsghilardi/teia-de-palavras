@@ -159,7 +159,11 @@ export function createProxyHandler({
         }
       });
 
-      const response = new NextResponse(await upstreamResponse.arrayBuffer(), {
+      // 204/205/304 não podem levar corpo (nem vazio): o construtor de Response
+      // lança TypeError e a chamada viraria 502.
+      const semCorpo = [204, 205, 304].includes(upstreamResponse.status);
+
+      const response = new NextResponse(semCorpo ? null : await upstreamResponse.arrayBuffer(), {
         status: upstreamResponse.status,
         headers: responseHeaders,
       });

@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\Crianca\MiniAulaController;
 use App\Http\Controllers\Api\Crianca\PerfilController;
 use App\Http\Controllers\Api\Crianca\RevisaoController;
 use App\Http\Controllers\Api\Crianca\TeiaController;
+use App\Http\Controllers\Api\Crianca\VozArquivoController;
+use App\Http\Controllers\Api\Crianca\VozController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +22,9 @@ Route::prefix('crianca')->group(function () {
     Route::get('/turma/{codigo}', [EntradaController::class, 'turma'])->middleware('throttle:crianca-turma');
     Route::post('/login', [EntradaController::class, 'login'])->middleware('throttle:crianca-login');
     Route::post('/refresh', [EntradaController::class, 'refresh']);
+    // Voz neural em cache: pública porque as telas de entrada falam antes do
+    // login (o proxy repassa sem Bearer). Sem provedor configurado responde 204.
+    Route::get('/voz', VozController::class)->middleware('throttle:voz');
 
     Route::middleware(['auth:crianca', 'crianca.ativa'])->group(function () {
         Route::get('/eu', [PerfilController::class, 'eu']);
@@ -52,3 +57,13 @@ Route::prefix('crianca')->group(function () {
         Route::post('/aulas/{aula}/concluir', [AulaController::class, 'concluir'])->whereNumber('aula');
     });
 });
+
+// Arquivos da voz neural: nome = hash do conteúdo, cache de um ano no navegador.
+// Fora do prefixo `crianca` porque o <audio> carrega direto do APP_URL, sem
+// proxy nem Bearer; e fora do throttle geral por IP (a escola inteira sai por
+// um IP só).
+Route::get('/vozes/{hash}.mp3', VozArquivoController::class)
+    ->where('hash', '[a-f0-9]{64}')
+    ->withoutMiddleware('throttle:api')
+    ->middleware('throttle:vozes')
+    ->name('vozes.arquivo');

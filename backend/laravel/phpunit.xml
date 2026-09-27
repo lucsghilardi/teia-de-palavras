@@ -36,6 +36,9 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <!-- Nunca chamar o Google nos testes, mesmo com chave no .env local. -->
+        <env name="TEIA_VOZ_PROVEDOR" value="nulo"/>
+        <env name="TEIA_VOZ_CHAVE" value=""/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
     </php>
 </phpunit>

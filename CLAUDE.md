@@ -16,7 +16,10 @@ subir o projeto e o plano de fases.
   entra na revisão espaçada (`crianca_itens`, caixas de Leitner em `App\Services\Revisao`); acerto → celebração.
   XP só no primeiro acerto de cada item; nível pela tabela `config('teia.niveis')`; medalhas em `config/conquistas.php`.
 - Palavra válida descoberta entra na Teia de Palavras da criança.
-- Áudio: gravação aprovada > arquivo da aula > Web Speech API pt-BR.
+- Áudio: gravação aprovada > arquivo da aula > voz neural em cache > Web Speech API pt-BR. A voz neural
+  (`App\Services\Voz`, Google TTS via `TEIA_VOZ_*`) gera cada frase uma vez, guarda pelo hash do texto no disco
+  privado e serve em `GET /api/vozes/{hash}.mp3` (público, cache de um ano); `GET /crianca/voz?texto=` devolve
+  a URL ou 204. Sem chave, tudo cai na Web Speech e nada quebra. `teia:gerar-vozes` aquece o conteúdo semeado.
 - LGPD: criança tem só apelido, avatar e turma. Cadastro pelo responsável com consentimento. Áudios em disco privado.
 - Ensino entre pares: mini-aula (voz + desafio gerado de uma missão) só circula depois que um adulto aprova;
   amizade entre turmas exige código de um responsável + aceite com termo do outro; áudio de criança só é servido
@@ -49,7 +52,8 @@ subir o projeto e o plano de fases.
   só com toques em tablet e celular; exige o compose de dev no ar).
 - Contratos: `docs/api-painel.md` e `docs/api-crianca.md`. Mudou endpoint? Atualize o contrato junto.
 - App da criança: todo botão ≥ 64 px e página sem rolagem lateral (o E2E confere); voz em `lib/fala.ts`
-  (URL de áudio se houver, senão Web Speech), nunca bloquear a tela esperando áudio terminar.
+  (URL de áudio se houver, senão voz neural via `lib/voz.ts`, senão Web Speech), nunca bloquear a tela
+  esperando áudio terminar.
 
 ## Bases de origem (não editar)
 - `~/Sites/projeto_pessoal`: auth/proxy/shadcn/gamificação copiados.

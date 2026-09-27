@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useNarracaoAutomatica } from "@/hooks/use-falar-ao-chegar";
 import { falar } from "@/lib/fala";
+import { preaquecerVozes } from "@/lib/voz";
 import type { Conquista } from "@/types/CriancaApp";
 
 /**
@@ -35,6 +36,9 @@ export async function narrar(
 ): Promise<boolean> {
   const minha = ++geracao;
   const lista = typeof trechos === "string" ? [{ texto: trechos }] : Array.isArray(trechos) ? trechos : [trechos];
+
+  // Busca a voz neural de todos os trechos de uma vez: a sequência não fica com buracos.
+  preaquecerVozes(lista.filter((t) => !t.audio_url).map((t) => t.texto));
 
   for (let i = 0; i < lista.length; i++) {
     if (geracao !== minha) return false;

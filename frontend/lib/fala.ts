@@ -1,17 +1,23 @@
 /**
  * Voz do app da criança, com a prioridade do escopo:
- *   áudio gravado aprovado  >  áudio da aula  >  Web Speech API pt-BR.
- * (O backend já escolhe a melhor URL; aqui é "tem URL? toca; não tem? sintetiza".)
+ *   áudio gravado aprovado  >  áudio da aula  >  voz neural em cache  >  Web Speech API pt-BR.
+ * (O backend já escolhe entre as duas primeiras; sem URL, este módulo pergunta
+ * a `lib/voz.ts` se existe um MP3 neural da frase e só então sintetiza no navegador.)
  *
  * Uma fala por vez no app inteiro: começar outra interrompe a atual. A
  * promessa resolve quando termina, dá erro ou estoura um tempo máximo — a tela
  * NUNCA fica presa esperando áudio (navegadores sem voz, aba em segundo plano).
  */
+import { normalizarParaVoz, obterUrlDeVoz, urlEmCache } from "@/lib/voz";
+
 type Ouvinte = (falando: boolean) => void;
 
 let audioAtual: HTMLAudioElement | null = null;
 let encerrarAtual: (() => void) | null = null;
 let vozPtBr: SpeechSynthesisVoice | null = null;
+// Cada `falar`/`parar` avança a geração: uma busca de voz neural que termina
+// depois de interrompida não toca atrasada, e o "falando" não apaga cedo.
+let geracao = 0;
 const ouvintes = new Set<Ouvinte>();
 
 function avisar(falando: boolean) {
@@ -28,14 +34,20 @@ function temSintese(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
 
+/** Da menos robótica para a mais: "Natural" (Edge), Google, Luciana/Francisca, qualquer pt-BR, qualquer pt. */
 function escolherVoz() {
   if (!temSintese()) return;
 
   const vozes = window.speechSynthesis.getVoices();
+  const idioma = (v: SpeechSynthesisVoice) => v.lang.replace("_", "-").toLowerCase();
+  const ptBr = vozes.filter((v) => idioma(v) === "pt-br");
+
   vozPtBr =
-    vozes.find((v) => v.lang === "pt-BR" && /female|luciana|francisca|google/i.test(v.name)) ??
-    vozes.find((v) => v.lang === "pt-BR") ??
-    vozes.find((v) => v.lang.startsWith("pt")) ??
+    ptBr.find((v) => /natural/i.test(v.name)) ??
+    ptBr.find((v) => /google/i.test(v.name)) ??
+    ptBr.find((v) => /luciana|francisca|female/i.test(v.name)) ??
+    ptBr[0] ??
+    vozes.find((v) => idioma(v).startsWith("pt")) ??
     null;
 }
 
@@ -46,7 +58,7 @@ if (temSintese()) {
 
 /** Texto em caixa alta faz alguns sintetizadores soletrarem ("T-E-I-A"). */
 function paraSintese(texto: string): string {
-  return texto.toLocaleLowerCase("pt-BR");
+  return normalizarParaVoz(texto);
 }
 
 function tempoMaximo(texto: string): number {
@@ -54,6 +66,7 @@ function tempoMaximo(texto: string): number {
 }
 
 export function parar() {
+  geracao++;
   encerrarAtual?.();
   encerrarAtual = null;
 
@@ -127,21 +140,35 @@ function tocar(url: string, textoReserva: string): Promise<void> {
 }
 
 /**
- * Fala um texto (ou toca o áudio dele, se houver URL). Interrompe o que
- * estiver tocando. Resolve quando termina — ou no tempo máximo.
+ * Fala um texto: toca o áudio dele se houver URL; senão a voz neural em cache;
+ * senão sintetiza no navegador. Interrompe o que estiver tocando. Resolve
+ * quando termina — ou no tempo máximo.
  */
 export async function falar(texto: string, audioUrl?: string | null): Promise<void> {
   parar();
+  const minha = geracao;
   avisar(true);
 
   try {
     if (audioUrl) {
       await tocar(audioUrl, texto);
+
+      return;
+    }
+
+    // Cache síncrono primeiro: mantém o gesto do toque (Safari) e não espera nada.
+    const url = urlEmCache(texto) ?? (await obterUrlDeVoz(texto));
+
+    // parar()/outra fala durante a busca: não toca atrasado.
+    if (geracao !== minha) return;
+
+    if (url) {
+      await tocar(url, texto); // tocar() já cai em sintetizar() se o arquivo falhar
     } else {
       await sintetizar(texto);
     }
   } finally {
-    avisar(false);
+    if (geracao === minha) avisar(false);
   }
 }
 
