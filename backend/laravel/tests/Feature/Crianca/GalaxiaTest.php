@@ -17,7 +17,7 @@ it('mostra os quatro planetas na ordem, com progresso e a próxima missão de ca
         ->and($json['planetas'][0])->toMatchArray(['nome' => 'Português', 'icone' => 'book-open', 'publicadas' => 5, 'concluidas' => 0, 'em_andamento' => 0])
         ->and($json['planetas'][0]['proxima']['rotulo'])->toBe('TEIA')
         ->and($json['planetas'][0]['proxima']['status'])->toBe('disponivel')
-        ->and($json['planetas'][1]['proxima']['rotulo'])->toBe('7 + 5')
+        ->and($json['planetas'][1]['proxima']['rotulo'])->toBe('4 + 3')
         ->and($json['planetas'][2])->toMatchArray(['nome' => 'Geografia', 'publicadas' => 4, 'concluidas' => 0])
         ->and($json['planetas'][2]['proxima']['rotulo'])->toBe('casa')
         ->and($json['planetas'][3]['proxima']['rotulo'])->toBe('ontem')
@@ -30,14 +30,14 @@ it('as escolhas do dia trazem uma missão por planeta, o planeta parado há mais
     $json = $this->comoCrianca($this->crianca)->getJson('/api/crianca/galaxia')->assertOk()->json();
 
     // Nunca jogou nada: ordem dos planetas, no máximo 3.
-    expect(collect($json['escolhas_do_dia'])->pluck('rotulo')->all())->toBe(['TEIA', '7 + 5', 'casa']);
+    expect(collect($json['escolhas_do_dia'])->pluck('rotulo')->all())->toBe(['TEIA', '4 + 3', 'casa']);
 
     // Jogou Português agora: os planetas nunca jogados passam na frente e Português sai das 3.
     $this->comoCrianca($this->crianca)->postJson('/api/crianca/aulas/'.aulaDaPalavra('TEIA')->id.'/iniciar')->assertOk();
 
     $json = $this->comoCrianca($this->crianca)->getJson('/api/crianca/galaxia')->assertOk()->json();
 
-    expect(collect($json['escolhas_do_dia'])->pluck('rotulo')->all())->toBe(['7 + 5', 'casa', 'ontem'])
+    expect(collect($json['escolhas_do_dia'])->pluck('rotulo')->all())->toBe(['4 + 3', 'casa', 'ontem'])
         ->and($json['planetas'][0]['proxima']['status'])->toBe('em_andamento')
         ->and($json['planetas'][0]['em_andamento'])->toBe(1);
 });

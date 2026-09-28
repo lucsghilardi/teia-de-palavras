@@ -21,7 +21,8 @@ class Configuracao extends Model
     public const PADROES = [
         'heroi_nome' => 'Teco',
         'fabrica_nome' => 'Fábrica Faz-de-Conta',
-        'minutos_pausa' => '20',
+        // 6+ (1º ano): convite de pausa depois de 15 minutos seguidos.
+        'minutos_pausa' => '15',
         'consentimento_versao' => 'v1',
         'consentimento_texto' => 'Declaro que sou responsável por esta criança e autorizo o uso do apelido, do avatar e dos áudios gravados dentro deste portal, apenas para fins educativos, podendo pedir a exclusão a qualquer momento.',
         'amizade_termo_versao' => 'v1',

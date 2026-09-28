@@ -9,8 +9,9 @@ use App\Support\Texto;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Consciência silábica (EF02LP02): completar a sílaba que falta numa palavra
- * ou trocar uma sílaba para formar outra palavra. Resposta `{ item, silaba }`.
+ * Consciência silábica (1º ano: EF01LP08/EF01LP09; trocar sílaba prepara o
+ * EF02LP02): completar a sílaba que falta numa palavra ou trocar uma sílaba
+ * para formar outra palavra. Resposta `{ item, silaba }`.
  *
  * config: { itens: [
  *   { id?, modo: "completar", palavra: "TATU", silabas: ["TA","TU"], oculta: 1, opcoes: ["TU","TO","TE"], dica? },

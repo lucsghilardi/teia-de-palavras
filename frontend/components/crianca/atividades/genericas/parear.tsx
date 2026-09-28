@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
-import { useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
+import { narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
 import { Enunciado } from "@/components/crianca/atividades/genericas/comuns";
 import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { useResposta } from "@/components/crianca/atividades/use-resposta";
@@ -36,6 +36,9 @@ function Item({ item, className, ...resto }: { item: ItemParear; className?: str
  * PAREAR: duas colunas; a criança toca num item da esquerda e no par dele à
  * direita. Par certo fica ligado; erro dá dica; 2º erro do mesmo item acende
  * o par certo. Continua quando todos os pares estão resolvidos.
+ *
+ * 1º ano: tocar num item fala o nome dele. Sem nada escolhido à esquerda,
+ * tocar à direita só faz ouvir (a criança explora antes de ligar).
  */
 export function Parear({ aula, atividade, aoConcluir, definirInstrucao, mostrarConquistas }: PropsAtividade<AtividadeParear>) {
   const [selecionado, setSelecionado] = useState<string | null>(null);
@@ -74,14 +77,23 @@ export function Parear({ aula, atividade, aoConcluir, definirInstrucao, mostrarC
   const tudoResolvido = todosResolvidos(idsEsquerda);
   const dicaAtual = selecionado ? estadoDe(selecionado)?.dica : null;
 
+  const ouvir = (lado: ItemParear[], id: string) => {
+    const item = lado.find((i) => i.id === id);
+
+    // narrar (e não falar): cancela a narração de chegada, que não volta por cima.
+    if (item) void narrar({ texto: item.texto });
+  };
+
   const tocarEsquerda = (id: string) => {
     sons.toque();
     setSelecionado((atual) => (atual === id ? null : id));
+    if (selecionado !== id) ouvir(atividade.esquerda, id);
   };
 
   const tocarDireita = async (idB: string) => {
     if (!selecionado) {
-      sons.dica();
+      sons.toque();
+      ouvir(atividade.direita, idB);
 
       return;
     }
@@ -126,7 +138,7 @@ export function Parear({ aula, atividade, aoConcluir, definirInstrucao, mostrarC
                 <li key={item.id}>
                   <Item
                     item={item}
-                    disabled={ligado || enviando || !selecionado}
+                    disabled={ligado || enviando}
                     onClick={() => void tocarDireita(item.id)}
                     className={cn(ligado && "opacity-60 ring-4 ring-[var(--c-grama)]", !selecionado && !ligado && "opacity-70")}
                   />

@@ -24,8 +24,8 @@ function atividadeMontada(Crianca $crianca, Aula $aula, int $ordem): array
 it('dá dica no primeiro erro, a resposta no segundo, e XP só no primeiro acerto', function () {
     $escolha = atividadeMontada($this->crianca, $this->aula, 5);
     $item = $escolha['itens'][0];
-    $errada = collect($item['opcoes'])->firstWhere('texto', '12')['id'];
-    $certa = collect($item['opcoes'])->firstWhere('texto', '14')['id'];
+    $errada = collect($item['opcoes'])->firstWhere('texto', '6')['id'];
+    $certa = collect($item['opcoes'])->firstWhere('texto', '7')['id'];
     $url = "/api/crianca/aulas/{$this->aula->id}/atividades/5/responder";
 
     $primeiro = $this->comoCrianca($this->crianca)->postJson($url, ['item' => $item['id'], 'opcao' => $errada])
@@ -38,7 +38,7 @@ it('dá dica no primeiro erro, a resposta no segundo, e XP só no primeiro acert
         ->assertJsonPath('xp_ganho', 0)
         ->json();
 
-    expect($primeiro['dica'])->toBe('Some 8 com 6.')
+    expect($primeiro['dica'])->toBe('Junte 4 com mais 3: cinco, seis, sete.')
         ->and(mb_strtolower($primeiro['mensagem']))->not->toContain('errad');
 
     $segundo = $this->comoCrianca($this->crianca)->postJson($url, ['item' => $item['id'], 'opcao' => $errada])
@@ -47,7 +47,7 @@ it('dá dica no primeiro erro, a resposta no segundo, e XP só no primeiro acert
         ->assertJsonPath('tentativas', 2)
         ->assertJsonPath('resolvido', true)
         ->assertJsonPath('revisao_agendada', true)
-        ->assertJsonPath('resposta_correta.texto', '14')
+        ->assertJsonPath('resposta_correta.texto', '7')
         ->json();
 
     expect($segundo['resposta_correta']['opcao'])->toBe($certa);
@@ -106,7 +106,7 @@ it('a missão de Matemática inteira pode ser concluída pelas rotas genéricas'
     $aula = $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$this->aula->id}/iniciar")->assertOk()->json();
 
     expect($aula['disciplina'])->toBe('matematica')
-        ->and($aula['rotulo'])->toBe('7 + 5')
+        ->and($aula['rotulo'])->toBe('4 + 3')
         ->and($aula['palavra_geradora'])->toBeNull()
         ->and($aula['total_atividades'])->toBe(5)
         ->and($aula['atividades'][0]['paginas'])->toHaveCount(2);

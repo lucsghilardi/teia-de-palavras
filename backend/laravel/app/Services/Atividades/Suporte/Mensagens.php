@@ -3,7 +3,7 @@
 namespace App\Services\Atividades\Suporte;
 
 /**
- * Frases de feedback do app da criança (7+): curtas, em minúsculas, nunca
+ * Frases de feedback do app da criança (1º ano, 6+): curtas, em minúsculas, nunca
  * "errado". Quem erra recebe uma dica; na segunda vez, a resposta.
  */
 final class Mensagens

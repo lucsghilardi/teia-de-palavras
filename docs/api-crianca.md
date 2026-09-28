@@ -45,7 +45,9 @@ cache de um ano. Pública porque as telas de entrada falam antes do login; o pro
 `GET /crianca/voz?texto=…` (até 300 caracteres)
 - 200 `{ url }` — JSON plano, sem Resource (um único campo). `url` é absoluta (`APP_URL/api/vozes/{hash}.mp3`).
 - 204 — sem voz para esta frase: provedor desligado (`TEIA_VOZ_PROVEDOR=nulo`), orçamento mensal
-  esgotado, teto diário de frases novas por criança/IP, ou falha do provedor. O app usa a Web Speech.
+  esgotado, teto diário de frases novas por criança/IP, teto diário de caracteres novos sem login
+  (somando todos os IPs, `TEIA_VOZ_ANONIMAS_CHARS_POR_DIA`: de fora do app ninguém esgota o
+  orçamento), ou falha do provedor. O app usa a Web Speech.
 - 422 — `texto` ausente ou longo demais. 429 — `throttle:voz` (120/min por criança ou IP).
 - Frases já em cache nunca contam no teto diário nem no orçamento.
 
@@ -58,7 +60,7 @@ cache de um ano. Pública porque as telas de entrada falam antes do login; o pro
 `GET /crianca/eu` → 200
 ```
 { id, apelido, avatar: OpcaoVisual,
-  usa_minusculas,                             // "texto como escrito": caso natural e peças em minúsculas (padrão true)
+  usa_minusculas,                             // "texto como escrito": caso natural e peças em minúsculas (padrão false: caixa alta no 1º ano)
   narracao_automatica,                        // fala história/instrução ao chegar na tela (padrão true)
   turma: { id, nome },
   xp, nivel, xp_no_nivel, xp_para_proximo,    // nível pela tabela config('teia.niveis'); último nível → xp_para_proximo null

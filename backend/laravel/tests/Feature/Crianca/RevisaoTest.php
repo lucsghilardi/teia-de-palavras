@@ -31,7 +31,7 @@ function itemDeRevisao(Crianca $crianca, string $fato, array $extra = []): Crian
 it('o segundo erro numa atividade cria o item na caixa 0, para amanhã', function () {
     $aula = $this->comoCrianca($this->crianca)->postJson("/api/crianca/aulas/{$this->aula->id}/iniciar")->assertOk()->json();
     $item = $aula['atividades'][4]['itens'][0];
-    $errada = collect($item['opcoes'])->firstWhere('texto', '12')['id'];
+    $errada = collect($item['opcoes'])->firstWhere('texto', '6')['id'];
     $url = "/api/crianca/aulas/{$this->aula->id}/atividades/5/responder";
 
     $this->comoCrianca($this->crianca)->postJson($url, ['item' => $item['id'], 'opcao' => $errada])->assertOk()->assertJsonPath('revisao_agendada', false);

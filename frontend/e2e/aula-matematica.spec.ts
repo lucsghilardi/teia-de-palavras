@@ -35,6 +35,26 @@ async function resolverFato(page: Page) {
   await tocar(page, String(valor));
 }
 
+/**
+ * Resposta de um problema da missão, calculada pelo próprio enunciado
+ * ("havia 4 foguetes e chegaram mais 3" / "havia 9 estrelas ... e 5 apagaram"):
+ * o teste não depende dos números semeados.
+ */
+function respostaDoProblema(pergunta: string): number {
+  const juntar = /havia (\d+) .*mais (\d+)/i.exec(pergunta);
+  if (juntar) return Number(juntar[1]) + Number(juntar[2]);
+
+  const tirar = /havia (\d+) .* e (\d+) apagaram/i.exec(pergunta);
+  if (tirar) return Number(tirar[1]) - Number(tirar[2]);
+
+  throw new Error(`enunciado sem padrão conhecido: ${pergunta}`);
+}
+
+/** Opções numéricas visíveis da escolha atual. */
+async function opcoesDaEscolha(page: Page): Promise<string[]> {
+  return (await page.locator("[data-opcao]").allInnerTexts()).map((t) => t.trim());
+}
+
 /** Depois de resolver um item: toca "Próximo" se houver outro; senão espera o "Continuar". */
 async function proximoOuContinuar(page: Page): Promise<"proximo" | "continuar"> {
   const proximo = botao(page, "Próximo");
@@ -55,7 +75,9 @@ test("criança completa a missão de Matemática só com toques, com dica no err
 
   // Galáxia → planeta Matemática: a missão aparece disponível.
   await irParaPlaneta(page, "Matemática", "matematica");
-  await tocar(page, "Missão 7 + 5, disponível");
+  const missao = page.getByRole("button", { name: /^Missão \d+ \+ \d+, disponível$/ });
+  const rotulo = ((await missao.getAttribute("aria-label")) ?? "").replace(/^Missão (.+), disponível$/, "$1");
+  await missao.tap();
   await expect(page).toHaveURL(/\/app\/missao\/\d+$/);
 
   // 1. História em JSON: páginas → Continuar.
@@ -87,15 +109,21 @@ test("criança completa a missão de Matemática só com toques, com dica no err
   }
   await tocar(page, "Continuar");
 
-  // 5. Escolha: erra de propósito ("12"), recebe a dica sem "errado", depois acerta ("14").
+  // 5. Escolha: erra de propósito, recebe a dica sem "errado", depois acerta.
+  //    As respostas saem do enunciado, não de números fixos.
   await etapaAtual(page, 5, TOTAL);
-  await tocar(page, "12");
-  await expect(page.getByRole("status").filter({ hasText: "Some 8 com 6." })).toBeVisible();
+  const enunciado = page.locator("section[aria-label='Escolha'] p").first();
+  const primeira = await enunciado.innerText();
+  const certa = String(respostaDoProblema(primeira));
+  const errada = (await opcoesDaEscolha(page)).find((o) => o !== certa)!;
+  await tocar(page, errada);
+  await expect(page.getByRole("status")).toBeVisible();
   await semPalavrasProibidas(page);
   await expect(botao(page, "Próximo")).toHaveCount(0);
-  await tocar(page, "14");
+  await tocar(page, certa);
   await tocar(page, "Próximo");
-  await tocar(page, "10");
+  await expect(enunciado).not.toHaveText(primeira);
+  await tocar(page, String(respostaDoProblema(await enunciado.innerText())));
   await tocar(page, "Continuar");
 
   // 6. Conquista: missão concluída, pontos e volta ao planeta.
@@ -104,7 +132,7 @@ test("criança completa a missão de Matemática só com toques, com dica no err
   await semPalavrasProibidas(page);
   await tocar(page, "Voltar ao planeta");
   await expect(page).toHaveURL(/\/app\/planeta\/matematica$/);
-  await expect(page.getByRole("button", { name: "Missão 7 + 5, concluída", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: `Missão ${rotulo}, concluída`, exact: true })).toBeVisible();
 
   // Na Galáxia, o planeta mostra o progresso e a Matemática sai das missões do dia.
   await tocar(page, "Voltar à Galáxia");

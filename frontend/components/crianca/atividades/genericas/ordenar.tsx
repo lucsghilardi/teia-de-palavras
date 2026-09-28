@@ -4,7 +4,7 @@ import { Check, Eraser } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { BotaoContinuar } from "@/components/crianca/aula/botao-continuar";
-import { useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
+import { narrar, useNarracaoDeChegada } from "@/components/crianca/aula/narrador";
 import { Enunciado } from "@/components/crianca/atividades/genericas/comuns";
 import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { useResposta } from "@/components/crianca/atividades/use-resposta";
@@ -43,7 +43,8 @@ function Cartao({ item, numero, className, ...resto }: { item: ItemOrdenar; nume
 /**
  * ORDENAR / LINHA DO TEMPO: a criança toca nos itens na ordem que acha certa
  * (eles sobem para a sequência) e confirma. Erro → dica e a sequência volta;
- * 2º erro → a ordem certa aparece numerada e ela segue.
+ * 2º erro → a ordem certa aparece numerada e ela segue. Todo toque num item
+ * fala o nome dele (1º ano: quem ainda não lê ouve o que escolheu).
  */
 export function Ordenar({ aula, atividade, aoConcluir, definirInstrucao, mostrarConquistas }: PropsAtividade<AtividadeOrdenar>) {
   const ids = useMemo(() => atividade.itens.map((i) => i.id), [atividade.itens]);
@@ -72,6 +73,10 @@ export function Ordenar({ aula, atividade, aoConcluir, definirInstrucao, mostrar
   const tocarNoMonte = (id: string) => {
     sons.toque();
     setSequencia((s) => escolher(s, id, ids));
+
+    // narrar (e não falar): cancela a narração de chegada, que não volta por cima.
+    const item = porId.get(id);
+    if (item) void narrar({ texto: item.texto });
   };
 
   const tocarNaSequencia = (id: string) => {

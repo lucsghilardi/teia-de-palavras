@@ -96,12 +96,12 @@ export const MODELOS_ATIVIDADE: ModeloAtividade[] = [
     descricao: "Fatos fixos ou gerados, com apoio de ícones, reta numérica ou só símbolos.",
     disciplinas: ["matematica"],
     avaliada: true,
-    modelo: { gerar: { quantidade: 4, maximo: 20, operacoes: ["+"] }, apoio: "icones" },
+    modelo: { gerar: { quantidade: 4, maximo: 10, operacoes: ["+"] }, apoio: "icones" },
   },
   {
     tipo: "escolher_silaba",
     nome: "Escolher a sílaba",
-    descricao: "Completar a sílaba que falta ou trocar uma sílaba para formar outra palavra (EF02LP02).",
+    descricao: "Completar a sílaba que falta ou trocar uma sílaba para formar outra palavra (EF01LP08).",
     disciplinas: ["portugues"],
     avaliada: true,
     modelo: {
@@ -117,10 +117,10 @@ MODELOS_ATIVIDADE.push(
   {
     tipo: "dinheiro",
     nome: "Dinheiro",
-    descricao: "Juntar moedas e notas (reais inteiros) para pagar o preço; qualquer combinação certa vale (EF02MA20).",
+    descricao: "Juntar moedas e notas (reais inteiros) para pagar o preço; qualquer combinação certa vale (EF01MA19).",
     disciplinas: ["matematica"],
     avaliada: true,
-    modelo: { itens: [{ preco: 7, moedas: [1, 1, 2, 5, 10] }, { preco: 12, moedas: [2, 5, 5, 10, 20] }] },
+    modelo: { itens: [{ preco: 3, moedas: [1, 1, 1, 2, 5] }, { preco: 7, moedas: [1, 2, 2, 5, 10] }] },
   },
   {
     tipo: "mapa_pontos",

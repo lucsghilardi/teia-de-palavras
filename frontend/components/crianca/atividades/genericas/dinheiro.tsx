@@ -16,7 +16,7 @@ import type { AtividadeDinheiro } from "@/types/CriancaApp";
 const INSTRUCAO_PADRAO = "toque nas moedas e notas até juntar o preço. depois toque em pagar.";
 
 /**
- * DINHEIRO (EF02MA20): o preço e um punhado de moedas e notas. A criança
+ * DINHEIRO (EF01MA19): o preço e um punhado de moedas e notas. A criança
  * escolhe algumas (o total aparece na hora) e paga. Qualquer combinação
  * certa vale; erro diz quanto falta ou sobra; 2º erro mostra uma combinação.
  */

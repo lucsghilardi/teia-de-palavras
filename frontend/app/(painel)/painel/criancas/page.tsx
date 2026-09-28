@@ -115,7 +115,8 @@ const formCadastroVazio: FormCadastro = {
   apelido: "",
   avatar_chave: null,
   figura_secreta_chave: null,
-  usa_minusculas: true,
+  // 1º ano: começa em caixa alta; ligue quando a criança já lê em minúsculas.
+  usa_minusculas: false,
   narracao_automatica: true,
   consentimento: false,
 };
@@ -828,7 +829,7 @@ function CriancasConteudo() {
                   <FieldContent>
                     <FieldLabel htmlFor="cadastro-minusculas">Texto como escrito</FieldLabel>
                     <FieldDescription>
-                      Frases em caso natural e peças em minúsculas. Desligado, o app mostra tudo em letras maiúsculas (leitores iniciantes).
+                      Frases em caso natural e peças em minúsculas, para quem já lê em minúsculas. Desligado (padrão no 1º ano), o app mostra tudo em letras maiúsculas.
                     </FieldDescription>
                   </FieldContent>
                 </Field>

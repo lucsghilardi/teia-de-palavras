@@ -19,7 +19,7 @@ function enunciado(item: ItemSilaba, minusculas: boolean): string {
 }
 
 /**
- * ESCOLHER SÍLABA (EF02LP02): completar a sílaba que falta ou trocar uma
+ * ESCOLHER SÍLABA (EF01LP08): completar a sílaba que falta ou trocar uma
  * sílaba para virar outra palavra. As peças da palavra ficam na tela, com um
  * buraco; as opções são peças de sílaba.
  */

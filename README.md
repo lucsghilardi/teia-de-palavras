@@ -2,7 +2,7 @@
 
 # Teia de Palavras
 
-**Um portal gratuito e de código aberto para crianças de 7+ aprenderem brincando: Português, Matemática, Geografia e História, em missões pela Galáxia.**
+**Um portal gratuito e de código aberto para crianças a partir do 1º ano (6+) aprenderem brincando: Português, Matemática, Geografia e História, em missões pela Galáxia.**
 
 Cada missão é uma aventura da nave Teia. Cada palavra descoberta vira um fio na teia da criança.
 
@@ -23,9 +23,10 @@ Cada missão é uma aventura da nave Teia. Cada palavra descoberta vira um fio n
 Comecei a Teia de Palavras para ajudar o meu filho a aprender a ler, partindo do
 método de Paulo Freire: uma palavra que faz sentido para a criança, os pedaços dela,
 e a descoberta de que dá para formar palavras novas. Ele cresceu, e o app cresceu
-junto: hoje é uma plataforma de missões para o 2º ano (7+), com quatro "planetas"
+junto: hoje é uma plataforma de missões a partir do 1º ano (6+), com quatro "planetas"
 (Português, Matemática, Geografia e História), revisão espaçada e feedback de jogo
-sem nota nem ranking.
+sem nota nem ranking. Como no 1º ano a criança ainda está aprendendo a ler, tudo
+o que ela precisa escolher também é falado.
 
 Deixei o código aberto porque muitas famílias, professoras e professores estão
 na mesma luta. Se ajudar mais uma criança, já valeu.
@@ -40,12 +41,12 @@ planetas com o progresso, a *base dos amigos* e, quando um adulto abre uma, a *R
 curtas, com instrução visível e alto-falante em toda tela, e termina numa
 conquista com pontos, itens novos e medalhas.
 
-| Planeta | O que a criança faz | BNCC (2º ano) |
+| Planeta | O que a criança faz | BNCC (1º ano) |
 |---|---|---|
-| **Português** | História, perguntas de compreensão, palavra geradora, ficha de famílias silábicas, montar palavras, escolher a sílaba que falta, ditado (ouvir e montar), escrever uma frase | EF02LP02 |
-| **Matemática** | Contar em grupos de 10, somar e subtrair com apoio (ícones → reta → símbolos), dezenas e unidades, ordenar números, pagar com moedas e notas | EF02MA01, 04, 05, 20 |
-| **Geografia** | Casa e rua, vizinhos, achar lugares num mapa visto de cima, pontos de referência, direita e esquerda, campo e cidade | EF02GE01, 04, 08, 10 |
-| **História** | Ontem, hoje e amanhã, a própria linha do tempo, família, trabalhos da comunidade | EF02HI01, 03, 06, 10 |
+| **Português** | História, perguntas de compreensão, palavra geradora, ficha de famílias silábicas, montar palavras, escolher a sílaba que falta, ditado (ouvir e montar), escrever uma frase | EF01LP08 |
+| **Matemática** | Juntar e tirar até 10 com objetos na tela, contar até 100 em grupos de 10, dezenas e unidades, ordenar números, pagar com moedas e notas até 10 reais | EF01MA04, 07, 08, 19 |
+| **Geografia** | Casa e rua, vizinhos, achar lugares num mapa visto de cima, pontos de referência, direita e esquerda, campo e cidade | EF01GE01, 07, 08, 09 |
+| **História** | Ontem, hoje e amanhã, a própria linha do tempo, família, quem faz o quê na comunidade | EF01HI01, 02, 06 |
 
 Três combinados que o sistema nunca quebra:
 
@@ -89,7 +90,7 @@ da base são configuráveis, e as histórias se adaptam a eles.
 
 | Português | Matemática | Geografia | História |
 |---|---|---|---|
-| A nave Teia: **TEIA** | Somar para decolar (7 + 5) | Minha casa e minha rua | Ontem, hoje, amanhã |
+| A nave Teia: **TEIA** | Somar para decolar (4 + 3) | Minha casa e minha rua | Ontem, hoje, amanhã |
 | A boneca-robô: **BONECA** | Contar até 100 | O mapa do bairro | Minha linha do tempo |
 | O pulo na lua: **PULO** | Dezenas e unidades | Caminhos e referências | Minha família |
 | A mola do robô: **MOLA** | Loja espacial | Campo e cidade | Trabalhos da comunidade |

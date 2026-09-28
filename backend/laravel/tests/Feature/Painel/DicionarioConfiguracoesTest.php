@@ -65,16 +65,16 @@ it('aprova e desaprova palavra', function () {
 it('lê e grava configurações', function () {
     $this->comoAdulto($this->educador)->getJson('/api/painel/configuracoes')
         ->assertOk()
-        ->assertJsonPath('minutos_pausa', 20)
+        ->assertJsonPath('minutos_pausa', 15)
         ->assertJsonPath('consentimento_versao', 'v1');
 
     $this->comoAdulto($this->educador)->putJson('/api/painel/configuracoes', [
         'heroi_nome' => 'Fio',
         'fabrica_nome' => 'Fábrica do Vento',
-        'minutos_pausa' => 15,
+        'minutos_pausa' => 12,
         'consentimento_versao' => 'v2',
         'consentimento_texto' => 'Texto novo',
-    ])->assertOk()->assertJsonPath('heroi_nome', 'Fio')->assertJsonPath('minutos_pausa', 15);
+    ])->assertOk()->assertJsonPath('heroi_nome', 'Fio')->assertJsonPath('minutos_pausa', 12);
 
     expect(Configuracao::aplicarPlaceholders('{{heroi}} foi à {{fabrica}}'))->toBe('Fio foi à Fábrica do Vento');
 });

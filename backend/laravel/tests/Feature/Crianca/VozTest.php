@@ -83,3 +83,14 @@ it('limita frases NOVAS por dia, mas repetir uma frase em cache continua de graÃ
     $this->comoCrianca($crianca)->get('/api/crianca/voz?texto=primeira')->assertOk();
     Http::assertSentCount(1);
 });
+
+it('sem login, limita os caracteres novos do dia somando todos os IPs; a crianÃ§a logada segue gerando', function () {
+    ligarGoogle();
+    config(['teia.voz.anonimas_chars_por_dia' => 10]);
+
+    $this->get('/api/crianca/voz?texto=primeira')->assertOk();
+    $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.2'])->get('/api/crianca/voz?texto=segunda')->assertNoContent();
+    $this->get('/api/crianca/voz?texto=primeira')->assertOk();
+    $this->comoCrianca(Crianca::factory()->create())->get('/api/crianca/voz?texto=segunda')->assertOk();
+    Http::assertSentCount(2);
+});

@@ -1,7 +1,7 @@
 # Teia de Palavras — guia para agentes
 
-Portal de alfabetização infantil (método Paulo Freire). Ver `README.md` para
-subir o projeto e o plano de fases.
+Portal de alfabetização infantil (método Paulo Freire) para crianças a partir do 1º ano (6+; BNCC EF01).
+Ver `README.md` para subir o projeto e o plano de fases.
 
 ## Regras de negócio inegociáveis
 - Uma aula pertence a uma disciplina (`App\Enums\Disciplina`: portugues, matematica, geografia,
@@ -41,8 +41,9 @@ subir o projeto e o plano de fases.
 - Painel do educador em `app/(painel)/painel/*` (shadcn). App da criança em `app/(crianca)/app/*`:
   tema Espaço (tokens em `globals.css` `.tema-crianca`, fonte Lexend, ícones lucide via `lib/icones.ts`,
   NUNCA emoji na tela), Galáxia (`GET /crianca/galaxia`) → planeta (`/app/planeta/{disciplina}`) → missão.
-  Botões ≥ 64px, áudio em todo toque, prefers-reduced-motion. `usa_minusculas` = "texto como escrito"
-  (padrão true; `lib/exibir.ts`: `exibir` para frases, `exibirPalavra` para peças/palavras);
+  Botões ≥ 64px, áudio em todo toque, prefers-reduced-motion. Leitor iniciante: nada depende só de ler
+  (opções de escolha narradas; tocar num item de ordenar/parear fala o nome). `usa_minusculas` = "texto como
+  escrito" (padrão false = caixa alta no 1º ano; `lib/exibir.ts`: `exibir` para frases, `exibirPalavra` para peças/palavras);
   `narracao_automatica` por criança (`useFalarAoChegar`/`useNarracaoDeChegada` respeitam).
 
 ## Comandos

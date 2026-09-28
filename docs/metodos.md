@@ -1,23 +1,25 @@
 # Métodos: por que o app é assim
 
 O Teia de Palavras nasceu do método de Paulo Freire (palavras geradoras) para
-alfabetizar. Ao crescer para crianças de 7+ e para quatro disciplinas, o produto
-passou a se apoiar em outros métodos com evidência forte. Este documento liga cada
+alfabetizar. É feito para crianças a partir do 1º ano (6+) e cobre quatro
+disciplinas; por isso se apoia também em outros métodos com evidência forte. Este documento liga cada
 decisão de produto ao método que a sustenta, para quem quiser criar conteúdo ou
 mudar regras sem perder o fio.
 
 | Método (evidência) | O que vira no produto |
 |---|---|
-| **Palavras geradoras** (Freire) + **consciência fonológica** (PNA 2019) | Português continua partindo de UMA palavra geradora por missão; sílabas geram famílias (TE → TA TE TI TO TU) que acumulam entre missões; palavra descoberta entra na Teia. `escolher_silaba` (completar/trocar sílaba, EF02LP02) treina a manipulação de sílabas. As palmas saíram da sequência padrão (ficam no editor). |
+| **Palavras geradoras** (Freire) + **consciência fonológica** (PNA 2019) | Português continua partindo de UMA palavra geradora por missão; sílabas geram famílias (TE → TA TE TI TO TU) que acumulam entre missões; palavra descoberta entra na Teia. `escolher_silaba` (completar/trocar sílaba, EF01LP08/EF01LP09) treina a relação entre a sílaba falada e a escrita; trocar sílaba já prepara o EF02LP02. As palmas saíram da sequência padrão (ficam no editor). |
 | **Prática de recuperação + espaçamento** (Roediger & Karpicke; guia AERO *Spacing and retrieval practice*) | Toda atividade avaliada gera *itens* numa fila de Leitner por criança (`crianca_itens`); a Revisão diária traz até 6 itens vencidos, os de caixa mais baixa primeiro. Acerto sobe a caixa (1, 3, 7, 14, 30 dias); erro volta para a caixa 0, amanhã. As perguntas de compreensão da história (`escolha`) substituem a conversa aberta como recuperação ativa. |
 | **Feedback formativo sem punição** (Hattie & Timperley; Dweck) | Nunca "errado", nota ou ranking. 1º erro: mensagem curta + dica específica. 2º erro do mesmo item: a resposta certa com explicação, e o item entra na revisão. XP só no primeiro acerto de cada item (não recompensa tentativa e erro). |
 | **Maestria** (Bloom; Khan Academy) | Nenhuma missão trava por nota. A maestria mora na Revisão: o item é "dominado" na caixa 4. Cada atividade avaliada mostra a resposta no 2º erro, então a criança sempre segue. |
-| **CPA: concreto → pictórico → abstrato** (Singapore Math; NIE) | `contar` mostra objetos em fileiras de 10; `somar_subtrair` tem apoio `icones` (concreto), `reta` (pictórico) ou `nenhum` (abstrato). As missões de Matemática vão do concreto ao símbolo. |
+| **CPA: concreto → pictórico → abstrato** (Singapore Math; NIE) | `contar` mostra objetos em fileiras de 10; `somar_subtrair` tem apoio `icones` (concreto), `reta` (pictórico) ou `nenhum` (abstrato). A primeira missão de Matemática fica nos fatos até 10 com objetos na tela (juntar e tirar); a reta e os números até 100 vêm depois. |
 | **Teoria da autodeterminação** (Ryan & Deci; Ryan, Rigby & Przybylski 2006, SDT em jogos) | Autonomia: a Galáxia oferece até 3 "missões do dia" e quatro planetas para escolher. Competência: XP, nível, barra e medalhas visíveis, sempre só da própria criança. Relacionamento: base dos amigos (mini-aulas e duplas, Fases 7 e 8). |
 | **Aprender ensinando / efeito protégé** (Chase, Chin, Oppezzo & Schwartz 2009; meta-análises 2024–25 de *learning by teaching* e *cross-age tutoring*) | Mini-aulas gravadas por modelos prontos (a criança escolhe e grava, nunca digita) e duplas ao vivo com papéis alternados; medalhas de "professor(a)". Programas estruturados rendem mais, por isso os modelos são fechados. (Fases 7 e 8.) |
 | **Design de jogos educativos** (metanálises de *game-based learning*; NN/g sobre cognição infantil) | Um objetivo e um CTA por tela; feedback imediato; missões de 5–8 min com convite de pausa; instrução curta visível + alto-falante em toda tela; botões ≥ 64 px; ícones consistentes por tipo de atividade. |
-| **Fluência de leitura** (fonte Lexend; texto como escrito) | O app da criança usa Lexend. `usa_minusculas` = "texto como escrito": frases em caso natural e peças em minúsculas por padrão (7+, 2º ano); caixa alta continua disponível por criança para leitores iniciantes. |
-| **BNCC 2º ano** | Cada missão nova cita `habilidade_bncc`: Matemática EF02MA01/04/05/20; Geografia EF02GE01/04/08/10; História EF02HI01/03/06/10; Português EF02LP02. |
+| **Leitor iniciante** (1º ano; PNA 2019) | A criança de 6 anos ainda está aprendendo a ler, então nada depende só de ler: na múltipla escolha a chegada lê a pergunta e cada opção (a opção lida acende) e o alto-falante repete pergunta + opções; em ordenar e parear, tocar num item fala o nome dele (à direita do parear, sem nada escolhido, tocar só faz ouvir). Instruções de Matemática dizem "ouça", não "leia". |
+| **Fluência de leitura** (fonte Lexend; letra de imprensa maiúscula) | O app da criança usa Lexend. Criança nova começa em caixa alta (letra de imprensa maiúscula, como no início do 1º ano). `usa_minusculas` = "texto como escrito" (frases em caso natural e peças em minúsculas) se liga por criança no painel quando ela já lê em minúsculas. |
+| **Tempo de tela** | Convite de pausa depois de 15 minutos seguidos (`minutos_pausa`, ajustável no painel). |
+| **BNCC 1º ano** | Cada missão cita `habilidade_bncc` da própria disciplina: Português EF01LP08; Matemática EF01MA08 (juntar e tirar até 10), EF01MA04 (contar até 100), EF01MA07 (dezenas e unidades), EF01MA19 (moedas e cédulas); Geografia EF01GE01 (lugares de vivência), EF01GE08 (caminho e mapa), EF01GE09 (referenciais com o corpo), EF01GE07 (trabalho no campo e na cidade); História EF01HI01 (tempo vivido e linha do tempo), EF01HI02 (família), EF01HI06 (papel de cada pessoa na comunidade). |
 
 ## Onde cada coisa vive
 

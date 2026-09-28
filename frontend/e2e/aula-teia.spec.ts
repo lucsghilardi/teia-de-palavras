@@ -237,7 +237,8 @@ test("criança completa a missão TEIA só com toques", async ({ page }) => {
   await expect(page).toHaveURL(/\/app$/);
   await expect(page.getByRole("button", { name: "Planeta Português", exact: true })).toContainText("1 de 5");
   // Português acabou de ser jogado: as missões do dia passam a ser dos outros planetas.
-  await expect(page.getByRole("button", { name: "Missão 7 + 5, disponível", exact: true })).toBeVisible();
+  // Primeira missão de Matemática (o rótulo é o fato da missão, ex.: "4 + 3").
+  await expect(page.getByRole("button", { name: /^Missão \d+ \+ \d+, disponível$/ })).toBeVisible();
 });
 
 test("figura secreta diferente não entra e não diz 'errado'", async ({ page }) => {

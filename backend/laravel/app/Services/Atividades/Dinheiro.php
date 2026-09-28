@@ -7,7 +7,7 @@ use App\Services\Atividades\Suporte\Mensagens;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Dinheiro (EF02MA20): juntar moedas e notas para pagar um preço exato. A
+ * Dinheiro (EF01MA19; no 2º ano, EF02MA20): juntar moedas e notas para pagar um preço exato. A
  * criança vê o preço e um conjunto de moedas/notas (em reais inteiros) e
  * escolhe algumas; qualquer combinação que some o preço vale.
  * Resposta `{ item, escolhidas: [ids das moedas] }`.

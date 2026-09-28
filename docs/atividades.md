@@ -83,7 +83,7 @@ por criança e atividade. Criança: `{ apoio, itens: [ { id: "7+5", a, b, operac
 Resposta: `{ item: "7+5", valor: 12 }` (o id carrega o fato; a conferência não depende do sorteio).
 Dica gerada: "comece no 7 e conte mais 5: 8, 9, 10…".
 
-### `escolher_silaba` (EF02LP02)
+### `escolher_silaba` (EF01LP08)
 ```json
 { "itens": [
   { "id": "e1", "modo": "completar", "palavra": "TATU", "silabas": ["TA","TU"], "oculta": 1, "opcoes": ["TU","TO","TE"] },
@@ -92,7 +92,7 @@ Dica gerada: "comece no 7 e conte mais 5: 8, 9, 10…".
 Criança: `{ itens: [ { id, modo, palavra e alvo (só em trocar), pecas: ["TA", null], posicao, opcoes } ] }`.
 Resposta: `{ item: "e1", silaba: "TU" }`. A sílaba correta entra nas opções automaticamente.
 
-### `dinheiro` (EF02MA20)
+### `dinheiro` (EF01MA19)
 ```json
 { "itens": [ { "id": "d1", "preco": 7, "moedas": [1, 1, 2, 5, 10], "dica": "..." } ] }
 ```

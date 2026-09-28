@@ -32,12 +32,12 @@ it('aula nova de Português já vem com a sequência legada de atividades', func
 });
 
 it('cria aula de Matemática sem palavra geradora e sem atividades', function () {
-    $aula = criarAula(['disciplina' => 'matematica', 'titulo' => 'Somar até 20', 'rotulo' => '7 + 5', 'habilidade_bncc' => 'EF02MA05']);
+    $aula = criarAula(['disciplina' => 'matematica', 'titulo' => 'Somar até 10', 'rotulo' => '4 + 3', 'habilidade_bncc' => 'EF01MA08']);
 
     expect($aula['disciplina'])->toBe('matematica')
         ->and($aula['palavra_geradora'])->toBeNull()
-        ->and($aula['rotulo'])->toBe('7 + 5')
-        ->and($aula['habilidade_bncc'])->toBe('EF02MA05')
+        ->and($aula['rotulo'])->toBe('4 + 3')
+        ->and($aula['habilidade_bncc'])->toBe('EF01MA08')
         ->and($aula['atividades'])->toBe([])
         ->and($aula['silabas'])->toBe([]);
 

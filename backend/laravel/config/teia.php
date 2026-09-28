@@ -69,5 +69,8 @@ return [
         'limite_mensal_chars' => (int) env('TEIA_VOZ_LIMITE_MENSAL_CHARS', 900000),
         // Frases NOVAS por criança (ou IP antes do login) por dia; repetir é de graça.
         'novas_por_dia' => (int) env('TEIA_VOZ_NOVAS_POR_DIA', 500),
+        // Caracteres NOVOS por dia antes do login, somando todos os IPs (telas de
+        // entrada): de fora do app ninguém esgota o orçamento do mês.
+        'anonimas_chars_por_dia' => (int) env('TEIA_VOZ_ANONIMAS_CHARS_POR_DIA', 3000),
     ],
 ];

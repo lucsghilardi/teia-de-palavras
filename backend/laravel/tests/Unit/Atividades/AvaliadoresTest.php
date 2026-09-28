@@ -222,7 +222,7 @@ describe('escolher sílaba', function () {
         semPalavrasNegativas($erro->mensagem, $erro->dica);
     });
 
-    it('troca uma sílaba para formar outra palavra (EF02LP02)', function () {
+    it('troca uma sílaba para formar outra palavra (consciência silábica)', function () {
         $config = ['itens' => [['modo' => 'trocar', 'de' => 'MOLA', 'silabas' => ['MO', 'LA'], 'para' => 'MALA', 'posicao' => 0, 'opcoes' => ['MA', 'MO', 'LA']]]];
 
         $acerto = app(EscolherSilaba::class)->avaliar($config, ['item' => 'e1', 'silaba' => 'MA'], contextoDeTeste());

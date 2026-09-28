@@ -66,13 +66,15 @@ export function falasDeConquistas(conquistas: Conquista[]): Trecho[] {
  * Na chegada da tela (ou quando `chave` muda — ex.: nova página da história):
  * define o que o alto-falante do topo repete e fala `fala`. Devolve `true`
  * quando a narração acabou, para o próximo botão pulsar. Nada espera por isso:
- * os botões já funcionam durante a fala.
+ * os botões já funcionam durante a fala. `aoTrecho(i)` avisa qual trecho está
+ * sendo falado (ex.: acender a opção que está sendo lida).
  */
 export function useNarracaoDeChegada(
   chave: string | number,
   fala: Trecho[],
   instrucao: Trecho,
   definirInstrucao: (t: Trecho) => void,
+  aoTrecho?: (indice: number) => void,
 ): boolean {
   const automatica = useNarracaoAutomatica();
   const [narrada, setNarrada] = useState<string | number | null>(null);
@@ -83,7 +85,7 @@ export function useNarracaoDeChegada(
     definirInstrucao(instrucao);
 
     // Narração desligada: a instrução fica no alto-falante e a tela já está "pronta".
-    void (automatica ? narrar(fala) : Promise.resolve(true)).then(() => {
+    void (automatica ? narrar(fala, undefined, aoTrecho) : Promise.resolve(true)).then(() => {
       if (ativo) setNarrada(chave);
     });
 

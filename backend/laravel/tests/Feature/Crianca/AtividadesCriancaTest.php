@@ -89,7 +89,7 @@ it('responder numa atividade avaliada equivale à tentativa da criação', funct
         ->assertJsonPath('correta', true)
         ->assertJsonPath('mensagem', 'isso! tatu.');
 
-    // Escolher sílaba (EF02LP02): completar TATU com TU.
+    // Escolher sílaba (EF01LP08): completar TATU com TU.
     $this->comoCrianca($this->crianca)->postJson("{$url}/6/responder", ['item' => 'e1', 'silaba' => 'TU'])
         ->assertOk()
         ->assertJsonPath('correta', true)

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Artisan;
 beforeEach(fn () => semearConteudo());
 
 it('semeia as missões de Geografia e História com habilidade da BNCC e atividades válidas', function () {
-    foreach (['geografia' => ['EF02GE', 4, 4], 'historia' => ['EF02HI', 4, 4], 'matematica' => ['EF02MA', 4, 4]] as $disciplina => [$prefixo, $total, $publicadas]) {
+    foreach (['geografia' => ['EF01GE', 4, 4], 'historia' => ['EF01HI', 4, 4], 'matematica' => ['EF01MA', 4, 4]] as $disciplina => [$prefixo, $total, $publicadas]) {
         $aulas = Aula::daDisciplina($disciplina)->with('atividades')->ordenadas()->get();
 
         expect($aulas)->toHaveCount($total)

@@ -6,13 +6,13 @@ use App\Services\Conteudo\AplicadorConteudo;
 use Illuminate\Database\Seeder;
 
 /**
- * As 10 missões de Português, no universo da nave Teia (7+). Personagens
+ * As 10 missões de Português, no universo da nave Teia (1º ano, 6+). Personagens
  * ORIGINAIS e editáveis: o capitão {{heroi}} e a oficina/base {{fabrica}},
  * nomes definidos em Configurações. Tom de aventura, nunca terror.
  *
  * Cada missão: história (3 páginas), perguntas de compreensão (escolha),
  * palavra geradora, ficha de descoberta, montar palavras, escolher sílaba
- * (EF02LP02), ditado (ouvir → montar) e frase. As palavras-meta e as famílias silábicas são as mesmas
+ * (EF01LP08: relacionar a sílaba falada à escrita), ditado (ouvir → montar) e frase. As palavras-meta e as famílias silábicas são as mesmas
  * da primeira versão (a progressão fonológica não mudou).
  *
  * Fase 1 (sílabas simples) entra publicada. Fase 2 (sílabas complexas) entra
@@ -78,7 +78,7 @@ class ConteudoInicialSeeder extends Seeder
             [
                 'slug' => 'missao-1-a-teia-do-bairro', 'titulo' => 'Missão 1: A nave Teia',
                 'descricao' => 'A rede de energia da nave salva um robô tatu preso no teto da base.',
-                'habilidade_bncc' => 'EF02LP02',
+                'habilidade_bncc' => 'EF01LP08',
                 'fase' => 1, 'ordem' => 1, 'palavra' => 'TEIA', 'publicar' => true,
                 'silabas' => [['TEI'], ['A']],
                 'historia' => [
@@ -106,7 +106,7 @@ class ConteudoInicialSeeder extends Seeder
             [
                 'slug' => 'missao-2-a-boneca-perdida', 'titulo' => 'Missão 2: A boneca-robô',
                 'descricao' => 'Uma boneca-robô perdeu o boné na oficina e a tripulação ajuda a achar.',
-                'habilidade_bncc' => 'EF02LP02',
+                'habilidade_bncc' => 'EF01LP08',
                 'fase' => 1, 'ordem' => 2, 'palavra' => 'BONECA', 'publicar' => true,
                 'silabas' => [['BO'], ['NE'], ['CA']],
                 'historia' => [
@@ -134,7 +134,7 @@ class ConteudoInicialSeeder extends Seeder
             [
                 'slug' => 'missao-3-o-pulo-certeiro', 'titulo' => 'Missão 3: O pulo na lua',
                 'descricao' => 'Na gravidade fraca da lua, um pulo certeiro resgata a pipa de sinalização.',
-                'habilidade_bncc' => 'EF02LP02',
+                'habilidade_bncc' => 'EF01LP08',
                 'fase' => 1, 'ordem' => 3, 'palavra' => 'PULO', 'publicar' => true,
                 'silabas' => [['PU'], ['LO']],
                 'historia' => [
@@ -162,7 +162,7 @@ class ConteudoInicialSeeder extends Seeder
             [
                 'slug' => 'missao-4-a-mola-do-robo', 'titulo' => 'Missão 4: A mola do robô',
                 'descricao' => 'O robô de manutenção parou de pular: falta uma mola, e a engenheira sabe onde achar.',
-                'habilidade_bncc' => 'EF02LP02',
+                'habilidade_bncc' => 'EF01LP08',
                 'fase' => 1, 'ordem' => 4, 'palavra' => 'MOLA', 'publicar' => true,
                 'silabas' => [['MO'], ['LA']],
                 'historia' => [
@@ -190,7 +190,7 @@ class ConteudoInicialSeeder extends Seeder
             [
                 'slug' => 'missao-5-juntos-salvamos-a-vila', 'titulo' => 'Missão 5: Juntos salvamos a vila',
                 'descricao' => 'Uma tempestade de poeira trava a vila lunar; a tripulação inteira puxa a teia.',
-                'habilidade_bncc' => 'EF02LP02',
+                'habilidade_bncc' => 'EF01LP08',
                 'fase' => 1, 'ordem' => 5, 'palavra' => 'SALVA', 'publicar' => true,
                 'silabas' => [['SAL', ['SA', 'SE', 'SI', 'SO', 'SU']], ['VA']],
                 'historia' => [
@@ -220,7 +220,7 @@ class ConteudoInicialSeeder extends Seeder
             [
                 'slug' => 'missao-6-a-aranha-do-telhado', 'titulo' => 'Missão 6: O robô-aranha',
                 'descricao' => 'Um robô-aranha aprende a tecer linhas de energia como a nave.',
-                'habilidade_bncc' => 'EF02LP02',
+                'habilidade_bncc' => 'EF01LP08',
                 'fase' => 2, 'ordem' => 1, 'palavra' => 'ARANHA', 'publicar' => false,
                 'silabas' => [['A'], ['RA'], ['NHA']],
                 'historia' => [
@@ -242,7 +242,7 @@ class ConteudoInicialSeeder extends Seeder
             [
                 'slug' => 'missao-7-o-que-faz-um-heroi', 'titulo' => 'Missão 7: O que faz um herói?',
                 'descricao' => 'As crianças da base perguntam ao capitão o que é ser herói.',
-                'habilidade_bncc' => 'EF02LP02',
+                'habilidade_bncc' => 'EF01LP08',
                 'fase' => 2, 'ordem' => 2, 'palavra' => 'HERÓI', 'publicar' => false,
                 'silabas' => [['HE'], ['RÓI']],
                 'historia' => [
@@ -264,7 +264,7 @@ class ConteudoInicialSeeder extends Seeder
             [
                 'slug' => 'missao-8-os-segredos-da-fabrica', 'titulo' => 'Missão 8: Os segredos da fábrica',
                 'descricao' => 'A fábrica de peças abre as portas: ninguém trabalha sozinho.',
-                'habilidade_bncc' => 'EF02LP02',
+                'habilidade_bncc' => 'EF01LP08',
                 'fase' => 2, 'ordem' => 3, 'palavra' => 'FÁBRICA', 'publicar' => false,
                 'silabas' => [['FÁ'], ['BRI'], ['CA']],
                 'historia' => [
@@ -286,7 +286,7 @@ class ConteudoInicialSeeder extends Seeder
             [
                 'slug' => 'missao-9-a-mascara-misteriosa', 'titulo' => 'Missão 9: A máscara misteriosa',
                 'descricao' => 'Uma máscara de oxigênio com um bilhete leva a uma festa surpresa.',
-                'habilidade_bncc' => 'EF02LP02',
+                'habilidade_bncc' => 'EF01LP08',
                 'fase' => 2, 'ordem' => 4, 'palavra' => 'MÁSCARA', 'publicar' => false,
                 'silabas' => [['MÁS', ['MAS', 'MES', 'MIS', 'MOS', 'MUS']], ['CA'], ['RA']],
                 'historia' => [
@@ -308,7 +308,7 @@ class ConteudoInicialSeeder extends Seeder
             [
                 'slug' => 'missao-10-o-brinquedo-esquecido', 'titulo' => 'Missão 10: O brinquedo esquecido',
                 'descricao' => 'Um brinquedo achado no fundo de uma caixa ganha conserto, tinta e nome novo.',
-                'habilidade_bncc' => 'EF02LP02',
+                'habilidade_bncc' => 'EF01LP08',
                 'fase' => 2, 'ordem' => 5, 'palavra' => 'BRINQUEDO', 'publicar' => false,
                 'silabas' => [['BRIN', ['BRAN', 'BREN', 'BRIN', 'BRON', 'BRUN']], ['QUE'], ['DO']],
                 'historia' => [

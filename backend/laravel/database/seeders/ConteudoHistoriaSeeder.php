@@ -6,8 +6,9 @@ use App\Services\Conteudo\AplicadorConteudo;
 use Illuminate\Database\Seeder;
 
 /**
- * Missões de História (BNCC 2º ano): tempo (ontem, hoje, amanhã), a linha do
- * tempo de cada um, família e trabalhos da comunidade. Idempotente por slug.
+ * Missões de História (BNCC 1º ano): tempo vivido (ontem, hoje, amanhã), a
+ * linha do tempo de cada um até entrar no 1º ano, família e o papel de cada
+ * pessoa na comunidade. Idempotente por slug.
  */
 class ConteudoHistoriaSeeder extends Seeder
 {
@@ -26,7 +27,7 @@ class ConteudoHistoriaSeeder extends Seeder
                 'titulo' => 'Ontem, hoje, amanhã',
                 'rotulo' => 'ontem',
                 'descricao' => 'Antes e depois: a ordem das coisas no diário de bordo.',
-                'habilidade_bncc' => 'EF02HI06',
+                'habilidade_bncc' => 'EF01HI01',
                 'fase' => 1,
                 'ordem' => 1,
                 'publicar' => true,
@@ -77,7 +78,7 @@ class ConteudoHistoriaSeeder extends Seeder
                 'titulo' => 'Minha linha do tempo',
                 'rotulo' => 'linha do tempo',
                 'descricao' => 'Os momentos da sua vida em ordem, do mais antigo até hoje.',
-                'habilidade_bncc' => 'EF02HI03',
+                'habilidade_bncc' => 'EF01HI01',
                 'fase' => 1,
                 'ordem' => 2,
                 'publicar' => true,
@@ -97,7 +98,7 @@ class ConteudoHistoriaSeeder extends Seeder
                         'config' => [
                             'instrucao' => 'do mais antigo até hoje',
                             'modo' => 'tempo',
-                            'itens' => [['texto' => 'nascer', 'icone' => 'baby'], ['texto' => 'engatinhar', 'icone' => 'footprints'], ['texto' => 'dar os primeiros passos', 'icone' => 'footprints'], ['texto' => 'entrar na escola', 'icone' => 'school'], ['texto' => 'fazer 7 anos', 'icone' => 'cake']],
+                            'itens' => [['texto' => 'nascer', 'icone' => 'baby'], ['texto' => 'engatinhar', 'icone' => 'footprints'], ['texto' => 'dar os primeiros passos', 'icone' => 'footprints'], ['texto' => 'ir para a pré-escola', 'icone' => 'backpack'], ['texto' => 'entrar no 1º ano', 'icone' => 'school']],
                             'dica' => 'Tudo começa quando a pessoa nasce.',
                         ],
                     ],
@@ -110,8 +111,8 @@ class ConteudoHistoriaSeeder extends Seeder
                             'pares' => [
                                 ['a' => '0 anos', 'b' => 'nascer', 'icone_b' => 'baby'],
                                 ['a' => '1 ano', 'b' => 'dar os primeiros passos', 'icone_b' => 'footprints'],
-                                ['a' => '6 anos', 'b' => 'entrar na escola', 'icone_b' => 'school'],
-                                ['a' => '7 anos', 'b' => 'estar no 2º ano', 'icone_b' => 'book'],
+                                ['a' => '4 anos', 'b' => 'ir para a pré-escola', 'icone_b' => 'backpack'],
+                                ['a' => '6 anos', 'b' => 'entrar no 1º ano', 'icone_b' => 'school'],
                             ],
                             'dica' => 'Quanto menor a idade, mais antigo o momento.',
                         ],
@@ -122,7 +123,7 @@ class ConteudoHistoriaSeeder extends Seeder
                         'instrucao' => 'Toque na resposta certa.',
                         'config' => ['itens' => [
                             ['pergunta' => 'O que é uma linha do tempo?', 'opcoes' => ['Os momentos em ordem, do mais antigo até hoje', 'Uma linha de energia', 'Uma fila de robôs'], 'correta' => 0, 'dica' => 'Ouça a segunda página.', 'explicacao' => 'Linha do tempo é a ordem dos momentos.', 'icone' => 'hourglass'],
-                            ['pergunta' => 'O que vem primeiro na história de uma pessoa?', 'opcoes' => ['Nascer', 'Entrar na escola', 'Fazer 7 anos'], 'correta' => 0, 'dica' => 'Antes de tudo.', 'explicacao' => 'Primeiro a pessoa nasce.', 'icone' => 'baby'],
+                            ['pergunta' => 'O que vem primeiro na história de uma pessoa?', 'opcoes' => ['Nascer', 'Ir para a pré-escola', 'Entrar no 1º ano'], 'correta' => 0, 'dica' => 'Antes de tudo.', 'explicacao' => 'Primeiro a pessoa nasce.', 'icone' => 'baby'],
                         ]],
                     ],
                 ],
@@ -133,7 +134,7 @@ class ConteudoHistoriaSeeder extends Seeder
                 'titulo' => 'Minha família',
                 'rotulo' => 'família',
                 'descricao' => 'Cada família é de um jeito; o que faz uma família é o cuidado.',
-                'habilidade_bncc' => 'EF02HI01',
+                'habilidade_bncc' => 'EF01HI02',
                 'fase' => 1,
                 'ordem' => 3,
                 'publicar' => true,
@@ -188,7 +189,7 @@ class ConteudoHistoriaSeeder extends Seeder
                 'titulo' => 'Trabalhos da comunidade',
                 'rotulo' => 'trabalho',
                 'descricao' => 'Quem faz o quê na base e na comunidade; o caminho do pão.',
-                'habilidade_bncc' => 'EF02HI10',
+                'habilidade_bncc' => 'EF01HI06',
                 'fase' => 1,
                 'ordem' => 4,
                 'publicar' => true,

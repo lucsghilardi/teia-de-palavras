@@ -6,8 +6,9 @@ use App\Services\Conteudo\AplicadorConteudo;
 use Illuminate\Database\Seeder;
 
 /**
- * Missões de Geografia (BNCC 2º ano): a nave Teia visita a Terra e observa
- * casa, rua, bairro, caminhos, campo e cidade. Idempotente por slug.
+ * Missões de Geografia (BNCC 1º ano): a nave Teia visita a Terra e observa os
+ * lugares de vivência (casa, rua, escola), o caminho de casa até a escola,
+ * direita e esquerda com o corpo como referência, campo e cidade. Idempotente por slug.
  */
 class ConteudoGeografiaSeeder extends Seeder
 {
@@ -26,7 +27,7 @@ class ConteudoGeografiaSeeder extends Seeder
                 'titulo' => 'Minha casa e minha rua',
                 'rotulo' => 'casa',
                 'descricao' => 'Endereço, vizinhos e os lugares perto de casa.',
-                'habilidade_bncc' => 'EF02GE01',
+                'habilidade_bncc' => 'EF01GE01',
                 'fase' => 1,
                 'ordem' => 1,
                 'publicar' => true,
@@ -82,7 +83,7 @@ class ConteudoGeografiaSeeder extends Seeder
                 'titulo' => 'O mapa do bairro',
                 'rotulo' => 'mapa',
                 'descricao' => 'O bairro visto de cima: achar os lugares no mapa.',
-                'habilidade_bncc' => 'EF02GE08',
+                'habilidade_bncc' => 'EF01GE08',
                 'fase' => 1,
                 'ordem' => 2,
                 'publicar' => true,
@@ -143,7 +144,7 @@ class ConteudoGeografiaSeeder extends Seeder
                 'titulo' => 'Caminhos e referências',
                 'rotulo' => 'caminho',
                 'descricao' => 'Pontos de referência, direita e esquerda, em cima e embaixo.',
-                'habilidade_bncc' => 'EF02GE10',
+                'habilidade_bncc' => 'EF01GE09',
                 'fase' => 1,
                 'ordem' => 3,
                 'publicar' => true,
@@ -199,7 +200,7 @@ class ConteudoGeografiaSeeder extends Seeder
                 'titulo' => 'Campo e cidade',
                 'rotulo' => 'campo',
                 'descricao' => 'Dois jeitos de viver que precisam um do outro.',
-                'habilidade_bncc' => 'EF02GE04',
+                'habilidade_bncc' => 'EF01GE07',
                 'fase' => 1,
                 'ordem' => 4,
                 'publicar' => true,

@@ -122,7 +122,7 @@ export function AbaBasico({ aula, rascunho, outrasAulas, onChange, midia }: AbaB
                   id="aula-bncc"
                   value={rascunho.habilidade_bncc}
                   maxLength={40}
-                  placeholder="Ex.: EF02MA05"
+                  placeholder="Ex.: EF01MA08"
                   onChange={(event) => onChange({ habilidade_bncc: event.target.value })}
                 />
               </Field>
