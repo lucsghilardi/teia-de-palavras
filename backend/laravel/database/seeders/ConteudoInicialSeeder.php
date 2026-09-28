@@ -7,13 +7,18 @@ use Illuminate\Database\Seeder;
 
 /**
  * As 10 missões de Português, no universo da nave Teia (1º ano, 6+). Personagens
- * ORIGINAIS e editáveis: o capitão {{heroi}} e a oficina/base {{fabrica}},
- * nomes definidos em Configurações. Tom de aventura, nunca terror.
+ * ORIGINAIS e editáveis: o capitão {{heroi}}, o robozinho {{mascote}} e a
+ * oficina/base {{fabrica}}, nomes definidos em Configurações. Tom de aventura,
+ * nunca terror. A Temporada 1 ("A Gosma Comilona", docs/temporada-1.md) é o fio
+ * que liga as missões: cada uma tem cenas desenhadas (`ilustracao`), desfecho e
+ * gancho para a próxima.
  *
- * Cada missão: história (3 páginas), perguntas de compreensão (escolha),
- * palavra geradora, ficha de descoberta, montar palavras, escolher sílaba
- * (EF01LP08: relacionar a sílaba falada à escrita), ditado (ouvir → montar) e frase. As palavras-meta e as famílias silábicas são as mesmas
- * da primeira versão (a progressão fonológica não mudou).
+ * Sequência da temporada (enxuta, ~5 min): história, palavra geradora, ficha de
+ * descoberta, montar palavras, um treino (escolher sílaba OU ditado, alternando;
+ * EF01LP08) e frase. O prólogo (missões 1 e 2) e as ainda não reescritas seguem
+ * a sequência clássica de 8 etapas, com perguntas de compreensão e os dois
+ * treinos. As palavras-meta e as famílias silábicas são as da primeira versão
+ * (a progressão fonológica não mudou).
  *
  * Fase 1 (sílabas simples) entra publicada. Fase 2 (sílabas complexas) entra
  * como rascunho para o educador revisar no CMS.
@@ -24,7 +29,24 @@ use Illuminate\Database\Seeder;
  */
 class ConteudoInicialSeeder extends Seeder
 {
-    public const SEQUENCIA = ['historia', 'escolha', 'palavra', 'ficha', 'montar_palavras', 'escolher_silaba', 'ditado', 'frase'];
+    /** Prólogo e missões ainda não reescritas para a temporada. */
+    public const SEQUENCIA_CLASSICA = ['historia', 'escolha', 'palavra', 'ficha', 'montar_palavras', 'escolher_silaba', 'ditado', 'frase'];
+
+    /** Os dois treinos que a sequência enxuta alterna, um por missão. */
+    public const TREINOS = ['escolher_silaba', 'ditado'];
+
+    /**
+     * Sequência de uma missão: enxuta com o `treino` escolhido, ou clássica
+     * quando a missão não tem treino (prólogo / ainda não reescrita).
+     *
+     * @return list<string>
+     */
+    public static function sequencia(?string $treino): array
+    {
+        return $treino === null
+            ? self::SEQUENCIA_CLASSICA
+            : ['historia', 'palavra', 'ficha', 'montar_palavras', $treino, 'frase'];
+    }
 
     public function run(AplicadorConteudo $aplicador): void
     {
@@ -39,25 +61,32 @@ class ConteudoInicialSeeder extends Seeder
 
     /**
      * Monta a sequência de atividades a partir dos blocos legíveis do seeder.
+     * `etapas` (opcional) troca título, instrução ou ilustração de uma etapa
+     * pelo tipo, para a etapa contar um pedaço da história.
      *
      * @param  array<string, mixed>  $m
      * @return array<string, mixed>
      */
     private static function comAtividades(array $m): array
     {
-        $m['disciplina'] = 'portugues';
-        $m['atividades'] = [
-            ['tipo' => 'historia', 'config' => []],
-            ['tipo' => 'escolha', 'titulo' => 'Você entendeu?', 'instrucao' => 'Toque na resposta certa.', 'config' => ['itens' => $m['escolha'], 'embaralhar' => true]],
-            ['tipo' => 'palavra', 'config' => []],
-            ['tipo' => 'ficha', 'config' => []],
-            ['tipo' => 'montar_palavras', 'config' => []],
-            ['tipo' => 'escolher_silaba', 'titulo' => 'Qual sílaba?', 'instrucao' => 'Toque na sílaba certa.', 'config' => ['itens' => $m['silabas_desafio']]],
-            ['tipo' => 'ditado', 'titulo' => 'Ditado', 'instrucao' => 'Ouça a palavra e monte com as peças.', 'config' => ['itens' => array_map(fn ($d) => ['palavra' => $d[0], 'silabas' => $d[1], 'opcoes' => $d[2]], $m['ditado'])]],
-            ['tipo' => 'frase', 'config' => []],
+        $blocos = [
+            'historia' => ['tipo' => 'historia', 'config' => []],
+            'escolha' => ['tipo' => 'escolha', 'titulo' => 'Você entendeu?', 'instrucao' => 'Toque na resposta certa.', 'config' => ['itens' => $m['escolha'] ?? [], 'embaralhar' => true]],
+            'palavra' => ['tipo' => 'palavra', 'config' => []],
+            'ficha' => ['tipo' => 'ficha', 'config' => []],
+            'montar_palavras' => ['tipo' => 'montar_palavras', 'config' => []],
+            'escolher_silaba' => ['tipo' => 'escolher_silaba', 'titulo' => 'Qual sílaba?', 'instrucao' => 'Toque na sílaba certa.', 'config' => ['itens' => $m['silabas_desafio']]],
+            'ditado' => ['tipo' => 'ditado', 'titulo' => 'Ditado', 'instrucao' => 'Ouça a palavra e monte com as peças.', 'config' => ['itens' => array_map(fn ($d) => ['palavra' => $d[0], 'silabas' => $d[1], 'opcoes' => $d[2]], $m['ditado'])]],
+            'frase' => ['tipo' => 'frase', 'config' => []],
         ];
 
-        unset($m['escolha'], $m['silabas_desafio'], $m['ditado']);
+        $m['disciplina'] = 'portugues';
+        $m['atividades'] = array_map(
+            fn (string $tipo) => [...$blocos[$tipo], ...($m['etapas'][$tipo] ?? [])],
+            self::sequencia($m['treino'] ?? null),
+        );
+
+        unset($m['escolha'], $m['silabas_desafio'], $m['ditado'], $m['treino'], $m['etapas']);
 
         return $m;
     }
@@ -80,11 +109,14 @@ class ConteudoInicialSeeder extends Seeder
                 'descricao' => 'A rede de energia da nave salva um robô tatu preso no teto da base.',
                 'habilidade_bncc' => 'EF01LP08',
                 'fase' => 1, 'ordem' => 1, 'palavra' => 'TEIA', 'publicar' => true,
+                'ilustracao' => 'capa-teia',
+                'desfecho' => 'O robô-tatu desceu são e salvo, e a tripulação comemorou. A nave Teia está pronta para a próxima missão!',
+                'gancho' => 'Na oficina, uma luz está piscando no meio da noite. O que será?',
                 'silabas' => [['TEI'], ['A']],
                 'historia' => [
-                    '{{heroi}} é o capitão da nave Teia. A nave tem esse nome por causa da rede de energia que ela lança no espaço: uma teia que segura tudo o que passa perto.',
-                    'Hoje a base {{fabrica}} mandou um alerta: um robô tatu subiu no teto da estação para consertar uma antena e ficou preso lá em cima.',
-                    '{{heroi}} lançou a teia como uma ponte. O tatu desceu devagar, sem pressa. A tia e o tio que cuidam da base agradeceram: — Valeu, capitão!',
+                    ['texto' => '{{heroi}} é o capitão da nave Teia. A nave tem esse nome por causa da rede de energia que ela lança no espaço: uma teia que segura tudo o que passa perto.', 'ilustracao' => 'capa-teia'],
+                    ['texto' => 'Hoje a base {{fabrica}} mandou um alerta: um robô tatu subiu no teto da estação para consertar uma antena e ficou preso lá em cima.', 'ilustracao' => 'capa-teia'],
+                    ['texto' => '{{heroi}} lançou a teia como uma ponte. O tatu desceu devagar, sem pressa. A tia e o tio que cuidam da base agradeceram: — Valeu, capitão!', 'ilustracao' => 'capa-teia'],
                 ],
                 'perguntas' => [
                     'Quem ajuda as pessoas no lugar onde você mora?',
@@ -108,11 +140,14 @@ class ConteudoInicialSeeder extends Seeder
                 'descricao' => 'Uma boneca-robô perdeu o boné na oficina e a tripulação ajuda a achar.',
                 'habilidade_bncc' => 'EF01LP08',
                 'fase' => 1, 'ordem' => 2, 'palavra' => 'BONECA', 'publicar' => true,
+                'ilustracao' => 'capa-boneca',
+                'desfecho' => 'A boneca-robô ganhou o boné de volta e abriu um sorriso. Mas quem deixou aquela gosma preta no canto da oficina?',
+                'gancho' => 'Uma bolha preta e mole está andando pela base. O que será?',
                 'silabas' => [['BO'], ['NE'], ['CA']],
                 'historia' => [
-                    'Numa noite de lua, {{heroi}} viu uma luz piscando na oficina {{fabrica}}, onde os robôs são montados.',
-                    'Num canto, uma boneca-robô estava sozinha. Tinha perdido o boné vermelho e não conseguia falar: a boca só piscava.',
-                    '{{heroi}} procurou com ela. O boné estava dentro de um cubo de metal, atrás de um cano. A boneca abriu um sorriso de orelha a orelha.',
+                    ['texto' => 'Numa noite de lua, {{heroi}} viu uma luz piscando na oficina {{fabrica}}, onde os robôs são montados.', 'ilustracao' => 'boneca-oficina'],
+                    ['texto' => 'Num canto, uma boneca-robô estava sozinha. Tinha perdido o boné vermelho e não conseguia falar: a boca só piscava.', 'ilustracao' => 'boneca-sozinha'],
+                    ['texto' => '{{heroi}} procurou com ela. O boné estava dentro de um cubo de metal, atrás de um cano. A boneca abriu um sorriso de orelha a orelha.', 'ilustracao' => 'boneca-bone'],
                 ],
                 'perguntas' => [
                     'Como você acha que a boneca se sentiu sozinha?',
@@ -128,28 +163,31 @@ class ConteudoInicialSeeder extends Seeder
                     ['modo' => 'completar', 'palavra' => 'BOCA', 'silabas' => ['BO', 'CA'], 'oculta' => 0, 'opcoes' => ['BO', 'BA', 'BE'], 'dica' => 'A palavra começa com bo.'],
                     ['modo' => 'trocar', 'de' => 'CANO', 'silabas' => ['CA', 'NO'], 'para' => 'CABO', 'posicao' => 1, 'opcoes' => ['BO', 'NO', 'CO'], 'dica' => 'Troque o último pedaço.'],
                 ],
-                'ditado' => [['BOCA', ['BO', 'CA'], ['NE', 'CO']], ['CUBO', ['CU', 'BO'], ['CA', 'BA']]],
-                'palavras' => [['BONECA', true], 'BOCA', 'BONÉ', 'CUBO', 'CANO', 'NABO'],
+                'ditado' => [['BOCA', ['BO', 'CA'], ['NE', 'CO']], ['CABO', ['CA', 'BO'], ['CO', 'BA']]],
+                'palavras' => [['BONECA', true], 'BOCA', 'BONÉ', 'CUBO', 'CANO', 'CABO', 'NABO'],
             ],
             [
-                'slug' => 'missao-3-o-pulo-certeiro', 'titulo' => 'Missão 3: O pulo na lua',
-                'descricao' => 'Na gravidade fraca da lua, um pulo certeiro resgata a pipa de sinalização.',
+                'slug' => 'missao-3-o-pulo-certeiro', 'titulo' => 'Missão 3: A Gosma aparece',
+                'descricao' => 'A Gosma Comilona come as letras da placa da base; um pulo na lua traz as letras de volta.',
                 'habilidade_bncc' => 'EF01LP08',
                 'fase' => 1, 'ordem' => 3, 'palavra' => 'PULO', 'publicar' => true,
+                'treino' => 'escolher_silaba',
+                'ilustracao' => 'bip-pulo',
+                'desfecho' => '{{mascote}} pegou as letras, e a placa da base voltou a brilhar. Mas a Gosma escorregou por um buraco e sumiu!',
+                'gancho' => 'Para onde a Gosma foi? E o que ela vai comer agora?',
+                'etapas' => [
+                    'escolher_silaba' => ['titulo' => 'Letras de volta', 'instrucao' => 'Ajude a pôr as letras no lugar: toque na sílaba certa.', 'ilustracao' => 'gosma-arroto'],
+                ],
                 'silabas' => [['PU'], ['LO']],
                 'historia' => [
-                    'Na lua, a gravidade é fraca: cada passo vira um pulo enorme. A tripulação da nave Teia foi treinar no campo de pouso.',
-                    'Uma pipa de sinalização ficou presa na antena mais alta. {{heroi}} olhou com a lupa: o chão estava livre? Estava.',
-                    'Com um pulo certeiro, ele pegou a pipa sem tocar na antena. Depois todo mundo dividiu um saco de pipoca na base {{fabrica}}.',
+                    ['texto' => 'Nhac, nhac! Uma bolha preta e mole chegou na base da lua. É a Gosma Comilona! Ela está comendo as letras da placa.', 'ilustracao' => 'gosma-aparece'],
+                    ['texto' => 'A Gosma deu um arroto bem alto: BURP! As letras voaram e ficaram presas lá no alto da antena.', 'ilustracao' => 'gosma-arroto'],
+                    ['texto' => 'Na lua, dá para pular muito alto. {{mascote}} ligou os jatos e deu um PULO enorme. Vamos ajudar?', 'ilustracao' => 'bip-pulo'],
                 ],
                 'perguntas' => [
                     'Por que é importante olhar antes de pular?',
                     'O que você já viu que fica preso no alto?',
-                    'Qual brincadeira você mais gosta de fazer ao ar livre?',
-                ],
-                'escolha' => [
-                    self::pergunta('Por que na lua cada passo vira um pulo?', ['A gravidade é fraca', 'O chão é mole', 'Tem muito vento'], 'Ouça a primeira página.', 'Na lua a gravidade é fraca.', 'moon'),
-                    self::pergunta('O que ficou preso na antena?', ['Uma pipa', 'Uma lupa', 'Um saco de pipoca'], 'Era de sinalização.', 'Uma pipa ficou presa na antena.', 'telescope'),
+                    'O que você faria se alguém comesse as letras da sua casa?',
                 ],
                 'silabas_desafio' => [
                     ['modo' => 'completar', 'palavra' => 'PULO', 'silabas' => ['PU', 'LO'], 'oculta' => 1, 'opcoes' => ['LO', 'LA', 'LU'], 'dica' => 'pu... lo.'],

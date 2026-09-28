@@ -2,20 +2,28 @@
 
 import { useState } from "react";
 
+import { existeIlustracao } from "@/components/crianca/ilustracoes/catalogo";
+import { CenaIlustrada } from "@/components/crianca/ilustracoes/cena-ilustrada";
 import { Icone } from "@/components/crianca/ui/icone";
 import { cn } from "@/lib/utils";
 
+const MOLDURA = "bg-linear-to-br from-[#312e81] via-[var(--c-superficie-2)] to-[var(--c-superficie)] ring-2 ring-[var(--c-borda)]";
+
 /**
- * Figura da aula (imagem do CMS) ou, sem imagem, um desenho do tema: ícone
- * grande sobre um céu noturno. Imagem quebrada também cai no desenho.
+ * Figura da aula. Ordem: imagem enviada pelo painel, senão a cena desenhada
+ * pelo app (`chave` do catálogo de ilustrações), senão um ícone grande sobre
+ * um céu noturno. Imagem quebrada também cai na cena ou no ícone.
  */
 export function Ilustracao({
   src,
+  chave,
   icone,
   alt = "",
   className,
 }: {
   src: string | null | undefined;
+  /** Chave de uma cena do catálogo (components/crianca/ilustracoes/catalogo.ts). */
+  chave?: string | null;
   /** Nome de ícone do lucide (lib/icones.ts) para a reserva. */
   icone: string;
   alt?: string;
@@ -36,6 +44,17 @@ export function Ilustracao({
     );
   }
 
+  if (existeIlustracao(chave)) {
+    return (
+      <div
+        aria-hidden={alt ? undefined : true}
+        className={cn("h-full w-full select-none overflow-hidden rounded-[2rem]", MOLDURA, className)}
+      >
+        <CenaIlustrada chave={chave} />
+      </div>
+    );
+  }
+
   return (
     <div
       role={alt ? "img" : undefined}
@@ -43,7 +62,7 @@ export function Ilustracao({
       aria-hidden={alt ? undefined : true}
       className={cn(
         "flex h-full w-full select-none items-center justify-center overflow-hidden rounded-[2rem]",
-        "bg-linear-to-br from-[#312e81] via-[var(--c-superficie-2)] to-[var(--c-superficie)] ring-2 ring-[var(--c-borda)]",
+        MOLDURA,
         className,
       )}
     >

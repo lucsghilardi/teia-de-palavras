@@ -16,6 +16,7 @@ class ConfiguracoesRequest extends FormRequest
         return [
             'heroi_nome' => ['required', 'string', 'max:60'],
             'fabrica_nome' => ['required', 'string', 'max:60'],
+            'mascote_nome' => ['sometimes', 'required', 'string', 'max:30'],
             'minutos_pausa' => ['required', 'integer', 'min:5', 'max:120'],
             'consentimento_versao' => ['required', 'string', 'max:20'],
             'consentimento_texto' => ['required', 'string', 'max:2000'],

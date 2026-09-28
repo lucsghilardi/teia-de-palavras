@@ -2,6 +2,8 @@
 
 import { Lock, Play, Star } from "lucide-react";
 
+import { existeIlustracao } from "@/components/crianca/ilustracoes/catalogo";
+import { CenaIlustrada } from "@/components/crianca/ilustracoes/cena-ilustrada";
 import { exibirPalavra } from "@/lib/exibir";
 import { cn } from "@/lib/utils";
 import type { Missao, StatusMissao } from "@/types/CriancaApp";
@@ -70,7 +72,8 @@ export function NoMissao({
 }) {
   const { status } = missao;
   const trancada = status === "bloqueada";
-  const temImagem = Boolean(missao.palavra_imagem_url);
+  const cena = !missao.palavra_imagem_url && existeIlustracao(missao.ilustracao) ? missao.ilustracao : null;
+  const temImagem = Boolean(missao.palavra_imagem_url) || cena !== null;
 
   return (
     <button
@@ -91,7 +94,11 @@ export function NoMissao({
           <AnelProgresso etapa={missao.etapa_atual} total={missao.total_atividades + 1} />
         ) : null}
 
-        {temImagem ? (
+        {cena ? (
+          <span aria-hidden className={cn("size-full overflow-hidden rounded-full bg-[var(--c-superficie)]", trancada && "opacity-40 grayscale")}>
+            <CenaIlustrada chave={cena} />
+          </span>
+        ) : temImagem ? (
           // eslint-disable-next-line @next/next/no-img-element -- host da mídia muda por ambiente
           <img
             src={missao.palavra_imagem_url ?? undefined}

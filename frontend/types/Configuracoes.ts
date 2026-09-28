@@ -3,6 +3,8 @@ export interface Configuracoes {
   heroi_nome: string;
   /** Nome da fábrica de palavras (substitui {{fabrica}}). */
   fabrica_nome: string;
+  /** Nome do robozinho mascote da temporada (substitui {{mascote}}). */
+  mascote_nome: string;
   minutos_pausa: number;
   consentimento_versao: string;
   consentimento_texto: string;

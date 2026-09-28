@@ -6,7 +6,9 @@ use App\Services\Conteudo\AplicadorConteudo;
 use Illuminate\Database\Seeder;
 
 /**
- * Missões de Matemática (BNCC 1º ano), no universo da nave Teia. Cada missão
+ * Missões de Matemática (BNCC 1º ano), no universo da nave Teia; na Temporada 1
+ * a nave vai ao Planeta Cubo, onde tudo é feito de blocos em pilhas de 10
+ * (docs/temporada-1.md). Cada missão
  * é uma sequência de atividades genéricas (config JSON validado pelos
  * avaliadores), do concreto (ícones) ao abstrato (símbolos). A primeira fica
  * nos fatos até 10 com objetos na tela; as seguintes contam e comparam até 100
@@ -33,13 +35,16 @@ class ConteudoMatematicaSeeder extends Seeder
                 'fase' => 1,
                 'ordem' => 1,
                 'publicar' => true,
+                'ilustracao' => 'capa-somar',
+                'desfecho' => 'Suprimentos conferidos! A nave Teia decolou rumo ao Planeta Cubo.',
+                'gancho' => 'No Planeta Cubo, tudo é feito de blocos. E tem alguém com muita fome por lá...',
                 'atividades' => [
                     [
                         'tipo' => 'historia',
                         'titulo' => 'A base lunar',
                         'config' => ['paginas' => [
-                            ['texto' => 'A nave Teia vai decolar da base lunar. Antes, a tripulação confere os suprimentos.', 'icone' => 'rocket'],
-                            ['texto' => 'Chegaram 4 caixas de água e mais 3 de comida. Quantas caixas ao todo? É isso que você vai descobrir.', 'icone' => 'package'],
+                            ['texto' => 'A nave Teia vai decolar da base lunar. Antes, a tripulação confere os suprimentos.', 'icone' => 'rocket', 'ilustracao' => 'capa-somar'],
+                            ['texto' => 'Chegaram 4 caixas de água e mais 3 de comida. Quantas caixas ao todo? É isso que você vai descobrir.', 'icone' => 'package', 'ilustracao' => 'capa-somar'],
                         ]],
                     ],
                     [
@@ -93,53 +98,60 @@ class ConteudoMatematicaSeeder extends Seeder
                 ],
             ],
             [
+                // Temporada 1: a Gosma comeu a ponte do Planeta Cubo. Contagem em
+                // pilhas de 10 com rampa suave (a missão 1 parou em 12).
                 'slug' => 'matematica-2-contar-ate-100',
                 'disciplina' => 'matematica',
-                'titulo' => 'Contar até 100',
-                'rotulo' => '1, 2, 3',
-                'descricao' => 'Contar, comparar e ordenar números até 100 com o radar da nave.',
+                'titulo' => 'Pilhas de blocos',
+                'rotulo' => '10, 20, 30',
+                'descricao' => 'Planeta Cubo: contar blocos em pilhas de 10 para refazer a ponte que a Gosma comeu.',
                 'habilidade_bncc' => 'EF01MA04',
                 'fase' => 1,
                 'ordem' => 2,
                 'publicar' => true,
+                'ilustracao' => 'cubo-ponte',
+                'desfecho' => 'Com os blocos contados, a ponte ficou pronta e a tripulação atravessou. Mas a Gosma já tinha fugido!',
+                'gancho' => 'Lá no fundo do Planeta Cubo tem uma mina de cristais. Será que a Gosma foi para lá?',
                 'atividades' => [
                     [
                         'tipo' => 'historia',
-                        'titulo' => 'O radar',
+                        'titulo' => 'A ponte comida',
                         'config' => ['paginas' => [
-                            ['texto' => 'O radar da nave Teia contou estrelas a noite inteira. Agora é a sua vez de conferir a contagem.', 'icone' => 'radar'],
-                            ['texto' => 'Quando der, conte de 10 em 10: 10, 20, 30... É bem mais rápido do que contar de um em um.', 'icone' => 'hash'],
+                            ['texto' => 'A nave Teia pousou no Planeta Cubo, onde tudo é feito de blocos. Nhac! A Gosma comeu a ponte!', 'icone' => 'package', 'ilustracao' => 'cubo-ponte'],
+                            ['texto' => 'Para refazer a ponte, os blocos vêm em pilhas de 10. Uma pilha e mais 3 soltos: 13 blocos!', 'icone' => 'package', 'ilustracao' => 'cubo-pilhas'],
                         ]],
                     ],
                     [
                         'tipo' => 'contar',
-                        'titulo' => 'Conferir o radar',
-                        'instrucao' => 'Conte em grupos de 10 e toque no número certo.',
+                        'titulo' => 'Contar os blocos',
+                        'instrucao' => 'Conte as pilhas de 10 e os blocos soltos. Depois toque no número.',
                         'config' => ['itens' => [
-                            ['icone' => 'star', 'quantidade' => 23],
-                            ['icone' => 'moon', 'quantidade' => 41],
-                            ['icone' => 'rocket', 'quantidade' => 68],
-                            ['icone' => 'satellite', 'quantidade' => 90],
+                            ['icone' => 'box', 'quantidade' => 12],
+                            ['icone' => 'box', 'quantidade' => 20],
+                            ['icone' => 'box', 'quantidade' => 27],
+                            ['icone' => 'box', 'quantidade' => 35],
                         ]],
                     ],
                     [
                         'tipo' => 'ordenar',
-                        'titulo' => 'Do menor ao maior',
+                        'titulo' => 'Pilhas em ordem',
                         'instrucao' => 'Coloque os números em ordem, do menor ao maior.',
                         'config' => [
                             'instrucao' => 'do menor ao maior',
                             'modo' => 'numeros',
-                            'itens' => [['texto' => '12'], ['texto' => '25'], ['texto' => '47'], ['texto' => '63'], ['texto' => '88']],
-                            'dica' => 'Comece pelo número menor. Olhe primeiro as dezenas.',
+                            'itens' => [['texto' => '8'], ['texto' => '13'], ['texto' => '20'], ['texto' => '27'], ['texto' => '35']],
+                            'dica' => 'Comece pelo menor. Quem tem menos pilhas de 10 vem antes.',
                         ],
                     ],
                     [
                         'tipo' => 'escolha',
-                        'titulo' => 'Antes e depois',
-                        'instrucao' => 'Toque na resposta.',
+                        'titulo' => 'Blocos para a ponte',
+                        'instrucao' => 'Ouça e toque na resposta.',
+                        'ilustracao' => 'cubo-pilhas',
                         'config' => ['itens' => [
-                            ['pergunta' => 'Qual número vem logo depois de 39?', 'opcoes' => ['40', '38', '49'], 'correta' => 0, 'dica' => 'Conte a partir de 39: 39, 40.', 'explicacao' => 'Depois de 39 vem 40.'],
-                            ['pergunta' => 'Qual desses números é o maior?', 'opcoes' => ['71', '17', '70'], 'correta' => 0, 'dica' => 'Olhe primeiro as dezenas; se empatar, as unidades.', 'explicacao' => '71 tem 7 dezenas e 1 unidade: é o maior.'],
+                            ['pergunta' => 'Uma pilha de 10 e mais 5 blocos soltos. Quantos blocos ao todo?', 'opcoes' => ['15', '6', '51'], 'correta' => 0, 'dica' => 'Comece no 10 e conte mais 5: onze, doze...', 'explicacao' => '10 e mais 5 são 15.'],
+                            ['pergunta' => 'Qual número vem logo depois de 29?', 'opcoes' => ['30', '28', '39'], 'correta' => 0, 'dica' => 'Conte a partir de 29: 29, ...', 'explicacao' => 'Depois de 29 vem 30.'],
+                            ['pergunta' => 'Qual monte tem mais blocos?', 'opcoes' => ['20', '12', '2'], 'correta' => 0, 'dica' => 'Quem tem mais pilhas de 10?', 'explicacao' => '20 são duas pilhas de 10: é o maior.'],
                         ]],
                     ],
                 ],

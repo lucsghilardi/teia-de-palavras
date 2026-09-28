@@ -44,6 +44,7 @@ class PerfilController extends Controller
             'config' => [
                 'heroi_nome' => Configuracao::valor('heroi_nome'),
                 'fabrica_nome' => Configuracao::valor('fabrica_nome'),
+                'mascote_nome' => Configuracao::valor('mascote_nome'),
                 'minutos_pausa' => (int) Configuracao::valor('minutos_pausa'),
             ],
         ]);

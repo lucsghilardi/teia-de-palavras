@@ -21,6 +21,8 @@ class Configuracao extends Model
     public const PADROES = [
         'heroi_nome' => 'Teco',
         'fabrica_nome' => 'Fábrica Faz-de-Conta',
+        // Temporada 1: o robozinho que acompanha a criança (a criança pode dar o nome).
+        'mascote_nome' => 'Bip',
         // 6+ (1º ano): convite de pausa depois de 15 minutos seguidos.
         'minutos_pausa' => '15',
         'consentimento_versao' => 'v1',
@@ -50,12 +52,13 @@ class Configuracao extends Model
         Cache::forget('configuracoes');
     }
 
-    /** Substitui {{heroi}} e {{fabrica}} nos textos das histórias/perguntas. */
+    /** Substitui {{heroi}}, {{fabrica}} e {{mascote}} nos textos das missões. */
     public static function aplicarPlaceholders(string $texto): string
     {
         return strtr($texto, [
             '{{heroi}}' => (string) self::valor('heroi_nome'),
             '{{fabrica}}' => (string) self::valor('fabrica_nome'),
+            '{{mascote}}' => (string) self::valor('mascote_nome'),
         ]);
     }
 }

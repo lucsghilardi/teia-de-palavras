@@ -37,7 +37,7 @@ export function Palavra({ aula, atividade, minusculas, aoConcluir, definirInstru
           whileTap={reduzido ? undefined : { scale: 0.95 }}
           className="relative aspect-square w-[min(70vw,42vh)] max-w-sm shrink-0 touch-manipulation focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--c-foco)] landscape:w-[min(40vw,50vh)] rounded-[2rem]"
         >
-          <Ilustracao src={imagem} icone="type" className="absolute inset-0 shadow-[0_8px_0_var(--c-borda)]" />
+          <Ilustracao src={imagem} chave={atividade.ilustracao ?? aula.ilustracao} icone="type" className="absolute inset-0 shadow-[0_8px_0_var(--c-borda)]" />
         </motion.button>
 
         <motion.button

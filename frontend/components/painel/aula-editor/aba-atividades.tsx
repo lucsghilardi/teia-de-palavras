@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { FormularioAtividade, temFormulario } from "@/components/painel/atividades/forms";
 import { MidiaField } from "@/components/painel/midia-field";
+import { SeletorIlustracao } from "@/components/painel/seletor-ilustracao";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,7 @@ type AbaAtividadesProps = {
 
 /**
  * A sequência de atividades da missão: tipo, título, instrução falada,
- * config em JSON (com um modelo por tipo) e imagem. A ordem da lista é a
+ * config em JSON (com um modelo por tipo), cena desenhada e imagem. A ordem da lista é a
  * ordem da missão; a conquista vem sozinha no fim.
  */
 export function AbaAtividades({ atividades, disciplina, onChange, midia }: AbaAtividadesProps) {
@@ -59,6 +60,7 @@ export function AbaAtividades({ atividades, disciplina, onChange, midia }: AbaAt
         titulo: "",
         instrucao: "",
         config: configParaTexto(modelo?.modelo ?? {}),
+        ilustracao: "",
         imagem_url: null,
         avaliada: modelo?.avaliada ?? false,
       },
@@ -230,16 +232,24 @@ export function AbaAtividades({ atividades, disciplina, onChange, midia }: AbaAt
                   )}
                 </Field>
 
-                <MidiaField
-                  tipo="imagem"
-                  label={`Imagem da ${rotulo}`}
-                  url={atividade.imagem_url}
-                  disabled={semId}
-                  disabledHint={DICA_SALVAR_PARA_MIDIA}
-                  onUpload={(arquivo) => midia.enviar("atividade_imagem", atividade.id, arquivo)}
-                  onRemove={() => midia.remover("atividade_imagem", atividade.id)}
-                  className="md:max-w-md"
-                />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <SeletorIlustracao
+                    id={`atividade-ilustracao-${atividade.chave}`}
+                    rotulo={`Cena desenhada da ${rotulo}`}
+                    valor={atividade.ilustracao}
+                    onChange={(ilustracao) => alterar(indice, { ilustracao })}
+                    descricao="Aparece numa faixa acima da atividade (história e palavra usam a própria figura)."
+                  />
+                  <MidiaField
+                    tipo="imagem"
+                    label={`Imagem da ${rotulo}`}
+                    url={atividade.imagem_url}
+                    disabled={semId}
+                    disabledHint={DICA_SALVAR_PARA_MIDIA}
+                    onUpload={(arquivo) => midia.enviar("atividade_imagem", atividade.id, arquivo)}
+                    onRemove={() => midia.remover("atividade_imagem", atividade.id)}
+                  />
+                </div>
               </li>
             );
           })}

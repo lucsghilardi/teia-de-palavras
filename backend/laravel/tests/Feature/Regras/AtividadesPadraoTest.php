@@ -4,14 +4,25 @@ use App\Models\Aula;
 use App\Services\Aulas\AtividadesPadrao;
 use Database\Seeders\ConteudoInicialSeeder;
 
-it('toda missão semeada de Português tem a sequência de 7 atividades (com escolha e escolher_silaba)', function () {
+it('toda missão semeada de Português segue a sequência clássica (prólogo) ou a enxuta da temporada', function () {
     semearConteudo();
 
-    Aula::daDisciplina('portugues')->with('atividades')->get()->each(function (Aula $aula) {
-        expect($aula->atividades->pluck('tipo')->all())->toBe(ConteudoInicialSeeder::SEQUENCIA)
-            ->and($aula->atividades->pluck('ordem')->all())->toBe(range(1, count(ConteudoInicialSeeder::SEQUENCIA)))
+    $validas = [ConteudoInicialSeeder::SEQUENCIA_CLASSICA, ...array_map(ConteudoInicialSeeder::sequencia(...), ConteudoInicialSeeder::TREINOS)];
+
+    Aula::daDisciplina('portugues')->with('atividades')->get()->each(function (Aula $aula) use ($validas) {
+        $tipos = $aula->atividades->pluck('tipo')->all();
+
+        expect(in_array($tipos, $validas, true))->toBeTrue("sequência inesperada em {$aula->slug}")
+            ->and($aula->atividades->pluck('ordem')->all())->toBe(range(1, count($tipos)))
             ->and($aula->disciplina)->toBe('portugues');
     });
+
+    $tipos = fn (string $slug) => Aula::where('slug', $slug)->first()->atividades()->pluck('tipo')->all();
+
+    // Prólogo clássico (8 etapas); a Temporada 1 começa enxuta (6 etapas, um treino).
+    expect($tipos('missao-1-a-teia-do-bairro'))->toBe(ConteudoInicialSeeder::SEQUENCIA_CLASSICA)
+        ->and($tipos('missao-2-a-boneca-perdida'))->toBe(ConteudoInicialSeeder::SEQUENCIA_CLASSICA)
+        ->and($tipos('missao-3-o-pulo-certeiro'))->toBe(['historia', 'palavra', 'ficha', 'montar_palavras', 'escolher_silaba', 'frase']);
 });
 
 it('garantir() cria a sequência padrão uma única vez e deixa outras disciplinas vazias', function () {

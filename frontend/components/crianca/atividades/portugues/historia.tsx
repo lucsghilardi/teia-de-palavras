@@ -21,7 +21,14 @@ export function Historia({ aula, atividade, minusculas, aoConcluir, definirInstr
   const paginas =
     atividade.paginas.length > 0
       ? atividade.paginas
-      : [{ texto: atividade.titulo ?? aula.titulo, imagem_url: atividade.imagem_url ?? aula.palavra_imagem_url, audio_url: null }];
+      : [
+          {
+            texto: atividade.titulo ?? aula.titulo,
+            imagem_url: atividade.imagem_url ?? aula.palavra_imagem_url,
+            ilustracao: atividade.ilustracao ?? aula.ilustracao,
+            audio_url: null,
+          },
+        ];
   const [pagina, setPagina] = useState(0);
   const atual = paginas[Math.min(pagina, paginas.length - 1)];
   const primeira = pagina === 0;
@@ -36,7 +43,13 @@ export function Historia({ aula, atividade, minusculas, aoConcluir, definirInstr
         className="animate-crianca-entrar flex min-h-0 flex-1 flex-col gap-3 sm:gap-4 landscape:flex-row landscape:items-stretch"
       >
         <div className="relative min-h-[36vh] flex-1 landscape:min-h-[40vh]">
-          <Ilustracao key={atual.imagem_url ?? "sem-imagem"} src={atual.imagem_url} icone={atual.icone ?? "rocket"} className="absolute inset-0" />
+          <Ilustracao
+            key={atual.imagem_url ?? atual.ilustracao ?? "sem-imagem"}
+            src={atual.imagem_url}
+            chave={atual.ilustracao}
+            icone={atual.icone ?? "rocket"}
+            className="absolute inset-0"
+          />
         </div>
         <p
           className={cn(

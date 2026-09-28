@@ -19,6 +19,7 @@ class AulaAtividadeResource extends JsonResource
             'instrucao' => $this->instrucao,
             'config' => (object) $this->configArray(),
             'imagem_url' => Midia::url($this->imagem_path),
+            'ilustracao' => $this->ilustracao,
             'avaliada' => $this->ehAvaliada(),
         ];
     }

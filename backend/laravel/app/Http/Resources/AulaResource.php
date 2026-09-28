@@ -25,6 +25,9 @@ class AulaResource extends JsonResource
             'palavra_geradora' => $this->palavra_geradora,
             'palavra_imagem_url' => Midia::url($this->palavra_imagem_path),
             'palavra_audio_url' => Midia::url($this->palavra_audio_path),
+            'ilustracao' => $this->ilustracao,
+            'desfecho' => $this->desfecho,
+            'gancho' => $this->gancho,
             'pre_requisito_aula_id' => $this->pre_requisito_aula_id,
             'criada_por' => $this->criadaPor ? ['id' => $this->criadaPor->id, 'name' => $this->criadaPor->name] : null,
             'silabas' => $this->silabas->map(fn ($s) => [
@@ -42,6 +45,7 @@ class AulaResource extends JsonResource
                 'id' => $p->id,
                 'ordem' => $p->ordem,
                 'texto' => $p->texto,
+                'ilustracao' => $p->ilustracao,
                 'imagem_url' => Midia::url($p->imagem_path),
                 'audio_url' => Midia::url($p->audio_path),
             ])->values(),

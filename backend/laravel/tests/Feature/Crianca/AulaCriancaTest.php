@@ -42,7 +42,7 @@ it('entrega a aula pronta para a criança', function () {
     expect($aula['status'])->toBe('em_andamento')
         ->and($aula['etapa_atual'])->toBe(1)
         ->and($aula)->not->toHaveKeys(['etapas', 'historia', 'palmas', 'ficha', 'pecas', 'metas', 'teia', 'palavrinhas'])
-        ->and($aula['atividades'])->toHaveCount(count(ConteudoInicialSeeder::SEQUENCIA))
+        ->and($aula['atividades'])->toHaveCount(count(ConteudoInicialSeeder::SEQUENCIA_CLASSICA))
         ->and($porTipo['historia']['paginas'][0]['texto'])->toContain('Fio')->not->toContain('{{heroi}}')
         ->and(array_column($porTipo['ficha']['linhas'][0]['membros'], 'texto'))->toBe(['TA', 'TE', 'TI', 'TO', 'TU'])
         ->and(array_column($porTipo['montar_palavras']['metas'], 'palavra'))->toContain('TATU', 'TETO')

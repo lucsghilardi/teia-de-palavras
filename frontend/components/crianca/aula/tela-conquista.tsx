@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowLeft, Mic, Network, Rocket, Star, Trophy } from "lucide-react";
+import { ArrowLeft, Mic, Network, Rocket, Sparkles, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { celebrar } from "@/components/crianca/aula/celebrar";
 import { falasDeConquistas, narrar, type Trecho } from "@/components/crianca/aula/narrador";
 import type { PropsConquista } from "@/components/crianca/atividades/tipos";
+import { MascoteSolo } from "@/components/crianca/ilustracoes/personagens";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { Icone } from "@/components/crianca/ui/icone";
 import { useCrianca } from "@/context/CriancaContext";
@@ -20,8 +21,10 @@ import type { ResultadoConclusao } from "@/types/CriancaApp";
 const FALA_FINAL = { texto: COPY.missao.concluida };
 
 /**
- * CONQUISTA (etapa N+1): conclui a missão no servidor (uma vez), comemora e
- * mostra os pontos, as palavras descobertas nesta missão e as medalhas. A missão
+ * CONQUISTA (etapa N+1): conclui a missão no servidor (uma vez), comemora com o
+ * mascote e mostra os pontos, as palavras descobertas nesta missão e as
+ * medalhas. O fecho do episódio (desfecho) é falado logo depois de "Missão
+ * concluída!" e o gancho do próximo episódio aparece num cartão. A missão
  * pode ser revista depois — nada aqui trava.
  */
 export function TelaConquista({
@@ -46,7 +49,7 @@ export function TelaConquista({
 
     definirInstrucao(FALA_FINAL);
     celebrar(reduzido);
-    const falaInicial = narrar(FALA_FINAL);
+    const falaInicial = narrar(aula.desfecho ? [FALA_FINAL, { texto: aula.desfecho }] : FALA_FINAL);
 
     void concluirMissao().then(async (r) => {
       setResultado(r);
@@ -57,6 +60,8 @@ export function TelaConquista({
       const extra: Trecho[] = [];
       const proxima = r?.desbloqueadas[0];
 
+      if (aula.gancho) extra.push({ texto: aula.gancho });
+
       if (proxima) {
         extra.push({ texto: `Você desbloqueou a próxima missão: ${proxima.palavra_geradora ?? proxima.titulo}!` });
       }
@@ -65,7 +70,7 @@ export function TelaConquista({
 
       // Só continua falando se a criança não tocou em nada durante "Missão concluída!".
       if (extra.length > 0 && (await falaInicial)) {
-        definirInstrucao({ texto: [FALA_FINAL.texto, ...extra.map((t) => t.texto)].join(" ") });
+        definirInstrucao({ texto: [FALA_FINAL.texto, aula.desfecho, ...extra.map((t) => t.texto)].filter(Boolean).join(" ") });
         await narrar(extra);
       }
     });
@@ -87,7 +92,7 @@ export function TelaConquista({
   return (
     <section aria-label="Conquista" className="flex flex-1 flex-col items-center gap-5 px-3 pb-6 sm:px-6">
       <div className="animate-crianca-entrar flex flex-col items-center gap-2 pt-2">
-        <Trophy aria-hidden className="size-[clamp(5rem,18vmin,9rem)] fill-[var(--c-alerta)]/20 text-[var(--c-alerta)]" strokeWidth={1.75} />
+        <MascoteSolo pose="comemorando" className="h-[clamp(6rem,20vmin,10rem)] w-auto" />
         <h2 className="text-center text-[clamp(2rem,6vw,3.5rem)] font-black leading-tight text-[var(--c-alerta)]">
           {exibir(COPY.missao.concluida, minusculas)}
         </h2>
@@ -107,6 +112,24 @@ export function TelaConquista({
         <Star aria-hidden className={cn("size-10 fill-[var(--c-alerta)] text-[var(--c-alerta)]", pronto && !reduzido && "animate-crianca-pulso")} />
         <span aria-hidden>{ganhas !== null && ganhas > 0 ? `+${ganhas}` : (xpTotal ?? "…")}</span>
       </div>
+
+      {aula.gancho && (
+        <button
+          type="button"
+          aria-label={`${COPY.missao.proximoEpisodio}: ${aula.gancho}`}
+          onClick={() => {
+            sons.toque();
+            void narrar(aula.gancho ?? "");
+          }}
+          className="animate-crianca-entrar flex w-full max-w-2xl items-center gap-3 rounded-[2rem] bg-[var(--c-superficie)] px-5 py-3 text-left shadow-[0_6px_0_var(--c-teia-sombra)] ring-4 ring-[var(--c-teia)] touch-manipulation focus-visible:outline-none focus-visible:ring-[var(--c-foco)]"
+        >
+          <Sparkles aria-hidden className="size-10 shrink-0 text-[var(--c-teia)]" strokeWidth={2.25} />
+          <span className="flex min-w-0 flex-col">
+            <span className="text-base font-black tracking-wide text-[var(--c-teia)]">{exibir(COPY.missao.proximoEpisodio, minusculas)}</span>
+            <span className="text-xl font-extrabold leading-snug">{exibir(aula.gancho, minusculas)}</span>
+          </span>
+        </button>
+      )}
 
       {palavras.length > 0 && (
         <ul aria-label="Palavras que você descobriu nesta missão" className="flex max-w-3xl flex-wrap justify-center gap-2 sm:gap-3">

@@ -17,6 +17,8 @@ export type PaginaRascunho = {
   chave: string;
   id?: number;
   texto: string;
+  /** Chave da cena desenhada ("" = nenhuma). */
+  ilustracao: string;
   imagem_url: string | null;
   audio_url: string | null;
 };
@@ -47,6 +49,8 @@ export type AtividadeRascunho = {
   instrucao: string;
   /** JSON como digitado; validado ao salvar (e pelo backend, por tipo). */
   config: string;
+  /** Chave da cena desenhada ("" = nenhuma). */
+  ilustracao: string;
   imagem_url: string | null;
   avaliada: boolean;
 };
@@ -58,6 +62,10 @@ export type AulaRascunho = {
   rotulo: string;
   descricao: string;
   habilidade_bncc: string;
+  /** Capa da missão: chave da cena desenhada ("" = nenhuma). */
+  ilustracao: string;
+  desfecho: string;
+  gancho: string;
   fase: number;
   pre_requisito_aula_id: number | null;
   silabas: SilabaRascunho[];
@@ -109,6 +117,7 @@ export function atividadeRascunho(atividade: AulaAtividade): AtividadeRascunho {
     titulo: atividade.titulo ?? "",
     instrucao: atividade.instrucao ?? "",
     config: configParaTexto(atividade.config),
+    ilustracao: atividade.ilustracao ?? "",
     imagem_url: atividade.imagem_url,
     avaliada: atividade.avaliada,
   };
@@ -123,6 +132,9 @@ export function rascunhoDaAula(aula: Aula): AulaRascunho {
     rotulo: aula.rotulo ?? "",
     descricao: aula.descricao ?? "",
     habilidade_bncc: aula.habilidade_bncc ?? "",
+    ilustracao: aula.ilustracao ?? "",
+    desfecho: aula.desfecho ?? "",
+    gancho: aula.gancho ?? "",
     fase: aula.fase,
     pre_requisito_aula_id: aula.pre_requisito_aula_id,
     silabas: porOrdem(aula.silabas).map((silaba) => ({
@@ -134,6 +146,7 @@ export function rascunhoDaAula(aula: Aula): AulaRascunho {
       chave: `pagina-${pagina.id}`,
       id: pagina.id,
       texto: pagina.texto,
+      ilustracao: pagina.ilustracao ?? "",
       imagem_url: pagina.imagem_url,
       audio_url: pagina.audio_url,
     })),
@@ -181,11 +194,15 @@ export function payloadDoRascunho(rascunho: AulaRascunho): UpdateAulaPayload {
     rotulo: textoOuNulo(rascunho.rotulo),
     descricao: textoOuNulo(rascunho.descricao),
     habilidade_bncc: textoOuNulo(rascunho.habilidade_bncc),
+    ilustracao: textoOuNulo(rascunho.ilustracao),
+    desfecho: textoOuNulo(rascunho.desfecho),
+    gancho: textoOuNulo(rascunho.gancho),
     atividades: rascunho.atividades.map((atividade) =>
       comId(atividade.id, {
         tipo: atividade.tipo,
         titulo: textoOuNulo(atividade.titulo),
         instrucao: textoOuNulo(atividade.instrucao),
+        ilustracao: textoOuNulo(atividade.ilustracao),
         config: configDoTexto(atividade.config) ?? {},
       }),
     ),
@@ -203,7 +220,7 @@ export function payloadDoRascunho(rascunho: AulaRascunho): UpdateAulaPayload {
       familia: silaba.familia,
     })),
     historia_paginas: rascunho.historia_paginas.map((pagina) =>
-      comId(pagina.id, { texto: pagina.texto }),
+      comId(pagina.id, { texto: pagina.texto, ilustracao: textoOuNulo(pagina.ilustracao) }),
     ),
     perguntas: rascunho.perguntas.map((pergunta) =>
       comId(pergunta.id, { texto: pergunta.texto }),

@@ -30,6 +30,11 @@ export const COPY = {
     falha: "Não consegui abrir a missão. Vamos tentar de novo?",
     concluida: "Missão concluída!",
     proxima: "Próxima missão",
+    proximoEpisodio: "Próximo episódio",
+  },
+  nivel: {
+    subiu: (nivel: number) => `Você subiu para o nível ${nivel}!`,
+    fechar: "Continuar",
   },
   amigos: {
     titulo: "Base dos amigos",

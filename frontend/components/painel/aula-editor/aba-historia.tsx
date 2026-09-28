@@ -3,6 +3,7 @@
 import { BookOpen, Plus } from "lucide-react";
 
 import { MidiaField } from "@/components/painel/midia-field";
+import { SeletorIlustracao } from "@/components/painel/seletor-ilustracao";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,13 +32,15 @@ export function AbaHistoria({ paginas, onChange, midia, configuracoes }: AbaHist
         <AlertTitle>Personagens da história</AlertTitle>
         <AlertDescription>
           <p>
-            Escreva <code className="rounded bg-sky-100 px-1 font-mono">{"{{heroi}}"}</code> e{" "}
-            <code className="rounded bg-sky-100 px-1 font-mono">{"{{fabrica}}"}</code> no texto:
+            Escreva <code className="rounded bg-sky-100 px-1 font-mono">{"{{heroi}}"}</code>,{" "}
+            <code className="rounded bg-sky-100 px-1 font-mono">{"{{fabrica}}"}</code> e{" "}
+            <code className="rounded bg-sky-100 px-1 font-mono">{"{{mascote}}"}</code> no texto:
             no app eles viram{" "}
             {configuracoes ? (
               <>
-                “<strong>{configuracoes.heroi_nome}</strong>” e “
-                <strong>{configuracoes.fabrica_nome}</strong>”
+                “<strong>{configuracoes.heroi_nome}</strong>”, “
+                <strong>{configuracoes.fabrica_nome}</strong>” e “
+                <strong>{configuracoes.mascote_nome}</strong>”
               </>
             ) : (
               "os nomes definidos"
@@ -89,6 +92,14 @@ export function AbaHistoria({ paginas, onChange, midia, configuracoes }: AbaHist
                   placeholder="Era uma vez {{heroi}}..."
                 />
 
+                <SeletorIlustracao
+                  id={`pagina-ilustracao-${pagina.chave}`}
+                  rotulo={`Cena desenhada da ${rotulo}`}
+                  valor={pagina.ilustracao}
+                  onChange={(ilustracao) => alterar(indice, { ilustracao })}
+                  descricao="Uma imagem enviada abaixo vence a cena."
+                />
+
                 <div className="grid gap-3 md:grid-cols-2">
                   <MidiaField
                     tipo="imagem"
@@ -121,7 +132,7 @@ export function AbaHistoria({ paginas, onChange, midia, configuracoes }: AbaHist
         onClick={() =>
           onChange([
             ...paginas,
-            { chave: novaChave("pagina"), texto: "", imagem_url: null, audio_url: null },
+            { chave: novaChave("pagina"), texto: "", ilustracao: "", imagem_url: null, audio_url: null },
           ])
         }
       >

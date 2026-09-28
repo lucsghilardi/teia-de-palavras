@@ -8,7 +8,8 @@ use Illuminate\Database\Seeder;
 /**
  * Missões de História (BNCC 1º ano): tempo vivido (ontem, hoje, amanhã), a
  * linha do tempo de cada um até entrar no 1º ano, família e o papel de cada
- * pessoa na comunidade. Idempotente por slug.
+ * pessoa na comunidade. Na Temporada 1 a Gosma bagunça o diário de bordo da
+ * nave (docs/temporada-1.md). Idempotente por slug.
  */
 class ConteudoHistoriaSeeder extends Seeder
 {
@@ -22,48 +23,55 @@ class ConteudoHistoriaSeeder extends Seeder
     {
         return [
             [
+                // Temporada 1: a ordem do dia é a do mascote (contada na história),
+                // não a da criança: quem estuda à tarde não "erra" por almoçar antes.
                 'slug' => 'historia-1-ontem-hoje-amanha',
                 'disciplina' => 'historia',
-                'titulo' => 'Ontem, hoje, amanhã',
+                'titulo' => 'O diário bagunçado',
                 'rotulo' => 'ontem',
-                'descricao' => 'Antes e depois: a ordem das coisas no diário de bordo.',
+                'descricao' => 'A Gosma espirrou no diário de bordo: antes e depois, ontem, hoje e amanhã.',
                 'habilidade_bncc' => 'EF01HI01',
                 'fase' => 1,
                 'ordem' => 1,
                 'publicar' => true,
+                'ilustracao' => 'diario-espirro',
+                'desfecho' => 'O diário está em ordem de novo! Numa página, a Gosma deixou um desenho: um coração meio torto.',
+                'gancho' => 'O que será que a Gosma quis dizer com esse desenho?',
                 'atividades' => [
                     [
                         'tipo' => 'historia',
                         'titulo' => 'O diário de bordo',
                         'config' => ['paginas' => [
-                            ['texto' => 'O diário de bordo da nave Teia guarda tudo em ordem: o que aconteceu ontem, o que acontece hoje e o que vai acontecer amanhã.', 'icone' => 'calendar'],
-                            ['texto' => 'Um dia também tem ordem: acordar, ir à escola, almoçar, brincar e dormir. Uma coisa vem antes, outra vem depois.', 'icone' => 'clock'],
+                            ['texto' => 'ATCHIM! A Gosma espirrou em cima do diário de bordo da nave Teia. As páginas voaram e ficaram fora de ordem.', 'icone' => 'book-open', 'ilustracao' => 'diario-espirro'],
+                            ['texto' => 'O diário guarda tudo em ordem: o que aconteceu ontem, o que acontece hoje e o que vai acontecer amanhã. Vamos arrumar?', 'icone' => 'calendar', 'ilustracao' => 'diario-tempo'],
                         ]],
                     ],
                     [
                         'tipo' => 'ordenar',
-                        'titulo' => 'O dia da tripulação',
-                        'instrucao' => 'Coloque o dia em ordem, do começo ao fim.',
+                        'titulo' => 'O dia do robozinho',
+                        'instrucao' => 'Coloque o dia do {{mascote}} em ordem, do começo ao fim.',
                         'config' => [
-                            'instrucao' => 'o dia da tripulação, do começo ao fim',
+                            'instrucao' => 'o dia do robozinho, do começo ao fim',
                             'modo' => 'tempo',
-                            'itens' => [['texto' => 'acordar', 'icone' => 'sun'], ['texto' => 'tomar café', 'icone' => 'cookie'], ['texto' => 'ir à escola', 'icone' => 'school'], ['texto' => 'almoçar', 'icone' => 'pizza'], ['texto' => 'dormir', 'icone' => 'moon']],
-                            'dica' => 'O que você faz assim que abre os olhos?',
+                            'itens' => [['texto' => 'acordar', 'icone' => 'sun'], ['texto' => 'carregar a bateria', 'icone' => 'battery'], ['texto' => 'voar pela base', 'icone' => 'rocket'], ['texto' => 'jantar', 'icone' => 'utensils'], ['texto' => 'dormir', 'icone' => 'moon']],
+                            'dica' => 'O que ele faz assim que abre os olhos? E o que faz por último?',
                         ],
                     ],
                     [
                         'tipo' => 'escolha',
                         'titulo' => 'Antes e depois',
                         'instrucao' => 'Toque na resposta certa.',
+                        'ilustracao' => 'diario-tempo',
                         'config' => ['itens' => [
-                            ['pergunta' => 'Qual dia vem depois de hoje?', 'opcoes' => ['Amanhã', 'Ontem', 'Nunca'], 'correta' => 0, 'dica' => 'É o dia que ainda vai chegar.', 'explicacao' => 'Depois de hoje vem amanhã.', 'icone' => 'calendar'],
-                            ['pergunta' => 'O que aconteceu antes de hoje?', 'opcoes' => ['Ontem', 'Amanhã', 'Hoje'], 'correta' => 0, 'dica' => 'É o dia que já passou.', 'explicacao' => 'Antes de hoje foi ontem.', 'icone' => 'hourglass'],
+                            ['pergunta' => 'Qual dia vem depois de hoje?', 'opcoes' => ['Amanhã', 'Ontem', 'Hoje'], 'correta' => 0, 'dica' => 'É o dia que ainda vai chegar.', 'explicacao' => 'Depois de hoje vem amanhã.', 'icone' => 'calendar'],
+                            ['pergunta' => 'Qual dia já passou?', 'opcoes' => ['Ontem', 'Amanhã', 'Hoje'], 'correta' => 0, 'dica' => 'É o dia que veio antes de hoje.', 'explicacao' => 'Ontem já passou.', 'icone' => 'hourglass'],
                         ]],
                     ],
                     [
                         'tipo' => 'verdadeiro_falso',
                         'titulo' => 'Verdadeiro ou falso?',
                         'instrucao' => 'Toque em verdadeiro ou falso.',
+                        'ilustracao' => 'diario-espirro',
                         'config' => ['itens' => [
                             ['frase' => 'Ontem vem depois de hoje.', 'correta' => false, 'dica' => 'Ontem já passou.', 'explicacao' => 'Ontem vem antes de hoje.'],
                             ['frase' => 'A gente almoça depois de acordar.', 'correta' => true, 'dica' => 'Ninguém almoça dormindo.', 'explicacao' => 'Primeiro acordar, depois almoçar.'],

@@ -94,6 +94,7 @@ export default function ConfiguracoesPage() {
       const atualizadas = await updateConfiguracoes({
         heroi_nome: form.heroi_nome.trim(),
         fabrica_nome: form.fabrica_nome.trim(),
+        mascote_nome: form.mascote_nome.trim(),
         minutos_pausa: minutos,
         consentimento_versao: form.consentimento_versao.trim(),
         consentimento_texto: form.consentimento_texto.trim(),
@@ -155,8 +156,8 @@ export default function ConfiguracoesPage() {
           <CardHeader>
             <CardTitle>Histórias e app</CardTitle>
             <CardDescription>
-              Nos textos das aulas, {"{{heroi}}"} e {"{{fabrica}}"} são trocados
-              por estes nomes.
+              Nos textos das aulas, {"{{heroi}}"}, {"{{fabrica}}"} e {"{{mascote}}"} são
+              trocados por estes nomes.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -183,6 +184,21 @@ export default function ConfiguracoesPage() {
                   required
                 />
                 <FieldDescription>Substitui {"{{fabrica}}"} nas histórias.</FieldDescription>
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="config-mascote">Nome do robozinho mascote</FieldLabel>
+                <Input
+                  id="config-mascote"
+                  value={form.mascote_nome}
+                  maxLength={30}
+                  onChange={(event) => alterar("mascote_nome", event.target.value)}
+                  disabled={salvando}
+                  required
+                />
+                <FieldDescription>
+                  Substitui {"{{mascote}}"} nas histórias. Que tal deixar a criança escolher o nome?
+                </FieldDescription>
               </Field>
 
               <Field>

@@ -17,7 +17,7 @@ it('entrega a sequência de atividades montada por tipo, sem respostas', functio
     expect($aula['disciplina'])->toBe('portugues')
         ->and($aula['rotulo'])->toBe('TEIA')
         ->and($aula['total_atividades'])->toBe(8)
-        ->and(array_column($aula['atividades'], 'tipo'))->toBe(ConteudoInicialSeeder::SEQUENCIA)
+        ->and(array_column($aula['atividades'], 'tipo'))->toBe(ConteudoInicialSeeder::SEQUENCIA_CLASSICA)
         ->and(array_column($aula['atividades'], 'ordem'))->toBe(range(1, 8))
         ->and(array_column($aula['atividades'], 'avaliada'))->toBe([false, true, false, false, true, true, true, true]);
 

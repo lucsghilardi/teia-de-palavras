@@ -41,7 +41,7 @@ export type Eu = {
   medalhas_total: number;
   /** Itens da Revisão vencidos hoje. */
   revisao_devidos: number;
-  config: { heroi_nome: string; fabrica_nome: string; minutos_pausa: number };
+  config: { heroi_nome: string; fabrica_nome: string; mascote_nome?: string; minutos_pausa: number };
 };
 
 export type Pulso = { sessao_id: number; minutos: number; sugerir_pausa: boolean };
@@ -62,6 +62,8 @@ export type Missao = {
   ordem: number;
   palavra_geradora: string | null;
   palavra_imagem_url: string | null;
+  /** Cena desenhada da capa (catálogo de ilustrações); a imagem enviada vence. */
+  ilustracao?: string | null;
   status: StatusMissao;
   /** 1..N+1 (N atividades; N+1 é a conquista) ou null quando não começou. */
   etapa_atual: number | null;
@@ -125,11 +127,20 @@ type AtividadeBase = {
   titulo: string | null;
   instrucao: string | null;
   imagem_url: string | null;
+  /** Cena desenhada da atividade (catálogo de ilustrações); a imagem enviada vence. */
+  ilustracao?: string | null;
   /** Pede resposta da criança (POST .../atividades/{ordem}/responder). */
   avaliada: boolean;
 };
 
-export type PaginaHistoria = { texto: string; imagem_url: string | null; audio_url: string | null; icone?: string | null };
+export type PaginaHistoria = {
+  texto: string;
+  imagem_url: string | null;
+  audio_url: string | null;
+  icone?: string | null;
+  /** Cena desenhada da página (catálogo de ilustrações). */
+  ilustracao?: string | null;
+};
 
 export type Meta = {
   palavra: string;
@@ -260,6 +271,12 @@ export type AulaCrianca = {
   palavra_geradora: string | null;
   palavra_imagem_url: string | null;
   palavra_audio_url: string | null;
+  /** Capa da missão (cena do catálogo); também ilustra a palavra geradora. */
+  ilustracao?: string | null;
+  /** Fecho do episódio, falado na conquista. */
+  desfecho?: string | null;
+  /** Gancho do próximo episódio, mostrado e falado na conquista. */
+  gancho?: string | null;
   status: StatusMissao;
   /** 1..N+1; concluída continua N+1 (pode rever). */
   etapa_atual: number;

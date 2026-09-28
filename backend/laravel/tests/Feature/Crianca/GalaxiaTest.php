@@ -58,7 +58,7 @@ it('a próxima missão do planeta é a em andamento, senão a primeira disponív
     $json = $this->comoCrianca($this->crianca)->getJson('/api/crianca/galaxia')->assertOk()->json();
 
     expect($json['planetas'][1])->toMatchArray(['concluidas' => 1])
-        ->and($json['planetas'][1]['proxima']['rotulo'])->toBe('1, 2, 3')
+        ->and($json['planetas'][1]['proxima']['rotulo'])->toBe('10, 20, 30')
         ->and(collect($json['escolhas_do_dia'])->pluck('rotulo')->all())->toBe(['casa', 'ontem', 'BONECA']);
 });
 

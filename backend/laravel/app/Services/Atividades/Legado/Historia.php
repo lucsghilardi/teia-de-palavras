@@ -5,13 +5,14 @@ namespace App\Services\Atividades\Legado;
 use App\Models\AulaAtividade;
 use App\Models\Configuracao;
 use App\Services\Atividades\ContextoAtividade;
+use App\Support\Ilustracao;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 /**
  * A história em páginas (texto, imagem, áudio). Em Português vem de
  * aula_historia_paginas (config vazio); nas outras disciplinas as páginas
- * ficam no config: { paginas: [ { texto, icone? } ] }.
+ * ficam no config: { paginas: [ { texto, icone?, ilustracao? } ] }.
  */
 final class Historia extends Base
 {
@@ -30,13 +31,18 @@ final class Historia extends Base
             'paginas' => ['required', 'array', 'min:1', 'max:20'],
             'paginas.*.texto' => ['required', 'string', 'max:600'],
             'paginas.*.icone' => ['nullable', 'string', 'max:40'],
+            'paginas.*.ilustracao' => Ilustracao::regra(),
         ]);
 
         if ($validador->fails()) {
             throw new ValidationException($validador);
         }
 
-        return ['paginas' => array_values(array_map(fn ($p) => ['texto' => trim($p['texto']), 'icone' => $p['icone'] ?? null], $config['paginas']))];
+        return ['paginas' => array_values(array_map(fn ($p) => [
+            'texto' => trim($p['texto']),
+            'icone' => $p['icone'] ?? null,
+            'ilustracao' => ($p['ilustracao'] ?? null) ?: null,
+        ], $config['paginas']))];
     }
 
     public function montar(AulaAtividade $atividade, ContextoAtividade $contexto): array
@@ -47,6 +53,7 @@ final class Historia extends Base
             return ['paginas' => array_map(fn ($p) => [
                 'texto' => Configuracao::aplicarPlaceholders((string) $p['texto']),
                 'icone' => $p['icone'] ?? null,
+                'ilustracao' => $p['ilustracao'] ?? null,
                 'imagem_url' => null,
                 'audio_url' => null,
             ], array_values($paginas))];

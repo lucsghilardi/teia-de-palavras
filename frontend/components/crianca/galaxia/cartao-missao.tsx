@@ -2,6 +2,8 @@
 
 import { Play } from "lucide-react";
 
+import { existeIlustracao } from "@/components/crianca/ilustracoes/catalogo";
+import { CenaIlustrada } from "@/components/crianca/ilustracoes/cena-ilustrada";
 import { ROTULO_STATUS, rotuloMissao } from "@/components/crianca/mapa/no-missao";
 import { BotaoGrande } from "@/components/crianca/ui/botao-grande";
 import { Icone } from "@/components/crianca/ui/icone";
@@ -38,6 +40,10 @@ export function CartaoMissao({
         {missao.palavra_imagem_url ? (
           // eslint-disable-next-line @next/next/no-img-element -- host da mídia muda por ambiente
           <img src={missao.palavra_imagem_url} alt="" draggable={false} className="size-full rounded-full object-cover" />
+        ) : existeIlustracao(missao.ilustracao) ? (
+          <span className="size-full overflow-hidden rounded-full">
+            <CenaIlustrada chave={missao.ilustracao} />
+          </span>
         ) : (
           <Icone nome={planeta.icone} className="size-9" strokeWidth={2.25} />
         )}

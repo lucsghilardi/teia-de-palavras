@@ -26,6 +26,7 @@ class AulaResumoResource extends JsonResource
             'status' => $this->status,
             'pre_requisito_aula_id' => $this->pre_requisito_aula_id,
             'palavra_imagem_url' => Midia::url($this->palavra_imagem_path),
+            'ilustracao' => $this->ilustracao,
             'totais' => [
                 'silabas' => (int) ($this->silabas_count ?? 0),
                 'palavras' => (int) ($this->palavras_count ?? 0),

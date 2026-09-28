@@ -62,7 +62,12 @@ final class ColetorDeFalas
     /** @return list<string> */
     private function daAula(Aula $aula): array
     {
-        $frases = [(string) $aula->palavra_geradora, (string) $aula->titulo];
+        $frases = [
+            (string) $aula->palavra_geradora,
+            (string) $aula->titulo,
+            Configuracao::aplicarPlaceholders((string) $aula->desfecho),
+            Configuracao::aplicarPlaceholders((string) $aula->gancho),
+        ];
 
         foreach ($aula->silabas as $s) {
             $frases[] = (string) $s->silaba?->texto;
@@ -85,8 +90,8 @@ final class ColetorDeFalas
         }
 
         foreach ($aula->atividades as $atividade) {
-            $frases[] = (string) $atividade->instrucao;
-            $frases[] = (string) $atividade->titulo;
+            $frases[] = Configuracao::aplicarPlaceholders((string) $atividade->instrucao);
+            $frases[] = Configuracao::aplicarPlaceholders((string) $atividade->titulo);
             $this->doConfig($atividade->configArray(), $frases);
         }
 

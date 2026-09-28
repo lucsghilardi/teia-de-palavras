@@ -8,7 +8,9 @@ use Illuminate\Database\Seeder;
 /**
  * Missões de Geografia (BNCC 1º ano): a nave Teia visita a Terra e observa os
  * lugares de vivência (casa, rua, escola), o caminho de casa até a escola,
- * direita e esquerda com o corpo como referência, campo e cidade. Idempotente por slug.
+ * direita e esquerda com o corpo como referência, campo e cidade. Na Temporada 1
+ * a Gosma leva o mascote para o bairro e o mapa vira ferramenta de resgate
+ * (docs/temporada-1.md). Idempotente por slug.
  */
 class ConteudoGeografiaSeeder extends Seeder
 {
@@ -31,12 +33,15 @@ class ConteudoGeografiaSeeder extends Seeder
                 'fase' => 1,
                 'ordem' => 1,
                 'publicar' => true,
+                'ilustracao' => 'capa-casa',
+                'desfecho' => '{{heroi}} mostrou a casa, a rua e os vizinhos. Agora a tripulação conhece o bairro!',
+                'gancho' => 'Enquanto isso, alguém escapou da nave e foi passear no bairro...',
                 'atividades' => [
                     [
                         'tipo' => 'historia',
                         'titulo' => 'Visita à Terra',
                         'config' => ['paginas' => [
-                            ['texto' => 'A nave Teia pousou na Terra para uma visita. {{heroi}} mostrou onde mora: uma casa com um número na porta, numa rua com nome.', 'icone' => 'house'],
+                            ['texto' => 'A nave Teia pousou na Terra para uma visita. {{heroi}} mostrou onde mora: uma casa com um número na porta, numa rua com nome.', 'icone' => 'house', 'ilustracao' => 'capa-casa'],
                             ['texto' => 'Na rua moram os vizinhos: as pessoas que vivem perto. Cada casa tem o seu endereço: o nome da rua e o número.', 'icone' => 'users'],
                             ['texto' => 'Perto da casa ficam lugares que todo mundo usa: a escola, a padaria, a praça e o posto de saúde.', 'icone' => 'map-pin'],
                         ]],
@@ -78,31 +83,27 @@ class ConteudoGeografiaSeeder extends Seeder
                 ],
             ],
             [
+                // Temporada 1: o mapa vem logo na 2ª etapa (antes era o quiz sobre
+                // o que é um mapa); o quiz fica para o fim, depois da experiência.
                 'slug' => 'geografia-2-o-mapa-do-bairro',
                 'disciplina' => 'geografia',
-                'titulo' => 'O mapa do bairro',
+                'titulo' => 'Resgate no mapa',
                 'rotulo' => 'mapa',
-                'descricao' => 'O bairro visto de cima: achar os lugares no mapa.',
+                'descricao' => 'A Gosma levou o mascote para o bairro: achar os lugares no mapa, visto de cima.',
                 'habilidade_bncc' => 'EF01GE08',
                 'fase' => 1,
                 'ordem' => 2,
                 'publicar' => true,
+                'ilustracao' => 'mapa-bairro',
+                'desfecho' => 'Achamos o {{mascote}} escondido atrás da árvore da praça! Ele estava bem, só um pouco melado de gosma.',
+                'gancho' => 'Mas por que a Gosma levou o {{mascote}}? Será que ela queria brincar?',
                 'atividades' => [
                     [
                         'tipo' => 'historia',
                         'titulo' => 'Visto de cima',
                         'config' => ['paginas' => [
-                            ['texto' => 'Lá do alto, a nave viu o bairro de um jeito diferente: a rua vira uma linha e as casas viram quadradinhos. Isso é um mapa.', 'icone' => 'map'],
-                            ['texto' => 'Com o mapa, a tripulação achou a escola, a padaria e a praça sem se perder.', 'icone' => 'map-pin'],
-                        ]],
-                    ],
-                    [
-                        'tipo' => 'escolha',
-                        'titulo' => 'Você entendeu?',
-                        'instrucao' => 'Toque na resposta certa.',
-                        'config' => ['itens' => [
-                            ['pergunta' => 'Como o bairro aparece num mapa?', 'opcoes' => ['Visto de cima', 'Visto de lado', 'Visto de baixo'], 'correta' => 0, 'dica' => 'Como a nave vê lá do alto.', 'explicacao' => 'O mapa mostra o bairro visto de cima.', 'icone' => 'map'],
-                            ['pergunta' => 'Para que serve um mapa?', 'opcoes' => ['Para achar lugares sem se perder', 'Para contar estrelas', 'Para brincar de pipa'], 'correta' => 0, 'dica' => 'A tripulação usou para achar a escola.', 'explicacao' => 'O mapa ajuda a achar lugares.', 'icone' => 'compass'],
+                            ['texto' => 'A Gosma levou o {{mascote}} para o bairro! Lá do alto, a rua vira uma linha e as casas viram quadradinhos. Isso é um mapa.', 'icone' => 'map', 'ilustracao' => 'mapa-bairro'],
+                            ['texto' => 'Siga o rastro de gosma no mapa. Ache os lugares e descubra onde o {{mascote}} está!', 'icone' => 'map-pin', 'ilustracao' => 'mapa-bairro'],
                         ]],
                     ],
                     [
@@ -121,20 +122,30 @@ class ConteudoGeografiaSeeder extends Seeder
                             'perguntas' => [
                                 ['alvo' => 'escola', 'texto' => 'Onde fica a escola?', 'dica' => 'Toque nos lugares para ouvir o nome de cada um.'],
                                 ['alvo' => 'padaria', 'texto' => 'Toque no lugar onde se compra pão.', 'dica' => 'Pão se compra na padaria.'],
-                                ['alvo' => 'praca', 'texto' => 'Onde a tripulação brinca ao ar livre?', 'dica' => 'É o lugar com árvores.'],
+                                ['alvo' => 'praca', 'texto' => 'O rastro de gosma vai até a praça. Onde fica a praça?', 'dica' => 'É o lugar com árvores.'],
                             ],
                         ],
                     ],
                     [
                         'tipo' => 'ordenar',
-                        'titulo' => 'O caminho até a escola',
-                        'instrucao' => 'Coloque o caminho em ordem.',
+                        'titulo' => 'O caminho do resgate',
+                        'instrucao' => 'Coloque o caminho do resgate em ordem.',
                         'config' => [
-                            'instrucao' => 'o caminho de casa até a escola',
+                            'instrucao' => 'o caminho da nave até a praça',
                             'modo' => 'sequencia',
-                            'itens' => [['texto' => 'sair de casa', 'icone' => 'house'], ['texto' => 'passar pela padaria', 'icone' => 'store'], ['texto' => 'atravessar na faixa', 'icone' => 'footprints'], ['texto' => 'chegar na escola', 'icone' => 'school']],
-                            'dica' => 'Tudo começa saindo de casa.',
+                            'itens' => [['texto' => 'sair da nave', 'icone' => 'rocket'], ['texto' => 'passar pela padaria', 'icone' => 'store'], ['texto' => 'atravessar na faixa', 'icone' => 'footprints'], ['texto' => 'chegar na praça', 'icone' => 'tree']],
+                            'dica' => 'Tudo começa saindo da nave.',
                         ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'O que é um mapa?',
+                        'instrucao' => 'Toque na resposta certa.',
+                        'ilustracao' => 'mapa-bairro',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'Como o bairro aparece num mapa?', 'opcoes' => ['Visto de cima', 'Visto de lado', 'Visto de dentro'], 'correta' => 0, 'dica' => 'Como a nave vê lá do alto.', 'explicacao' => 'O mapa mostra o bairro visto de cima.', 'icone' => 'map'],
+                            ['pergunta' => 'Para que serve um mapa?', 'opcoes' => ['Para achar lugares sem se perder', 'Para medir a altura', 'Para ouvir música'], 'correta' => 0, 'dica' => 'Foi com ele que achamos a praça.', 'explicacao' => 'O mapa ajuda a achar lugares.', 'icone' => 'compass'],
+                        ]],
                     ],
                 ],
             ],

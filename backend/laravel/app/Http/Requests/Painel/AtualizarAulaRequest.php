@@ -4,6 +4,7 @@ namespace App\Http\Requests\Painel;
 
 use App\Models\Aula;
 use App\Services\Atividades\RegistroAtividades;
+use App\Support\Ilustracao;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -39,6 +40,9 @@ class AtualizarAulaRequest extends FormRequest
             'rotulo' => ['sometimes', 'nullable', 'string', 'max:30'],
             'descricao' => ['sometimes', 'nullable', 'string', 'max:200'],
             'habilidade_bncc' => ['sometimes', 'nullable', 'string', 'max:40'],
+            'ilustracao' => ['sometimes', ...Ilustracao::regra()],
+            'desfecho' => ['sometimes', 'nullable', 'string', 'max:400'],
+            'gancho' => ['sometimes', 'nullable', 'string', 'max:300'],
 
             'silabas' => [$soPortugues, 'present', 'array', 'max:12'],
             'silabas.*.texto' => ['required', 'string', 'max:8', 'regex:/^\p{L}+$/u'],
@@ -48,6 +52,7 @@ class AtualizarAulaRequest extends FormRequest
             'historia_paginas' => [$soPortugues, 'present', 'array', 'max:20'],
             'historia_paginas.*.id' => ['nullable', 'integer'],
             'historia_paginas.*.texto' => ['required', 'string', 'max:600'],
+            'historia_paginas.*.ilustracao' => ['sometimes', ...Ilustracao::regra()],
 
             'perguntas' => [$soPortugues, 'present', 'array', 'max:10'],
             'perguntas.*.id' => ['nullable', 'integer'],
@@ -65,6 +70,7 @@ class AtualizarAulaRequest extends FormRequest
             'atividades.*.tipo' => ['required', 'string', Rule::in(RegistroAtividades::tipos())],
             'atividades.*.titulo' => ['nullable', 'string', 'max:80'],
             'atividades.*.instrucao' => ['nullable', 'string', 'max:200'],
+            'atividades.*.ilustracao' => ['sometimes', ...Ilustracao::regra()],
             'atividades.*.config' => ['sometimes', 'nullable', 'array'],
         ];
     }
@@ -77,6 +83,9 @@ class AtualizarAulaRequest extends FormRequest
             'silabas.*.texto.regex' => 'Sílabas devem ter só letras.',
             'silabas.*.familia.*.regex' => 'Membros da família devem ter só letras.',
             'atividades.*.tipo.in' => 'Tipo de atividade desconhecido.',
+            'ilustracao.regex' => 'Ilustração inválida: use a chave de uma cena do app.',
+            'historia_paginas.*.ilustracao.regex' => 'Ilustração inválida: use a chave de uma cena do app.',
+            'atividades.*.ilustracao.regex' => 'Ilustração inválida: use a chave de uma cena do app.',
         ];
     }
 }

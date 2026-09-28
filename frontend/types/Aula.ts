@@ -28,6 +28,8 @@ export interface AulaResumo {
   status: AulaStatus;
   pre_requisito_aula_id: number | null;
   palavra_imagem_url: string | null;
+  /** Cena desenhada da capa (catálogo de ilustrações do app). */
+  ilustracao: string | null;
   totais: AulaTotais;
   updated_at: string;
 }
@@ -50,6 +52,8 @@ export interface AulaHistoriaPagina {
   id: number;
   ordem: number;
   texto: string;
+  /** Cena desenhada da página (catálogo de ilustrações do app). */
+  ilustracao: string | null;
   imagem_url: string | null;
   audio_url: string | null;
 }
@@ -79,6 +83,8 @@ export interface AulaAtividade {
   instrucao: string | null;
   config: Record<string, unknown>;
   imagem_url: string | null;
+  /** Cena desenhada da atividade (catálogo de ilustrações do app). */
+  ilustracao: string | null;
   avaliada: boolean;
 }
 
@@ -96,6 +102,12 @@ export interface Aula {
   palavra_geradora: string | null;
   palavra_imagem_url: string | null;
   palavra_audio_url: string | null;
+  /** Capa da missão: cena do catálogo de ilustrações (também ilustra a palavra geradora). */
+  ilustracao: string | null;
+  /** Fecho do episódio, falado na tela de conquista. */
+  desfecho: string | null;
+  /** Gancho do próximo episódio, mostrado e falado na tela de conquista. */
+  gancho: string | null;
   pre_requisito_aula_id: number | null;
   criada_por: { id: number; name: string } | null;
   silabas: AulaSilaba[];
@@ -123,6 +135,7 @@ export interface AtividadePayload {
   tipo: string;
   titulo?: string | null;
   instrucao?: string | null;
+  ilustracao?: string | null;
   config?: Record<string, unknown>;
 }
 
@@ -140,8 +153,11 @@ export interface UpdateAulaPayload {
   rotulo?: string | null;
   descricao?: string | null;
   habilidade_bncc?: string | null;
+  ilustracao?: string | null;
+  desfecho?: string | null;
+  gancho?: string | null;
   silabas?: { texto: string; familia: string[] }[];
-  historia_paginas?: { id?: number; texto: string }[];
+  historia_paginas?: { id?: number; texto: string; ilustracao?: string | null }[];
   perguntas?: { id?: number; texto: string }[];
   palavras?: { id?: number; palavra: string; silabas: string[]; destaque: boolean }[];
   atividades?: AtividadePayload[];

@@ -2,6 +2,7 @@
 
 import { CaixaAltaInput } from "@/components/painel/caixa-alta-input";
 import { MidiaField } from "@/components/painel/midia-field";
+import { SeletorIlustracao } from "@/components/painel/seletor-ilustracao";
 import {
   Card,
   CardContent,
@@ -199,6 +200,49 @@ export function AbaBasico({ aula, rascunho, outrasAulas, onChange, midia }: AbaB
       </Card>
 
       <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Episódio</CardTitle>
+            <CardDescription>
+              A capa aparece no mapa e na palavra da missão. O desfecho e o gancho
+              fecham a missão na tela de conquista (falados pelo app). Pode usar{" "}
+              {"{{heroi}}"}, {"{{mascote}}"} e {"{{fabrica}}"}.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FieldGroup className="gap-5">
+              <SeletorIlustracao
+                id="aula-ilustracao"
+                rotulo="Capa (cena desenhada)"
+                valor={rascunho.ilustracao}
+                onChange={(ilustracao) => onChange({ ilustracao })}
+              />
+              <Field>
+                <FieldLabel htmlFor="aula-desfecho">Desfecho</FieldLabel>
+                <Textarea
+                  id="aula-desfecho"
+                  value={rascunho.desfecho}
+                  maxLength={400}
+                  rows={3}
+                  placeholder="Ex.: {{mascote}} pegou as letras e a placa voltou a brilhar."
+                  onChange={(event) => onChange({ desfecho: event.target.value })}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="aula-gancho">Gancho do próximo episódio</FieldLabel>
+                <Textarea
+                  id="aula-gancho"
+                  value={rascunho.gancho}
+                  maxLength={300}
+                  rows={2}
+                  placeholder="Ex.: Para onde a Gosma foi?"
+                  onChange={(event) => onChange({ gancho: event.target.value })}
+                />
+              </Field>
+            </FieldGroup>
+          </CardContent>
+        </Card>
+
         {portugues ? (
         <Card>
           <CardHeader>

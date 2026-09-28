@@ -45,18 +45,20 @@ it('nenhum texto de nenhum planeta diz "errado" nem usa marcas de terceiros', fu
             ...$aula->historiaPaginas->pluck('texto'),
             ...$aula->perguntas->pluck('texto'),
             ...$aula->atividades->map(fn ($a) => json_encode($a->config, JSON_UNESCAPED_UNICODE).' '.$a->titulo.' '.$a->instrucao),
+            (string) $aula->desfecho, (string) $aula->gancho,
         ]));
 
         // "nota de 10 reais" é dinheiro, não avaliação: a proibição é a nota como conceito.
         expect($texto)->not->toMatch('/errad|incorret|ranking|\bnota\b(?! de )/', "missão {$aula->slug}");
 
-        foreach (['homem-aranha', 'spider', 'marvel', 'sony', 'poppy', 'huggy', 'playtime', 'disney'] as $proibido) {
+        // Temporada 1: personagens ORIGINAIS inspirados no universo da criança, nunca os de outras obras.
+        foreach (['homem-aranha', 'spider', 'marvel', 'sony', 'poppy', 'huggy', 'playtime', 'disney', 'venom', 'minecraft', 'roblox', 'astro bot', 'creeper'] as $proibido) {
             expect($texto)->not->toContain($proibido);
         }
     }
 });
 
-it('as missões de Português têm 3 páginas na Fase 1, duas perguntas de compreensão e desafios de sílaba com as palavras da missão', function () {
+it('as missões de Português têm 3 páginas na Fase 1, perguntas de compreensão (no prólogo) e treinos com as palavras da missão', function () {
     foreach (Aula::daDisciplina('portugues')->with(['atividades', 'historiaPaginas', 'palavras'])->get() as $aula) {
         $escolha = $aula->atividades->firstWhere('tipo', 'escolha');
         $silaba = $aula->atividades->firstWhere('tipo', 'escolher_silaba');
@@ -64,15 +66,20 @@ it('as missões de Português têm 3 páginas na Fase 1, duas perguntas de compr
         $palavras = $aula->palavras->pluck('palavra')->all();
 
         expect($aula->historiaPaginas)->toHaveCount($aula->fase === 1 ? 3 : 2)
-            ->and($escolha->configArray()['itens'])->toHaveCount(2)
-            ->and(count($silaba->configArray()['itens']))->toBeGreaterThanOrEqual(2)
-            ->and($ditado->configArray()['itens'])->toHaveCount(2);
+            ->and($silaba !== null || $ditado !== null)->toBeTrue("{$aula->slug} sem treino");
 
-        foreach ($ditado->configArray()['itens'] as $item) {
+        if ($escolha !== null) {
+            expect($escolha->configArray()['itens'])->toHaveCount(2);
+        }
+
+        foreach ($ditado?->configArray()['itens'] ?? [] as $item) {
             expect(in_array($item['palavra'], $palavras, true))->toBeTrue("{$item['palavra']} não é palavra da missão {$aula->slug}");
         }
 
-        foreach ($silaba->configArray()['itens'] as $item) {
+        expect($ditado === null || count($ditado->configArray()['itens']) === 2)->toBeTrue()
+            ->and($silaba === null || count($silaba->configArray()['itens']) >= 2)->toBeTrue();
+
+        foreach ($silaba?->configArray()['itens'] ?? [] as $item) {
             $alvo = $item['modo'] === 'completar' ? $item['palavra'] : $item['para'];
             expect(in_array($alvo, $palavras, true) || Palavra::where('palavra', $alvo)->exists())->toBeTrue("{$alvo} não é palavra da missão {$aula->slug} nem do dicionário");
         }
@@ -88,13 +95,13 @@ it('teia:reaplicar-conteudo lista sem --forcar e sobrescreve com --forcar', func
 
     expect(Artisan::output())->toContain('já existe')
         ->and($teia->fresh()->titulo)->toBe('Editada no CMS')
-        ->and($teia->atividades()->count())->toBe(count(ConteudoInicialSeeder::SEQUENCIA) - 1);
+        ->and($teia->atividades()->count())->toBe(count(ConteudoInicialSeeder::SEQUENCIA_CLASSICA) - 1);
 
     Artisan::call('teia:reaplicar-conteudo', ['--slug' => ['missao-1-a-teia-do-bairro'], '--forcar' => true]);
 
     expect(Artisan::output())->toContain('sobrescrita')
         ->and($teia->fresh()->titulo)->toBe('Missão 1: A nave Teia')
-        ->and($teia->atividades()->pluck('tipo')->all())->toBe(ConteudoInicialSeeder::SEQUENCIA)
+        ->and($teia->atividades()->pluck('tipo')->all())->toBe(ConteudoInicialSeeder::SEQUENCIA_CLASSICA)
         ->and($teia->fresh()->estaPublicada())->toBeTrue()
         ->and(aulaDaPalavra('BONECA')->pre_requisito_aula_id)->toBe($teia->id);
 });

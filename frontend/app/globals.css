@@ -236,3 +236,53 @@
     animation: none;
   }
 }
+
+/* Ilustrações da temporada (components/crianca/ilustracoes): movimento leve em
+   grupos SVG. Cada classe vai num <g> sem transform próprio. */
+@keyframes ilu-flutuar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes ilu-respirar {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.04, 0.96); }
+}
+
+@keyframes ilu-piscar {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+@keyframes ilu-chama {
+  from { transform: scaleY(0.8); }
+  to { transform: scaleY(1.15); }
+}
+
+@keyframes ilu-brilhar {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+@keyframes ilu-balancar {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.ilu-flutuar { animation: ilu-flutuar 2.6s ease-in-out infinite; transform-box: fill-box; }
+.ilu-respirar { animation: ilu-respirar 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+.ilu-piscar { animation: ilu-piscar 4.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.ilu-chama { animation: ilu-chama 0.35s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 0%; }
+.ilu-brilhar { animation: ilu-brilhar 2.4s ease-in-out infinite; }
+.ilu-balancar { animation: ilu-balancar 3s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ilu-flutuar,
+  .ilu-respirar,
+  .ilu-piscar,
+  .ilu-chama,
+  .ilu-brilhar,
+  .ilu-balancar {
+    animation: none;
+  }
+}

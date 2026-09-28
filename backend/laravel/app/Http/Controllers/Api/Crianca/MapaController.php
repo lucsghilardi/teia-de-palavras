@@ -38,6 +38,7 @@ class MapaController extends Controller
             'ordem' => $aula->ordem,
             'palavra_geradora' => $aula->palavra_geradora,
             'palavra_imagem_url' => Midia::url($aula->palavra_imagem_path),
+            'ilustracao' => $aula->ilustracao,
             'status' => $status,
             'etapa_atual' => $etapaAtual,
             'total_atividades' => $aula->totalAtividades(),

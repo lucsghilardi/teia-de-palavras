@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Services\Atividades\RegistroAtividades;
 use App\Services\Palavras\Silabador;
 use App\Services\Palavras\SugestorFamilia;
+use App\Support\Ilustracao;
 use App\Support\Midia;
 use App\Support\Texto;
 use Illuminate\Support\Facades\DB;
@@ -104,6 +105,7 @@ class AulaEditorService
         $palavras = array_key_exists('palavras', $dados) ? $this->normalizarPalavras($dados['palavras'] ?? []) : null;
         $atividades = array_key_exists('atividades', $dados) ? $this->normalizarAtividades($dados['atividades'] ?? []) : null;
         $preRequisito = $dados['pre_requisito_aula_id'] ?? null;
+        $ilustracao = array_key_exists('ilustracao', $dados) ? Ilustracao::normalizar($dados['ilustracao'], 'ilustracao') : $aula->ilustracao;
 
         $erros = [];
 
@@ -135,7 +137,7 @@ class AulaEditorService
             throw ValidationException::withMessages($erros);
         }
 
-        return DB::transaction(function () use ($aula, $dados, $palavraGeradora, $silabas, $palavras, $atividades, $preRequisito, $autor) {
+        return DB::transaction(function () use ($aula, $dados, $palavraGeradora, $silabas, $palavras, $atividades, $preRequisito, $ilustracao, $autor) {
             $aula->update([
                 'titulo' => trim((string) $dados['titulo']),
                 'palavra_geradora' => $palavraGeradora ?: null,
@@ -144,6 +146,9 @@ class AulaEditorService
                 'rotulo' => array_key_exists('rotulo', $dados) ? $this->textoOuNulo($dados['rotulo']) : $aula->rotulo,
                 'descricao' => array_key_exists('descricao', $dados) ? $this->textoOuNulo($dados['descricao']) : $aula->descricao,
                 'habilidade_bncc' => array_key_exists('habilidade_bncc', $dados) ? $this->textoOuNulo($dados['habilidade_bncc']) : $aula->habilidade_bncc,
+                'ilustracao' => $ilustracao,
+                'desfecho' => array_key_exists('desfecho', $dados) ? $this->textoOuNulo($dados['desfecho']) : $aula->desfecho,
+                'gancho' => array_key_exists('gancho', $dados) ? $this->textoOuNulo($dados['gancho']) : $aula->gancho,
             ]);
 
             if ($silabas !== null) {
@@ -151,7 +156,7 @@ class AulaEditorService
             }
 
             if (array_key_exists('historia_paginas', $dados)) {
-                $this->sincronizarTextos($aula, AulaHistoriaPagina::class, $dados['historia_paginas'] ?? [], 'historia_paginas', ['imagem_path', 'audio_path']);
+                $this->sincronizarTextos($aula, AulaHistoriaPagina::class, $dados['historia_paginas'] ?? [], 'historia_paginas', ['imagem_path', 'audio_path'], ['ilustracao']);
             }
 
             if (array_key_exists('perguntas', $dados)) {
@@ -294,13 +299,15 @@ class AulaEditorService
     }
 
     /**
-     * Páginas da história e perguntas: só `texto` e ordem vêm do documento.
+     * Páginas da história e perguntas: `texto`, ordem e (nas páginas) a
+     * `ilustracao` vêm do documento. Ilustração ausente no item fica como está.
      *
      * @param  class-string<AulaHistoriaPagina|AulaPergunta>  $modelo
-     * @param  list<array{id?: int|null, texto: string}>  $itens
+     * @param  list<array{id?: int|null, texto: string, ilustracao?: string|null}>  $itens
      * @param  list<string>  $colunasMidia
+     * @param  list<string>  $colunasIlustracao
      */
-    private function sincronizarTextos(Aula $aula, string $modelo, array $itens, string $campo, array $colunasMidia): void
+    private function sincronizarTextos(Aula $aula, string $modelo, array $itens, string $campo, array $colunasMidia, array $colunasIlustracao = []): void
     {
         $existentes = $modelo::query()->where('aula_id', $aula->id)->get()->keyBy('id');
         $mantidos = [];
@@ -313,6 +320,12 @@ class AulaEditorService
             }
 
             $dados = ['texto' => trim((string) $item['texto']), 'ordem' => $posicao + 1];
+
+            foreach ($colunasIlustracao as $coluna) {
+                if (array_key_exists($coluna, $item)) {
+                    $dados[$coluna] = Ilustracao::normalizar($item[$coluna], "$campo.$posicao.$coluna");
+                }
+            }
 
             if ($id !== null) {
                 $existentes[$id]->update($dados);
@@ -332,7 +345,7 @@ class AulaEditorService
      * Atividades: a posição no array é a ordem. Com `id` atualiza (mantendo a
      * imagem), sem `id` cria, ausentes são apagadas.
      *
-     * @param  list<array{id: int|null, tipo: string, titulo: string|null, instrucao: string|null, config: array<string, mixed>}>  $itens
+     * @param  list<array{id: int|null, tipo: string, titulo: string|null, instrucao: string|null, ilustracao?: string|null, config: array<string, mixed>}>  $itens
      */
     private function sincronizarAtividades(Aula $aula, array $itens): void
     {
@@ -350,6 +363,11 @@ class AulaEditorService
                 'instrucao' => $item['instrucao'],
                 'config' => $item['config'],
             ];
+
+            // Sem a chave no documento (cliente antigo), a ilustração fica como está.
+            if (array_key_exists('ilustracao', $item)) {
+                $dados['ilustracao'] = $item['ilustracao'];
+            }
 
             if ($item['id'] !== null) {
                 if (! $existentes->has($item['id'])) {
@@ -420,7 +438,7 @@ class AulaEditorService
      * Valida tipo e config de cada atividade pelo avaliador do tipo.
      *
      * @param  list<array<string, mixed>>  $atividades
-     * @return list<array{id: int|null, tipo: string, titulo: string|null, instrucao: string|null, config: array<string, mixed>}>
+     * @return list<array{id: int|null, tipo: string, titulo: string|null, instrucao: string|null, ilustracao?: string|null, config: array<string, mixed>}>
      */
     private function normalizarAtividades(array $atividades): array
     {
@@ -447,13 +465,19 @@ class AulaEditorService
                 throw ValidationException::withMessages($mensagens);
             }
 
-            $saida[] = [
+            $normalizada = [
                 'id' => isset($item['id']) ? (int) $item['id'] : null,
                 'tipo' => $tipo,
                 'titulo' => $this->textoOuNulo($item['titulo'] ?? null),
                 'instrucao' => $this->textoOuNulo($item['instrucao'] ?? null),
                 'config' => $config,
             ];
+
+            if (array_key_exists('ilustracao', $item)) {
+                $normalizada['ilustracao'] = Ilustracao::normalizar($item['ilustracao'], "atividades.$indice.ilustracao");
+            }
+
+            $saida[] = $normalizada;
         }
 
         return $saida;

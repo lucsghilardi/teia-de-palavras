@@ -7,7 +7,7 @@ use App\Http\Requests\Painel\ConfiguracoesRequest;
 use App\Models\Configuracao;
 use Illuminate\Http\JsonResponse;
 
-/** Nome do herói, da fábrica, tempo até sugerir pausa e texto do consentimento. */
+/** Nome do herói, da fábrica e do mascote, tempo até sugerir pausa e texto do consentimento. */
 class ConfiguracaoController extends Controller
 {
     public function show(): JsonResponse
@@ -32,6 +32,7 @@ class ConfiguracaoController extends Controller
         return [
             'heroi_nome' => $todas['heroi_nome'],
             'fabrica_nome' => $todas['fabrica_nome'],
+            'mascote_nome' => $todas['mascote_nome'],
             'minutos_pausa' => (int) $todas['minutos_pausa'],
             'consentimento_versao' => $todas['consentimento_versao'],
             'consentimento_texto' => $todas['consentimento_texto'],

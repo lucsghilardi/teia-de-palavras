@@ -88,9 +88,10 @@ class MontadorAulaCrianca
             return [
                 'ordem' => $atividade->ordem,
                 'tipo' => $atividade->tipo,
-                'titulo' => $atividade->titulo,
-                'instrucao' => $atividade->instrucao,
+                'titulo' => $this->comPlaceholders($atividade->titulo),
+                'instrucao' => $this->comPlaceholders($atividade->instrucao),
                 'imagem_url' => Midia::url($atividade->imagem_path),
+                'ilustracao' => $atividade->ilustracao,
                 'avaliada' => $atividade->ehAvaliada(),
                 ...$atividade->avaliador()->montar($atividade, $contexto),
             ];
@@ -106,6 +107,9 @@ class MontadorAulaCrianca
             'palavra_geradora' => $aula->palavra_geradora,
             'palavra_imagem_url' => $recursos['palavra_imagem_url'],
             'palavra_audio_url' => $recursos['palavra_audio_url'],
+            'ilustracao' => $aula->ilustracao,
+            'desfecho' => $this->comPlaceholders($aula->desfecho),
+            'gancho' => $this->comPlaceholders($aula->gancho),
             'status' => $status,
             'etapa_atual' => $etapa,
             'total_atividades' => $total,
@@ -131,6 +135,7 @@ class MontadorAulaCrianca
             'palavra_audio_url' => $aula->palavra_geradora ? $audio->palavra($aula->palavra_geradora, $aula->palavra_audio_path) : null,
             'historia' => $aula->historiaPaginas->map(fn ($p) => [
                 'texto' => Configuracao::aplicarPlaceholders($p->texto),
+                'ilustracao' => $p->ilustracao,
                 'imagem_url' => Midia::url($p->imagem_path),
                 'audio_url' => Midia::url($p->audio_path),
             ])->values()->all(),
@@ -193,5 +198,10 @@ class MontadorAulaCrianca
         }
 
         return $saida;
+    }
+
+    private function comPlaceholders(?string $texto): ?string
+    {
+        return $texto === null ? null : Configuracao::aplicarPlaceholders($texto);
     }
 }

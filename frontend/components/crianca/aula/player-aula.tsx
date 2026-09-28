@@ -8,6 +8,7 @@ import { AtividadeAtual } from "@/components/crianca/atividades/registro";
 import type { PropsAtividade } from "@/components/crianca/atividades/tipos";
 import { AvisoConquistas, type LoteConquistas } from "@/components/crianca/aula/aviso-conquistas";
 import { BarraAula } from "@/components/crianca/aula/barra-aula";
+import { FaixaCena, temFaixaCena } from "@/components/crianca/aula/faixa-cena";
 import { cancelarNarracao, narrar, type Trecho } from "@/components/crianca/aula/narrador";
 import { TelaConquista } from "@/components/crianca/aula/tela-conquista";
 import { useWakeLock } from "@/components/crianca/aula/use-wake-lock";
@@ -270,6 +271,7 @@ export function PlayerAula({ id }: { id: number }) {
 
       <main ref={refConteudo} className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden pt-2">
         <h1 className="sr-only">{aula.titulo}</h1>
+        {atividade && temFaixaCena(atividade) ? <FaixaCena key={`cena-${atividade.ordem}`} atividade={atividade} /> : null}
         {atividade ? (
           <AtividadeAtual key={`${atividade.tipo}-${atividade.ordem}`} {...props} atividade={atividade} />
         ) : conquista ? (
