@@ -16,19 +16,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# NEXT_PUBLIC_* é embutido no bundle em tempo de build, não lido em runtime.
-# Só serve de fallback: o tráfego autenticado usa INTERNAL_API_URL, que é
-# resolvido no servidor (ver lib/auth.ts).
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-ARG NEXT_PUBLIC_REVERB_APP_KEY
-ENV NEXT_PUBLIC_REVERB_APP_KEY=${NEXT_PUBLIC_REVERB_APP_KEY}
-ARG NEXT_PUBLIC_REVERB_HOST
-ENV NEXT_PUBLIC_REVERB_HOST=${NEXT_PUBLIC_REVERB_HOST}
-ARG NEXT_PUBLIC_REVERB_PORT
-ENV NEXT_PUBLIC_REVERB_PORT=${NEXT_PUBLIC_REVERB_PORT}
-ARG NEXT_PUBLIC_REVERB_SCHEME
-ENV NEXT_PUBLIC_REVERB_SCHEME=${NEXT_PUBLIC_REVERB_SCHEME}
+# NEXT_PUBLIC_* é embutido no bundle em tempo de build, não lido em runtime, e
+# vem do frontend/.env.production (o .dockerignore deixa ele entrar no COPY).
+# Não declare ARG/ENV com esses nomes aqui: uma variável já definida, mesmo
+# vazia, vence o .env.production e o tempo real sai desligado do build.
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build

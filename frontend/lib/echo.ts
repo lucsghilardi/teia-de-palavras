@@ -22,8 +22,9 @@ function criar(autorizar: Autorizar): Echo<"reverb"> | null {
   }
 
   const host = process.env.NEXT_PUBLIC_REVERB_HOST || window.location.hostname;
-  const port = Number(process.env.NEXT_PUBLIC_REVERB_PORT ?? 443);
-  const forceTLS = (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? "https") === "https";
+  // `||` e não `??`: no .env uma variável vazia chega como "", e Number("") é 0.
+  const port = Number(process.env.NEXT_PUBLIC_REVERB_PORT || 443);
+  const forceTLS = (process.env.NEXT_PUBLIC_REVERB_SCHEME || "https") === "https";
 
   return new Echo<"reverb">({
     broadcaster: "reverb",

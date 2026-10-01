@@ -3,9 +3,13 @@ name: teia_prod
 # Produção. Diferenças para o docker-compose.yml (dev):
 #  - o código vai dentro das imagens (nenhum bind mount)
 #  - nginx + php-fpm e Next standalone, sem `artisan serve` nem `npm run dev`
-#  - só duas portas, e no loopback: frontend (3002) e o nginx do backend (8003),
-#    este último apenas para o nginx do host encaminhar o websocket /app.
+#  - só duas portas, e no loopback: frontend (3005) e o nginx do backend (8003).
+#    Na VPS, 3000-3004, 8080, 8090 e 8094 são de outros projetos.
+#    O nginx do host (deploy/nginx/teiadepalavras.com.br.conf) manda ao 8003 só
+#    o websocket /app/<REVERB_APP_KEY>, /storage/ (mídia das aulas) e /api/vozes/
+#    (voz neural); todo o resto vai ao Next, que fala com a API pela rede interna.
 #  - storage/ do Laravel em volume nomeado: mídia das aulas e áudios das crianças.
+#  - deploy e redeploy: deploy/deploy.sh (roteiro completo em docs/deploy.md).
 
 services:
   postgres:
@@ -43,8 +47,11 @@ services:
       target: web
     image: teia/backend-web:latest
     ports:
-      # Só para o nginx do host repassar wss://<dominio>/app (Reverb).
+      # Só para o nginx do host repassar o websocket, /storage/ e /api/vozes/.
       - "127.0.0.1:8003:80"
+    volumes:
+      # Somente leitura: o nginx serve /storage/ direto de storage/app/public.
+      - teia_prod_storage:/var/www/laravel/storage:ro
     depends_on:
       - php
       - reverb
@@ -99,7 +106,7 @@ services:
       NODE_ENV: production
       INTERNAL_API_URL: http://backend/api
     ports:
-      - "127.0.0.1:3002:3000"
+      - "127.0.0.1:3005:3000"
     depends_on:
       - backend
     restart: unless-stopped

@@ -1,0 +1,19 @@
+# Contexto do build de produção (backend/Dockerfile.prod faz `COPY laravel/ ./`).
+# Nada daqui pode entrar na imagem:
+#  - .env: segredos; em produção ele é montado pelo compose (somente leitura)
+#  - vendor: o Dockerfile instala com --no-dev; o vendor local (com dev) o sobrescreveria
+#  - storage: mídia, gravações das crianças e vozes vivem no volume teia_prod_storage;
+#    o Dockerfile recria as pastas vazias
+#  - bootstrap/cache: caches gerados pelo deploy.sh, com o .env já no lugar
+laravel/.env
+laravel/.env.*
+!laravel/.env.example
+laravel/vendor
+laravel/node_modules
+laravel/storage
+laravel/bootstrap/cache/*.php
+laravel/public/storage
+laravel/public/hot
+laravel/tests
+laravel/phpunit.xml
+**/.DS_Store

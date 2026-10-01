@@ -165,6 +165,14 @@ docker compose exec backend php artisan teia:gerar-vozes                        
 `/app/entrar` no tablet, digite o código da turma e deixe a criança escolher o
 avatar e a figura secreta.
 
+### Produção
+
+Publicado em **https://teiadepalavras.com.br**. O `docker-compose.prod.yml` sobe a mesma
+pilha com as imagens de produção atrás do nginx da VPS (TLS no host). Cada push na `main`
+entra no ar sozinho em até 3 minutos (`deploy/auto-deploy.sh` no cron), e há backup diário
+(`deploy/backup.sh`). O roteiro completo, de DNS e `.env` a HTTPS e a migração dos dados,
+está em [`docs/deploy.md`](docs/deploy.md).
+
 ## Tecnologia
 
 | Camada | Tecnologia |
@@ -185,13 +193,13 @@ backend/laravel      API Laravel (routes/api/{auth,painel,crianca}.php; regras e
 frontend             Next.js: app/(painel) para o educador, app/(crianca) para a criança
                      components/crianca/atividades: um componente por tipo (registro)
                      lib/aula, lib/atividades, lib/crianca: lógica pura, testada com Vitest
-deploy               scripts e init do PostgreSQL
+deploy               deploy, auto-deploy, backup e HTTPS da VPS; vhost do nginx do host; init do PostgreSQL de dev
 docs                 contratos da API, formato das atividades, métodos e imagens
 ```
 
 Contratos e referências: [`docs/api-painel.md`](docs/api-painel.md),
 [`docs/api-crianca.md`](docs/api-crianca.md), [`docs/atividades.md`](docs/atividades.md),
-[`docs/metodos.md`](docs/metodos.md) e [`docs/api-roda.md`](docs/api-roda.md).
+[`docs/metodos.md`](docs/metodos.md), [`docs/api-roda.md`](docs/api-roda.md) e [`docs/deploy.md`](docs/deploy.md).
 
 ## Testes
 
