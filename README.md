@@ -236,7 +236,7 @@ cd frontend && npm run test:e2e                # missões TEIA e 7 + 5, Revisão
 - [x] Amizades entre turmas e mini-aulas gravadas pelas crianças (aprovadas por um adulto)
 - [x] Duplas ao vivo (a *Roda*, contrato em `docs/api-roda.md`)
 - [x] Progresso da criança no painel
-- [ ] Reverb em produção (hoje o compose sobe o servidor; sem ele a Roda usa polling)
+- [x] Produção em teiadepalavras.com.br, com Reverb (a Roda ao vivo), deploy automático e backup diário
 - [ ] Mais missões por planeta e imagens próprias nas atividades
 
 ## Quer ajudar?
