@@ -18,7 +18,7 @@ it('mostra os quatro planetas na ordem, com progresso e a próxima missão de ca
         ->and($json['planetas'][0]['proxima']['rotulo'])->toBe('TEIA')
         ->and($json['planetas'][0]['proxima']['status'])->toBe('disponivel')
         ->and($json['planetas'][1]['proxima']['rotulo'])->toBe('4 + 3')
-        ->and($json['planetas'][2])->toMatchArray(['nome' => 'Geografia', 'publicadas' => 4, 'concluidas' => 0])
+        ->and($json['planetas'][2])->toMatchArray(['nome' => 'Geografia', 'publicadas' => 8, 'concluidas' => 0])
         ->and($json['planetas'][2]['proxima']['rotulo'])->toBe('casa')
         ->and($json['planetas'][3]['proxima']['rotulo'])->toBe('ontem')
         ->and($json['planetas'][0])->not->toHaveKey('jogado_em')

@@ -246,6 +246,255 @@ class ConteudoGeografiaSeeder extends Seeder
                     ],
                 ],
             ],
+
+            // Fase 2: a Gosma passeia pela Terra com a tripulação e descobre que
+            // não precisa ficar sozinha. Cada missão faz sentido sozinha.
+            [
+                'slug' => 'geografia-5-dia-e-noite',
+                'disciplina' => 'geografia',
+                'titulo' => 'Dia e noite',
+                'rotulo' => 'dia',
+                'descricao' => 'O sol e a lua, o dia e a noite, e o que a gente faz em cada parte do dia.',
+                'habilidade_bncc' => 'EF01GE05',
+                'fase' => 2,
+                'ordem' => 1,
+                'publicar' => true,
+                'desfecho' => 'A Gosma entendeu: de dia todo mundo está acordado para brincar. Agora ela acorda de manhã, junto com a tripulação!',
+                'gancho' => 'Amanhã a tripulação vai passear com a Gosma. Mas como estará o tempo: sol ou chuva?',
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'A Gosma acordada',
+                        'config' => ['paginas' => [
+                            ['texto' => 'A Gosma dormia o dia inteiro e acordava de noite. Quando ela queria brincar, todo mundo estava dormindo. Por isso ela se sentia sozinha.', 'icone' => 'moon'],
+                            ['texto' => 'De dia, o sol ilumina tudo e o céu fica claro: é hora de ir à escola, brincar e trabalhar. À noite, o céu fica escuro, a lua e as estrelas aparecem, e a maioria das pessoas dorme.', 'icone' => 'sun'],
+                            ['texto' => 'A Terra é redonda e gira. Quando aqui é dia, do outro lado da Terra é noite!', 'icone' => 'earth'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'ordenar',
+                        'titulo' => 'Do nascer ao anoitecer',
+                        'instrucao' => 'Coloque o caminho do sol em ordem, do começo do dia até a noite.',
+                        'config' => [
+                            'instrucao' => 'do começo do dia até a noite',
+                            'modo' => 'tempo',
+                            'itens' => [['texto' => 'o sol nasce', 'icone' => 'sunrise'], ['texto' => 'o sol fica alto no céu', 'icone' => 'sun'], ['texto' => 'o sol se põe', 'icone' => 'sunset'], ['texto' => 'a lua e as estrelas aparecem', 'icone' => 'moon']],
+                            'dica' => 'O dia começa quando o sol nasce. A lua aparece por último.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'Você entendeu?',
+                        'instrucao' => 'Ouça e toque na resposta.',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'O que ilumina o dia?', 'opcoes' => ['O sol', 'A lua', 'As estrelas'], 'correta' => 0, 'dica' => 'Ele é grande, quente e amarelo.', 'explicacao' => 'O sol ilumina o dia.', 'icone' => 'sun'],
+                            ['pergunta' => 'Quando a maioria das pessoas dorme?', 'opcoes' => ['À noite', 'De manhã', 'À tarde'], 'correta' => 0, 'dica' => 'É quando o céu fica escuro.', 'explicacao' => 'A maioria das pessoas dorme à noite.', 'icone' => 'bed'],
+                            ['pergunta' => 'Por que a Gosma se sentia sozinha?', 'opcoes' => ['Ela acordava quando todos dormiam', 'Ela tinha amigos demais', 'Ela não gostava de brincar'], 'correta' => 0, 'dica' => 'Ouça de novo a primeira página.', 'explicacao' => 'Ela acordava de noite, quando todo mundo dormia.', 'icone' => 'moon'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'verdadeiro_falso',
+                        'titulo' => 'Verdadeiro ou falso?',
+                        'instrucao' => 'Toque em verdadeiro ou falso.',
+                        'config' => ['itens' => [
+                            ['frase' => 'De dia, o céu fica claro.', 'correta' => true, 'dica' => 'O sol ilumina tudo.', 'explicacao' => 'De dia o sol deixa o céu claro.'],
+                            ['frase' => 'À noite a gente pode ver a lua e as estrelas.', 'correta' => true, 'dica' => 'Olhe o céu escuro.', 'explicacao' => 'À noite aparecem a lua e as estrelas.'],
+                            ['frase' => 'Quando aqui é dia, é dia na Terra inteira.', 'correta' => false, 'dica' => 'Ouça de novo a última página.', 'explicacao' => 'Quando aqui é dia, do outro lado da Terra é noite.'],
+                        ]],
+                    ],
+                ],
+            ],
+            [
+                // EF01GE10 (ritmos da natureza no lugar de vivência); a roupa certa para
+                // cada tempo também toca o EF01GE11.
+                'slug' => 'geografia-6-chuva-sol-e-vento',
+                'disciplina' => 'geografia',
+                'titulo' => 'Chuva, sol e vento',
+                'rotulo' => 'tempo',
+                'descricao' => 'Sol, chuva, vento e frio: como fica o lugar onde a gente vive e a roupa certa para cada tempo.',
+                'habilidade_bncc' => 'EF01GE10',
+                'fase' => 2,
+                'ordem' => 2,
+                'publicar' => true,
+                'desfecho' => 'Com capa e guarda-chuva, ninguém ficou encharcado. E a Gosma? Adorou pular nas poças!',
+                'gancho' => 'Amanhã a tripulação vai conhecer a escola de {{heroi}}. A Gosma quer ir junto!',
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'O passeio',
+                        'config' => ['paginas' => [
+                            ['texto' => 'A tripulação saiu para passear com a Gosma. Primeiro fez sol forte: todo mundo passou protetor e pôs boné.', 'icone' => 'sun'],
+                            ['texto' => 'Depois veio um vento que balançou as árvores e levou a pipa lá para o alto.', 'icone' => 'wind'],
+                            ['texto' => 'No fim da tarde, nuvens escuras e... chuva! O chão ficou molhado. Ainda bem que tinha capa e guarda-chuva na mochila.', 'icone' => 'cloud-rain'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'parear',
+                        'titulo' => 'Tempo e roupa',
+                        'instrucao' => 'Ligue cada tempo ao que combina com ele. Toque para ouvir o nome.',
+                        'config' => [
+                            'instrucao' => 'ligue cada tempo ao que combina com ele',
+                            'pares' => [
+                                ['a' => 'sol forte', 'b' => 'boné e protetor solar', 'icone_a' => 'sun', 'icone_b' => 'shirt'],
+                                ['a' => 'chuva', 'b' => 'capa e guarda-chuva', 'icone_a' => 'cloud-rain', 'icone_b' => 'umbrella'],
+                                ['a' => 'frio', 'b' => 'casaco e meia', 'icone_a' => 'snowflake', 'icone_b' => 'shirt'],
+                                ['a' => 'vento', 'b' => 'soltar pipa', 'icone_a' => 'wind'],
+                            ],
+                            'dica' => 'Pense no que você usa quando sai de casa em cada tempo.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'O que levar?',
+                        'instrucao' => 'Ouça e toque na resposta.',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'Está chovendo. O que levar para não se molhar?', 'opcoes' => ['O guarda-chuva', 'A pipa', 'O boné'], 'correta' => 0, 'dica' => 'Ele abre em cima da cabeça.', 'explicacao' => 'O guarda-chuva protege da chuva.', 'icone' => 'umbrella'],
+                            ['pergunta' => 'Está muito calor. Qual roupa é melhor?', 'opcoes' => ['Camiseta leve', 'Casaco grosso', 'Gorro de lã'], 'correta' => 0, 'dica' => 'No calor, roupa fresquinha.', 'explicacao' => 'No calor, a roupa leve é melhor.', 'icone' => 'sun'],
+                            ['pergunta' => 'Que tempo é bom para soltar pipa?', 'opcoes' => ['Com vento', 'Sem vento nenhum', 'Com chuva forte'], 'correta' => 0, 'dica' => 'Quem leva a pipa lá para o alto?', 'explicacao' => 'O vento faz a pipa subir.', 'icone' => 'wind'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'verdadeiro_falso',
+                        'titulo' => 'Verdadeiro ou falso?',
+                        'instrucao' => 'Toque em verdadeiro ou falso.',
+                        'config' => ['itens' => [
+                            ['frase' => 'Quando chove, o chão fica molhado.', 'correta' => true, 'dica' => 'Lembre das poças da Gosma.', 'explicacao' => 'A chuva molha o chão.'],
+                            ['frase' => 'No dia de muito frio, a gente usa casaco.', 'correta' => true, 'dica' => 'O casaco esquenta.', 'explicacao' => 'No frio, o casaco ajuda a esquentar.'],
+                            ['frase' => 'Com sol forte, a capa de chuva é a melhor roupa.', 'correta' => false, 'dica' => 'A capa é para quando chove.', 'explicacao' => 'No sol forte, o melhor é boné e roupa leve.'],
+                        ]],
+                    ],
+                ],
+            ],
+            [
+                // Cenário `escola` (frontend/public/cenarios/escola.svg, 800x600): prédio das
+                // salas no alto à esquerda, quadra à direita, pátio embaixo com bebedouro
+                // (azul) e cantina (amarela), jardim embaixo à direita, portão no muro de baixo.
+                'slug' => 'geografia-7-a-escola-por-dentro',
+                'disciplina' => 'geografia',
+                'titulo' => 'A escola por dentro',
+                'rotulo' => 'escola',
+                'descricao' => 'Os lugares da escola vistos de cima e as regras para todo mundo conviver bem.',
+                'habilidade_bncc' => 'EF01GE04',
+                'fase' => 2,
+                'ordem' => 3,
+                'publicar' => true,
+                'desfecho' => 'A Gosma aprendeu as regras da escola: esperou a vez na fila da cantina e ajudou a regar o jardim!',
+                'gancho' => 'No domingo, a turma vai à praça do bairro. Que regras será que valem por lá?',
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'Visita à escola',
+                        'config' => ['paginas' => [
+                            ['texto' => 'A tripulação e a Gosma foram conhecer a escola de {{heroi}}. Vista de cima, ela tem salas, pátio, quadra, jardim e cantina.', 'icone' => 'school'],
+                            ['texto' => 'Nhac! A Gosma quis comer as flores do jardim. A professora explicou: na escola tem regras para todo mundo conviver bem.', 'icone' => 'flower'],
+                            ['texto' => 'Esperar a vez, guardar os brinquedos, cuidar das plantas e falar um de cada vez. A turma combina as regras junto!', 'icone' => 'users'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'mapa_pontos',
+                        'titulo' => 'Ache na escola',
+                        'instrucao' => 'Toque no lugar que a pergunta pede. Toque nos lugares para ouvir o nome.',
+                        'config' => [
+                            'cenario' => 'escola',
+                            'pontos' => [
+                                ['chave' => 'sala', 'rotulo' => 'as salas de aula', 'icone' => 'book-open', 'x' => 0.35, 'y' => 0.27],
+                                ['chave' => 'quadra', 'rotulo' => 'a quadra', 'icone' => 'volleyball', 'x' => 0.8, 'y' => 0.35],
+                                ['chave' => 'bebedouro', 'rotulo' => 'o bebedouro', 'icone' => 'droplet', 'x' => 0.163, 'y' => 0.6],
+                                ['chave' => 'cantina', 'rotulo' => 'a cantina', 'icone' => 'utensils', 'x' => 0.538, 'y' => 0.6],
+                                ['chave' => 'patio', 'rotulo' => 'o pátio', 'icone' => 'users', 'x' => 0.35, 'y' => 0.8],
+                                ['chave' => 'jardim', 'rotulo' => 'o jardim', 'icone' => 'flower', 'x' => 0.8, 'y' => 0.78],
+                                ['chave' => 'portao', 'rotulo' => 'o portão', 'icone' => 'lock', 'x' => 0.525, 'y' => 0.927],
+                            ],
+                            'perguntas' => [
+                                ['alvo' => 'sala', 'texto' => 'Onde as crianças estudam com a professora?', 'dica' => 'Toque nos lugares para ouvir o nome de cada um.'],
+                                ['alvo' => 'quadra', 'texto' => 'Onde a turma joga bola?', 'dica' => 'É o lugar com as linhas do jogo.'],
+                                ['alvo' => 'jardim', 'texto' => 'Onde ficam as flores que a Gosma quis comer?', 'dica' => 'É o lugar verde, com árvores.'],
+                                ['alvo' => 'cantina', 'texto' => 'Onde a turma pega o lanche?', 'dica' => 'Fica no pátio. Toque para ouvir o nome.'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'As regras da escola',
+                        'instrucao' => 'Ouça e toque na resposta.',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'Na fila da cantina, o que fazer?', 'opcoes' => ['Esperar a vez', 'Passar na frente', 'Empurrar o colega'], 'correta' => 0, 'dica' => 'Na fila, cada um tem a sua vez.', 'explicacao' => 'Na fila, a gente espera a vez.', 'icone' => 'users'],
+                            ['pergunta' => 'A brincadeira acabou. E os brinquedos?', 'opcoes' => ['Guardar no lugar', 'Deixar no chão', 'Esconder do colega'], 'correta' => 0, 'dica' => 'Assim todo mundo acha depois.', 'explicacao' => 'Guardar os brinquedos no lugar ajuda todo mundo.', 'icone' => 'box'],
+                            ['pergunta' => 'A Gosma quer comer as flores do jardim. Qual é a regra?', 'opcoes' => ['Cuidar das plantas', 'Arrancar as flores', 'Pisar no jardim'], 'correta' => 0, 'dica' => 'As plantas são de todos na escola.', 'explicacao' => 'Na escola a gente cuida das plantas.', 'icone' => 'flower'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'verdadeiro_falso',
+                        'titulo' => 'Verdadeiro ou falso?',
+                        'instrucao' => 'Toque em verdadeiro ou falso.',
+                        'config' => ['itens' => [
+                            ['frase' => 'Na sala, a gente fala um de cada vez.', 'correta' => true, 'dica' => 'Se todos falam juntos, ninguém escuta.', 'explicacao' => 'Falar um de cada vez ajuda todos a ouvir.'],
+                            ['frase' => 'Jogar lixo no chão do pátio ajuda a escola.', 'correta' => false, 'dica' => 'Onde vai o lixo?', 'explicacao' => 'O lixo vai no lixo; assim o pátio fica limpo.'],
+                            ['frase' => 'As regras ajudam todo mundo a conviver bem.', 'correta' => true, 'dica' => 'Ouça de novo a última página.', 'explicacao' => 'As regras ajudam todos a conviver bem.'],
+                        ]],
+                    ],
+                ],
+            ],
+            [
+                'slug' => 'geografia-8-pracas-e-parques',
+                'disciplina' => 'geografia',
+                'titulo' => 'Praças e parques',
+                'rotulo' => 'praça',
+                'descricao' => 'Lugares públicos de lazer: como cada um usa a praça e o parque, e como cuidar deles.',
+                'habilidade_bncc' => 'EF01GE03',
+                'fase' => 2,
+                'ordem' => 4,
+                'publicar' => true,
+                'ilustracao' => 'mapa-bairro',
+                'desfecho' => 'A Gosma ajudou a limpar a praça e fez muitos amigos no bairro. Ela não está mais sozinha!',
+                'gancho' => 'Enquanto isso, na nave, a tripulação prepara uma surpresa para a Gosma. Shhh!',
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'Domingo na praça',
+                        'config' => ['paginas' => [
+                            ['texto' => 'Domingo, a turma foi com a Gosma à praça do bairro. A praça é um lugar público: é de todo mundo.', 'icone' => 'tree', 'ilustracao' => 'mapa-bairro'],
+                            ['texto' => 'Cada um usa a praça de um jeito: crianças no balanço, gente caminhando, famílias fazendo piquenique e uma roda de música.', 'icone' => 'users'],
+                            ['texto' => 'Como a praça e o parque são de todos, todos cuidam: lixo no lixo e flores no lugar. A Gosma ajudou a catar os papéis do chão.', 'icone' => 'trash-2'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'parear',
+                        'titulo' => 'Cada um do seu jeito',
+                        'instrucao' => 'Ligue cada lugar da praça ao que as pessoas fazem nele.',
+                        'config' => [
+                            'instrucao' => 'ligue cada lugar ao que se faz nele',
+                            'pares' => [
+                                ['a' => 'balanço', 'b' => 'brincar', 'icone_b' => 'smile'],
+                                ['a' => 'pista', 'b' => 'caminhar e correr', 'icone_b' => 'footprints'],
+                                ['a' => 'banco', 'b' => 'sentar e conversar', 'icone_b' => 'users'],
+                                ['a' => 'gramado', 'b' => 'fazer piquenique', 'icone_b' => 'utensils'],
+                            ],
+                            'dica' => 'Pense no que você gosta de fazer em cada canto da praça.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'Você entendeu?',
+                        'instrucao' => 'Ouça e toque na resposta.',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'De quem é a praça?', 'opcoes' => ['De todas as pessoas', 'Só de quem mora ao lado', 'Só dos adultos'], 'correta' => 0, 'dica' => 'Ela é um lugar público.', 'explicacao' => 'A praça é pública: é de todo mundo.', 'icone' => 'users'],
+                            ['pergunta' => 'O lanche acabou. O que fazer com o papel?', 'opcoes' => ['Jogar no lixo', 'Deixar na grama', 'Esconder embaixo do banco'], 'correta' => 0, 'dica' => 'Quem cuida da praça somos todos nós.', 'explicacao' => 'Papel vai no lixo; assim a praça fica limpa.', 'icone' => 'trash-2'],
+                            ['pergunta' => 'Qual destes lugares é público, para todo mundo usar?', 'opcoes' => ['O parque', 'O quarto da casa', 'A cozinha da casa'], 'correta' => 0, 'dica' => 'Qual deles é de todas as pessoas?', 'explicacao' => 'O parque é público; o quarto e a cozinha são da casa da família.', 'icone' => 'tree'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'verdadeiro_falso',
+                        'titulo' => 'Verdadeiro ou falso?',
+                        'instrucao' => 'Toque em verdadeiro ou falso.',
+                        'config' => ['itens' => [
+                            ['frase' => 'Na praça, cada pessoa pode usar o espaço de um jeito.', 'correta' => true, 'dica' => 'Uns brincam, outros caminham.', 'explicacao' => 'Cada um usa a praça de um jeito.'],
+                            ['frase' => 'Arrancar as flores é cuidar do parque.', 'correta' => false, 'dica' => 'Cuidar é deixar as flores no lugar.', 'explicacao' => 'Cuidar do parque é deixar as flores no lugar.'],
+                            ['frase' => 'No parque dá para brincar, caminhar e fazer piquenique.', 'correta' => true, 'dica' => 'Ouça de novo a segunda página.', 'explicacao' => 'O parque é lugar de lazer para todos.'],
+                        ]],
+                    ],
+                ],
+            ],
         ];
     }
 }

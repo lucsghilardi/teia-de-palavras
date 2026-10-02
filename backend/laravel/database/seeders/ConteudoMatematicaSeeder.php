@@ -263,6 +263,250 @@ class ConteudoMatematicaSeeder extends Seeder
                     ],
                 ],
             ],
+
+            // Fase 2: fecha o arco da Gosma (ela não era vilã: tinha fome e estava
+            // sozinha). Cada missão faz sentido sozinha; o gancho só sugere a próxima.
+            [
+                // Reforço: contar de 20 a 50 e comparar (a criança hesitou em 12, 20 e 27).
+                // As opções trocam dezena e unidade (34 e 43) para treinar o valor de cada algarismo.
+                'slug' => 'matematica-5-a-mina-de-cristais',
+                'disciplina' => 'matematica',
+                'titulo' => 'A mina de cristais',
+                'rotulo' => '20 a 50',
+                'descricao' => 'No fundo do Planeta Cubo: contar cristais de 20 a 50 e descobrir qual monte tem mais.',
+                'habilidade_bncc' => 'EF01MA05',
+                'fase' => 2,
+                'ordem' => 1,
+                'publicar' => true,
+                'desfecho' => 'No fundo da mina, a tripulação viu a Gosma de perto. Ela estava sozinha, mordiscando um cristal. Quando viu a nave, se escondeu.',
+                'gancho' => 'A Gosma estava com fome. E se a tripulação preparasse um lanche para ela?',
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'A mina',
+                        'config' => ['paginas' => [
+                            ['texto' => 'A tripulação desceu até o fundo do Planeta Cubo. Lá tem uma mina cheia de cristais brilhantes!', 'icone' => 'gem'],
+                            ['texto' => 'Os cristais estão em montes. Alguns têm marquinhas de mordida, e no chão tem um rastro de gosma. Quem será que anda comendo cristais?', 'icone' => 'footprints'],
+                            ['texto' => 'Para saber qual monte tem mais, conte de 10 em 10 e depois os soltos. Quem tem mais pilhas de 10 tem mais cristais.', 'icone' => 'gem', 'ilustracao' => 'cubo-pilhas'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'contar',
+                        'titulo' => 'Contar os cristais',
+                        'instrucao' => 'Conte as pilhas de 10 e os cristais soltos. Depois toque no número.',
+                        'config' => ['itens' => [
+                            ['icone' => 'gem', 'quantidade' => 23, 'opcoes' => [23, 32, 22]],
+                            ['icone' => 'gem', 'quantidade' => 27, 'opcoes' => [27, 37, 72]],
+                            ['icone' => 'gem', 'quantidade' => 34, 'opcoes' => [34, 43, 24]],
+                            ['icone' => 'gem', 'quantidade' => 45, 'opcoes' => [45, 54, 35]],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'ordenar',
+                        'titulo' => 'Montes em ordem',
+                        'instrucao' => 'Coloque os montes em ordem, do menor ao maior. Toque num número para ouvir.',
+                        'config' => [
+                            'instrucao' => 'do menor ao maior',
+                            'modo' => 'numeros',
+                            'itens' => [['texto' => '20'], ['texto' => '27'], ['texto' => '34'], ['texto' => '43'], ['texto' => '50']],
+                            'dica' => 'Olhe primeiro as dezenas: quem tem menos pilhas de 10 vem antes.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'Qual tem mais?',
+                        'instrucao' => 'Ouça com calma e toque na resposta.',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'Um monte tem 27 cristais. Outro tem 20. Qual monte tem mais?', 'opcoes' => ['O de 27', 'O de 20', 'Os dois têm igual'], 'correta' => 0, 'dica' => 'Os dois têm 2 pilhas de 10. Quem tem cristais soltos a mais?', 'explicacao' => '27 é maior que 20: são 7 cristais a mais.', 'icone' => 'gem'],
+                            ['pergunta' => 'Qual número é maior: 34 ou 43?', 'opcoes' => ['43', '34', 'São iguais'], 'correta' => 0, 'dica' => 'Olhe o primeiro número: ele conta as pilhas de 10.', 'explicacao' => '43 tem 4 pilhas de 10; 34 tem só 3. Então 43 é maior.', 'icone' => 'gem'],
+                            ['pergunta' => 'Qual número vem logo depois de 39?', 'opcoes' => ['40', '38', '49'], 'correta' => 0, 'dica' => 'Conte a partir de 39: trinta e nove, ...', 'explicacao' => 'Depois de 39 vem 40: fecha mais uma pilha de 10.', 'icone' => 'gem'],
+                        ]],
+                    ],
+                ],
+            ],
+            [
+                // Reforço de dezenas e unidades com apoio concreto (contar agrupando)
+                // antes do símbolo; depois fatos até 20 na reta numérica.
+                'slug' => 'matematica-6-pacotes-de-dez',
+                'disciplina' => 'matematica',
+                'titulo' => 'Pacotes de dez',
+                'rotulo' => '46 = 40 + 6',
+                'descricao' => 'Lanche para a Gosma em pacotes de 10: dezenas, unidades e contas até 20 na reta.',
+                'habilidade_bncc' => 'EF01MA07',
+                'fase' => 2,
+                'ordem' => 2,
+                'publicar' => true,
+                'ilustracao' => 'cubo-pilhas',
+                'desfecho' => 'Os pacotes de lanche ficaram na entrada da mina. De manhã, estavam vazios. E no chão tinha um coração meio torto, desenhado com gosma!',
+                'gancho' => 'A Gosma gostou do lanche. Será que agora ela quer morar perto da tripulação?',
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'Lanche para a Gosma',
+                        'config' => ['paginas' => [
+                            ['texto' => 'A Gosma come pontes e cristais porque está com fome. A tripulação teve uma ideia: fazer biscoitos para ela!', 'icone' => 'cookie'],
+                            ['texto' => 'Os biscoitos vão em pacotes de 10. Um pacote fechado é uma dezena. Os biscoitos soltos são as unidades.', 'icone' => 'package', 'ilustracao' => 'cubo-pilhas'],
+                            ['texto' => '46 biscoitos são 4 pacotes de 10 e mais 6 soltos: 4 dezenas e 6 unidades.', 'icone' => 'package'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'contar',
+                        'titulo' => 'Pacotes e soltos',
+                        'instrucao' => 'Conte os pacotes de 10 e os biscoitos soltos. Depois toque no número.',
+                        'config' => ['itens' => [
+                            ['icone' => 'cookie', 'quantidade' => 16, 'opcoes' => [16, 61, 26]],
+                            ['icone' => 'cookie', 'quantidade' => 23],
+                            ['icone' => 'cookie', 'quantidade' => 30],
+                            ['icone' => 'cookie', 'quantidade' => 46, 'opcoes' => [46, 64, 36]],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'parear',
+                        'titulo' => 'Número e pacotes',
+                        'instrucao' => 'Ligue cada número aos pacotes e biscoitos soltos que ele tem.',
+                        'config' => [
+                            'instrucao' => 'ligue cada número ao que ele tem',
+                            'pares' => [
+                                ['a' => '12', 'b' => '1 dezena e 2 unidades'],
+                                ['a' => '21', 'b' => '2 dezenas e 1 unidade'],
+                                ['a' => '30', 'b' => '3 dezenas'],
+                                ['a' => '46', 'b' => '4 dezenas e 6 unidades'],
+                            ],
+                            'dica' => 'O primeiro número conta os pacotes de 10. O segundo conta os soltos.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'somar_subtrair',
+                        'titulo' => 'Contas na reta',
+                        'instrucao' => 'Use a reta: ande para a frente para juntar e para trás para tirar.',
+                        'config' => ['itens' => [
+                            ['a' => 10, 'b' => 6, 'operacao' => '+'],
+                            ['a' => 13, 'b' => 4, 'operacao' => '+'],
+                            ['a' => 8, 'b' => 7, 'operacao' => '+'],
+                            ['a' => 17, 'b' => 5, 'operacao' => '-'],
+                            ['a' => 20, 'b' => 10, 'operacao' => '-'],
+                        ], 'apoio' => 'reta'],
+                    ],
+                ],
+            ],
+            [
+                'slug' => 'matematica-7-formas-do-planeta-cubo',
+                'disciplina' => 'matematica',
+                'titulo' => 'Formas do Planeta Cubo',
+                'rotulo' => 'formas',
+                'descricao' => 'Cubo, esfera, cilindro e cone: as formas da toca nova da Gosma e das coisas de casa.',
+                'habilidade_bncc' => 'EF01MA13',
+                'fase' => 2,
+                'ordem' => 3,
+                'publicar' => true,
+                'desfecho' => 'A toca nova da Gosma ficou pronta: paredes de cubos, colunas de cilindros, bolas de esfera para brincar e um telhado de cone. A Gosma pulou de alegria!',
+                'gancho' => 'A tripulação quer convidar a Gosma para visitar a nave. Que dia será bom? Vamos olhar o calendário.',
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'A toca da Gosma',
+                        'config' => ['paginas' => [
+                            ['texto' => 'A Gosma mora sozinha num buraco frio da mina. A tripulação resolveu construir uma toca para ela.', 'icone' => 'house'],
+                            ['texto' => 'No Planeta Cubo não tem só cubos! Tem esfera, que rola como bola; cilindro, como uma lata; e cone, como a casquinha de sorvete.', 'icone' => 'cone'],
+                            ['texto' => 'Olhe as coisas da sua casa: o dado parece um cubo, a bola é uma esfera e o copo parece um cilindro.', 'icone' => 'dice-5'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'parear',
+                        'titulo' => 'Forma e objeto',
+                        'instrucao' => 'Ligue cada forma a um objeto que se parece com ela. Toque para ouvir o nome.',
+                        'config' => [
+                            'instrucao' => 'ligue cada forma ao objeto parecido',
+                            'pares' => [
+                                ['a' => 'cubo', 'b' => 'dado', 'icone_a' => 'box', 'icone_b' => 'dice-5'],
+                                ['a' => 'esfera', 'b' => 'bola', 'icone_a' => 'circle', 'icone_b' => 'volleyball'],
+                                ['a' => 'cilindro', 'b' => 'lata', 'icone_a' => 'cylinder'],
+                                ['a' => 'cone', 'b' => 'casquinha de sorvete', 'icone_a' => 'cone', 'icone_b' => 'ice-cream-cone'],
+                            ],
+                            'dica' => 'A esfera rola para todo lado. O cone tem uma ponta.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'Qual é a forma?',
+                        'instrucao' => 'Ouça e toque na resposta.',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'Qual forma rola para todo lado e não tem ponta nenhuma?', 'opcoes' => ['A esfera', 'O cubo', 'O cone'], 'correta' => 0, 'dica' => 'Pense numa bola.', 'explicacao' => 'A esfera é redondinha como a bola: rola para todo lado.', 'icone' => 'circle'],
+                            ['pergunta' => 'Qual objeto parece um cilindro?', 'opcoes' => ['Uma lata', 'Um dado', 'Uma bola'], 'correta' => 0, 'dica' => 'O cilindro é redondo em cima e embaixo, e fica em pé.', 'explicacao' => 'A lata parece um cilindro.', 'icone' => 'cylinder'],
+                            ['pergunta' => 'O chapéu de festa parece qual forma?', 'opcoes' => ['O cone', 'A esfera', 'O cubo'], 'correta' => 0, 'dica' => 'Ele termina numa ponta, como a casquinha de sorvete.', 'explicacao' => 'O chapéu de festa parece um cone.', 'icone' => 'cone'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'verdadeiro_falso',
+                        'titulo' => 'Verdadeiro ou falso?',
+                        'instrucao' => 'Toque em verdadeiro ou falso.',
+                        'config' => ['itens' => [
+                            ['frase' => 'A bola tem forma de esfera.', 'correta' => true, 'dica' => 'A esfera é redondinha.', 'explicacao' => 'A bola é uma esfera.'],
+                            ['frase' => 'O dado tem forma de cone.', 'correta' => false, 'dica' => 'O dado não tem ponta.', 'explicacao' => 'O dado parece um cubo.'],
+                            ['frase' => 'Uma caixa de sapato parece um bloco, como os do Planeta Cubo.', 'correta' => true, 'dica' => 'Ela tem lados retos, como os blocos.', 'explicacao' => 'A caixa parece um bloco retangular.'],
+                        ]],
+                    ],
+                ],
+            ],
+            [
+                'slug' => 'matematica-8-o-calendario-da-nave',
+                'disciplina' => 'matematica',
+                'titulo' => 'O calendário da nave',
+                'rotulo' => 'semana',
+                'descricao' => 'Os dias da semana e as partes do dia para marcar uma festa no calendário.',
+                'habilidade_bncc' => 'EF01MA17',
+                'fase' => 2,
+                'ordem' => 4,
+                'publicar' => true,
+                'desfecho' => 'A festa está marcada no calendário da nave: sábado, à tarde! Só falta entregar o convite para a Gosma.',
+                'gancho' => 'Será que a Gosma vai aceitar o convite para a festa?',
+                'atividades' => [
+                    [
+                        'tipo' => 'historia',
+                        'titulo' => 'O calendário',
+                        'config' => ['paginas' => [
+                            ['texto' => 'A tripulação quer fazer uma festa para a Gosma. Para ninguém esquecer, vai marcar no calendário da nave.', 'icone' => 'calendar'],
+                            ['texto' => 'A semana tem 7 dias: domingo, segunda, terça, quarta, quinta, sexta e sábado. Depois do sábado, começa tudo de novo.', 'icone' => 'calendar'],
+                            ['texto' => 'Cada dia tem partes: a manhã, quando o sol nasce; a tarde, depois do almoço; e a noite, quando a lua aparece. A festa vai ser no sábado, à tarde.', 'icone' => 'sun'],
+                        ]],
+                    ],
+                    [
+                        'tipo' => 'ordenar',
+                        'titulo' => 'Os dias da semana',
+                        'instrucao' => 'Coloque os dias da semana em ordem. Toque num dia para ouvir o nome.',
+                        'config' => [
+                            'instrucao' => 'do domingo ao sábado',
+                            'modo' => 'tempo',
+                            'itens' => [['texto' => 'domingo'], ['texto' => 'segunda-feira'], ['texto' => 'terça-feira'], ['texto' => 'quarta-feira'], ['texto' => 'quinta-feira'], ['texto' => 'sexta-feira'], ['texto' => 'sábado']],
+                            'dica' => 'A semana começa no domingo. Segunda, terça, quarta, quinta e sexta vêm em ordem, e o sábado fecha a semana.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'parear',
+                        'titulo' => 'As partes do dia',
+                        'instrucao' => 'Ligue cada parte do dia ao que acontece nela.',
+                        'config' => [
+                            'instrucao' => 'ligue cada parte do dia ao que acontece',
+                            'pares' => [
+                                ['a' => 'manhã', 'b' => 'o sol nasce', 'icone_b' => 'sunrise'],
+                                ['a' => 'tarde', 'b' => 'vem depois do almoço', 'icone_b' => 'utensils'],
+                                ['a' => 'noite', 'b' => 'a lua aparece no céu', 'icone_b' => 'moon'],
+                            ],
+                            'dica' => 'O dia começa de manhã e termina à noite.',
+                        ],
+                    ],
+                    [
+                        'tipo' => 'escolha',
+                        'titulo' => 'Dias e semanas',
+                        'instrucao' => 'Ouça e toque na resposta.',
+                        'config' => ['itens' => [
+                            ['pergunta' => 'Quantos dias tem uma semana?', 'opcoes' => ['7', '5', '10'], 'correta' => 0, 'dica' => 'Conte de domingo até sábado.', 'explicacao' => 'A semana tem 7 dias.', 'icone' => 'calendar'],
+                            ['pergunta' => 'Qual dia vem logo depois da sexta-feira?', 'opcoes' => ['Sábado', 'Domingo', 'Quinta-feira'], 'correta' => 0, 'dica' => 'É o dia da festa da Gosma.', 'explicacao' => 'Depois da sexta-feira vem o sábado.', 'icone' => 'calendar'],
+                            ['pergunta' => 'A festa vai ser depois do almoço. Em que parte do dia?', 'opcoes' => ['À tarde', 'De manhã', 'À noite'], 'correta' => 0, 'dica' => 'A manhã vem antes do almoço.', 'explicacao' => 'Depois do almoço é a tarde.', 'icone' => 'sun'],
+                        ]],
+                    ],
+                ],
+            ],
         ];
     }
 }

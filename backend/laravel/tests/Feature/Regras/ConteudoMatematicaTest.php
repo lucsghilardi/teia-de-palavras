@@ -40,8 +40,8 @@ it('as missões publicadas aparecem no mapa encadeadas, depois das de Português
     $missoes = $this->comoCrianca($crianca)->getJson('/api/crianca/mapa')->json('missoes');
     $matematica = collect($missoes)->where('disciplina', 'matematica')->values();
 
-    expect($matematica)->toHaveCount(4)
-        ->and($matematica->pluck('rotulo')->all())->toBe(['4 + 3', '10, 20, 30', '10 + 4', 'R$'])
-        ->and($matematica->pluck('status')->all())->toBe(['disponivel', 'bloqueada', 'bloqueada', 'bloqueada'])
+    expect($matematica)->toHaveCount(8)
+        ->and($matematica->pluck('rotulo')->all())->toBe(['4 + 3', '10, 20, 30', '10 + 4', 'R$', '20 a 50', '46 = 40 + 6', 'formas', 'semana'])
+        ->and($matematica->pluck('status')->all())->toBe(['disponivel', 'bloqueada', 'bloqueada', 'bloqueada', 'bloqueada', 'bloqueada', 'bloqueada', 'bloqueada'])
         ->and(collect($missoes)->pluck('disciplina')->unique()->values()->all())->toBe(['portugues', 'matematica', 'geografia', 'historia']);
 });

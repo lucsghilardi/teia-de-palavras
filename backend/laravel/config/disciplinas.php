@@ -19,7 +19,7 @@ return [
         'icone' => 'calculator',
         'ordem' => 2,
         'tem_palavra_geradora' => false,
-        'descricao' => 'Contar, comparar, somar e subtrair até 100, dinheiro, formas e tempo (BNCC 2º ano).',
+        'descricao' => 'Contar, comparar, somar e subtrair até 100, dinheiro, formas e tempo (BNCC 1º ano).',
     ],
     'geografia' => [
         'nome' => 'Geografia',
@@ -27,7 +27,7 @@ return [
         'icone' => 'map',
         'ordem' => 3,
         'tem_palavra_geradora' => false,
-        'descricao' => 'Casa, rua, bairro, mapas simples, campo e cidade, dia e noite (BNCC 2º ano).',
+        'descricao' => 'Casa, rua, bairro, mapas simples, campo e cidade, dia e noite (BNCC 1º ano).',
     ],
     'historia' => [
         'nome' => 'História',
@@ -35,6 +35,6 @@ return [
         'icone' => 'hourglass',
         'ordem' => 4,
         'tem_palavra_geradora' => false,
-        'descricao' => 'Antes e depois, linha do tempo, família, comunidade e trabalhos (BNCC 2º ano).',
+        'descricao' => 'Antes e depois, linha do tempo, família, comunidade e trabalhos (BNCC 1º ano).',
     ],
 ];

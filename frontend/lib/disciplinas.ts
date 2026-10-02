@@ -25,7 +25,7 @@ export const DISCIPLINAS: InfoDisciplina[] = [
     nome: "Matemática",
     cor: "#22d3ee",
     icone: "calculator",
-    descricao: "Contar, comparar, somar e subtrair até 100, dinheiro, formas e tempo (BNCC 2º ano).",
+    descricao: "Contar, comparar, somar e subtrair até 100, dinheiro, formas e tempo (BNCC 1º ano).",
     temPalavraGeradora: false,
   },
   {
@@ -33,7 +33,7 @@ export const DISCIPLINAS: InfoDisciplina[] = [
     nome: "Geografia",
     cor: "#34d399",
     icone: "map",
-    descricao: "Casa, rua, bairro, mapas simples, campo e cidade, dia e noite (BNCC 2º ano).",
+    descricao: "Casa, rua, bairro, mapas simples, campo e cidade, dia e noite (BNCC 1º ano).",
     temPalavraGeradora: false,
   },
   {
@@ -41,7 +41,7 @@ export const DISCIPLINAS: InfoDisciplina[] = [
     nome: "História",
     cor: "#fbbf24",
     icone: "hourglass",
-    descricao: "Antes e depois, linha do tempo, família, comunidade e trabalhos (BNCC 2º ano).",
+    descricao: "Antes e depois, linha do tempo, família, comunidade e trabalhos (BNCC 1º ano).",
     temPalavraGeradora: false,
   },
 ];

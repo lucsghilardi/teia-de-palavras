@@ -3,6 +3,7 @@
 use App\Models\Aula;
 use App\Models\Configuracao;
 use App\Models\Crianca;
+use App\Models\CriancaAula;
 use App\Models\CriancaResposta;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
@@ -43,6 +44,11 @@ it('a criança recebe capa, cenas, desfecho e gancho, com o nome do mascote no l
     Configuracao::definir('mascote_nome', 'Pipoco');
     $crianca = Crianca::factory()->create();
     $aula = Aula::where('slug', 'missao-3-o-pulo-certeiro')->firstOrFail();
+
+    // A missão 3 só abre depois das duas primeiras.
+    foreach (['missao-1-a-teia-do-bairro', 'missao-2-a-boneca-perdida'] as $anterior) {
+        progresso($crianca, Aula::where('slug', $anterior)->firstOrFail(), CriancaAula::CONCLUIDA);
+    }
 
     $json = $this->comoCrianca($crianca)->postJson("/api/crianca/aulas/{$aula->id}/iniciar")->assertOk()->json();
     $porTipo = collect($json['atividades'])->keyBy('tipo');
