@@ -130,6 +130,9 @@ function tocar(url: string, textoReserva: string): Promise<void> {
     encerrarAtual = fim;
     audio.onended = fim;
     audio.onerror = () => {
+      // Já interrompida (parar()/outra fala): o pause() rejeita o play() com
+      // AbortError, e sintetizar aqui falaria o texto antigo por cima do novo.
+      if (terminou) return;
       // Arquivo quebrado ou bloqueado: cai para a voz sintetizada.
       terminou = true;
       clearTimeout(limite);

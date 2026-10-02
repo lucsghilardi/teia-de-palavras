@@ -349,11 +349,13 @@ class AulaEditorService
      */
     private function sincronizarAtividades(Aula $aula, array $itens): void
     {
+        // Libera a unique (aula_id, ordem) antes de reatribuir as posições. Carrega
+        // DEPOIS: com o modelo antigo em memória, quem fica na mesma posição não
+        // parece "sujo" e o update() não grava a ordem de volta (ficaria no +1000).
+        AulaAtividade::query()->where('aula_id', $aula->id)->update(['ordem' => DB::raw('ordem + 1000')]);
+
         $existentes = AulaAtividade::query()->where('aula_id', $aula->id)->get()->keyBy('id');
         $mantidos = [];
-
-        // Libera a unique (aula_id, ordem) antes de reatribuir as posições.
-        AulaAtividade::query()->where('aula_id', $aula->id)->update(['ordem' => DB::raw('ordem + 1000')]);
 
         foreach ($itens as $posicao => $item) {
             $dados = [

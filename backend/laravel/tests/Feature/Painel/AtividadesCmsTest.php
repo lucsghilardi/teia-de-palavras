@@ -83,6 +83,30 @@ it('salva atividades mantendo ids, reordenando, criando e apagando', function ()
         ->and(Aula::find($aula['id'])->atividades()->count())->toBe(3);
 });
 
+it('atividade mantida na mesma posição continua com a ordem certa (não fica no +1000 provisório)', function () {
+    $aula = criarAula(['palavra_geradora' => 'TEIA']);
+    $porTipo = collect($aula['atividades'])->keyBy('tipo');
+
+    $this->comoAdulto($this->educador)->putJson("/api/painel/aulas/{$aula['id']}", [
+        'titulo' => $aula['titulo'],
+        'palavra_geradora' => 'TEIA',
+        'fase' => 1,
+        'pre_requisito_aula_id' => null,
+        'silabas' => [['texto' => 'TEI', 'familia' => ['TA', 'TE']], ['texto' => 'A', 'familia' => ['A']]],
+        'historia_paginas' => [['texto' => 'Era uma vez']],
+        'perguntas' => [],
+        'palavras' => [['palavra' => 'TATU']],
+        'atividades' => [
+            ['id' => $porTipo['historia']['id'], 'tipo' => 'historia'],
+            ['id' => $porTipo['conversa']['id'], 'tipo' => 'conversa', 'titulo' => 'Pense'],
+            ['tipo' => 'frase', 'config' => ['minimo' => 3]],
+        ],
+    ])->assertOk();
+
+    expect(Aula::find($aula['id'])->atividades()->orderBy('ordem')->pluck('ordem', 'tipo')->all())
+        ->toBe(['historia' => 1, 'conversa' => 2, 'frase' => 3]);
+});
+
 it('recusa tipo desconhecido e config inválido', function () {
     $aula = criarAula(['disciplina' => 'historia']);
     $base = ['titulo' => 'História', 'fase' => 1, 'pre_requisito_aula_id' => null];
